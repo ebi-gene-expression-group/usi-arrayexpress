@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArrayExpress Submission Project Schema",
+  "description": "The project for the submission which is roughly equal to the publication",
+  "version": "1.0.0",
+  "author": "arrayexpress",
+  "type": "object",
+  "properties": {
+    "required": [
+      "alias",
+      "releaseDate",
+      "contacts"
+    ],
+    "alias": {
+      "description": "A unique identifier of the project",
+      "type": "string",
+      "minLength": 1
+    },
+    "releaseDate": {
+      "description": "The date at which the project shall be made public",
+      "type":  "string",
+      "pattern": "([12][0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]))"
+    },
+    "publications": {
+      "description": "The journal publication(s) associated to this submission",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "articleTitle": {
+            "description": "The title of the publication",
+            "type": "string"
+          },
+          "status": {
+            "description": "The state in the publication process",
+            "type": "string",
+            "enum": ["published", "submitted", "in preparation"]
+          },
+          "pubmedId": {
+            "description": "The accession number of the publication in the NCBI PubMed database",
+            "type": "integer"
+          },
+          "authors": {
+            "description": "A list of the manuscript authors",
+            "type": "sting"
+          },
+          "doi": {
+            "description": "The digital object identifier of the publication (without 'http://')",
+            "type": "string",
+            "pattern": "^10.[0-9]{4,9}/[-._;()/:A-Z0-9]+$"
+          }
+        }
+      }
+    },
+    "contacts": {
+      "description": "The persons affiliated with the project",
+      "type": "array",
+      "minItems": 1,
+      "required": [
+        "firstName",
+        "lastName"
+      ],
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "affiliation": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "phone": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "array manufacturer",
+              "biomaterial provider",
+              "biosequence provider",
+              "consortium member",
+              "consultant",
+              "curator",
+              "data analyst",
+              "data coder",
+              "experiment performer",
+              "funder",
+              "hardware manufacturer",
+              "institution",
+              "investigator",
+              "material supplier role",
+              "peer review quality control role",
+              "software manufacturer",
+              "submitter"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

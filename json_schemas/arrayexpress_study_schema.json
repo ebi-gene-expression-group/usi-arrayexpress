@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Submissions Study Schema",
+    "title": "ArrayExpress Submissions Study Schema",
     "description": "ArrayExpress study schema",
     "version": "1.0.0",
     "author": "arrayexpress",
