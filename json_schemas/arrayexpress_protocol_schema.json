@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ArrayExpress Protocol Schema",
   "description": "Protocol schema for ArrayExpress submissions. Protocols describe an experimental procedure used to generate data from biological material.",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "arrayexpress",
   "type": "object",
   "additionalProperties": false,
