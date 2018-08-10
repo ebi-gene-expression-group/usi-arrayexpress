@@ -1,18 +1,18 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "ArrayExpress Submissions Study Schema",
-    "description": "ArrayExpress study schema",
+    "title": "ArrayExpress Study Schema",
+    "description": "Study schema for ArrayExpress submissions",
     "version": "1.0.0",
     "author": "arrayexpress",
     "type": "object",
+    "required": [
+      "alias",
+      "studyType",
+      "title",
+      "description",
+      "protocolRefs"
+    ],
     "properties": {
-      "required": [
-        "alias",
-        "studyType",
-        "title",
-        "description",
-        "protocolRefs"
-      ],
         "alias": {
             "description": "A unique identifier of the study",
             "type": "string",

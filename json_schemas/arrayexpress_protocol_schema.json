@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArrayExpress Protocol Schema",
+  "description": "Protocol schema for ArrayExpress submissions. Protocols describe an experimental procedure used to generate data from biological material.",
+  "version": "1.0.0",
+  "author": "arrayexpress",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "alias",
+    "title",
+    "description"
+    ],
+  "properties": {
+    "title": {
+      "description": "The name or accession of the protocol.",
+      "type": "string"
+    },
+    "alias": {
+      "description": "Unique identifier of the protocol.",
+      "type": "string"
+    },
+    "description": {
+      "description": "The protocol text, describing the methods used for the experimental or analysis step.",
+      "type": "string"
+    },
+    "team": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "archive": {
+      "type": "string",
+      "enum": [
+        "ArrayExpress"
+      ]
+    },
+    "attributes": {
+      "description": "ArrayExpress protocol attributes.",
+      "type": "object",
+      "required": [
+        "protocol_type"
+      ],
+      "properties": {
+        "additionalProperties": false,
+        "protocol_type": {
+          "description": "The type of protocol. Must be child of protocol EFO term (http://purl.obolibrary.org/obo/OBI_0000272)."
+        },
+        "software": {
+          "description": "The type of software used for the procedure."
+        },
+        "hardware": {
+          "description": "The type of hardware used for the procedure. Mandatory for type nucleic acid sequencing protocol."
+        },
+        "performer": {
+          "description": "The person, institute or company who performed the procedure. Mandatory for type nucleic acid sequencing protocol."
+        },
+        "parameters": {
+          "description": "The parameters used or tested in the protocol, e.g. temperature, batch, PCR cycles."
+        }
+      },
+      "patternProperties": {
+        "^.*$": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "units": {
+                "type": "string",
+                "minLength": 1
+              },
+              "terms": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "value"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

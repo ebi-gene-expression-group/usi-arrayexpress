@@ -5,12 +5,12 @@
   "version": "1.0.0",
   "author": "arrayexpress",
   "type": "object",
+  "required": [
+    "alias",
+    "releaseDate",
+    "contacts"
+  ],
   "properties": {
-    "required": [
-      "alias",
-      "releaseDate",
-      "contacts"
-    ],
     "alias": {
       "description": "A unique identifier of the project",
       "type": "string",
@@ -42,7 +42,7 @@
           },
           "authors": {
             "description": "A list of the manuscript authors",
-            "type": "sting"
+            "type": "string"
           },
           "doi": {
             "description": "The digital object identifier of the publication (without 'http://')",
