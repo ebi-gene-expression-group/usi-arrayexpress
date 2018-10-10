@@ -1,0 +1,70 @@
+MAGE-TAB Version	1.1
+Investigation Title	Transcriptional profiling of articular cartilage in a porcine model of early post-traumatic osteoarthritis
+
+Experimental Design	time series design	injury design
+Experimental Design Term Source REF	EFO	EFO
+Experimental Design Term Accession Number	EFO_0001779	EFO_0001760
+
+Experimental Factor Name	sex	injury	treatment	time
+Experimental Factor Type	sex	injury	treatment	time
+Experimental Factor Term Source REF	EFO	EFO		EFO
+Experimental Factor Term Accession Number	PATO_0000047	EFO_0000546		EFO_0000721
+
+Person Last Name	Sieker
+Person First Name	Jakob
+Person Mid Initials	T
+Person Email	Jakob.Sieker@childrens.harvard.edu
+Person Phone	
+Person Fax	
+Person Affiliation	'Boston Children''s Hospital, Harvard Medical School'
+Person Address	300 Longwood Ave, Boston, MA 02115
+Person Roles	data analyst;experiment performer;investigator;submitter
+Person Roles Term Source REF	
+Person Roles Term Accession Number	
+
+Quality Control Type
+Quality Control Term Source REF
+Quality Control Term Accession Number
+
+Replicate Type
+Replicate Term Source REF
+Replicate Term Accession Number
+
+Normalization Type
+Normalization Term Source REF
+Normalization Term Accession Number
+
+Date of Experiment	2014-12-31
+Public Release Date	2017-10-22
+
+PubMed ID
+Publication DOI
+Publication Author List
+Publication Title
+Publication Status
+Publication Status Term Source REF
+Publication Status Term Accession Number
+
+Experiment Description	36 Yucatan minipigs underwent anterior cruciate ligament (ACL) transection and were randomly assigned in equal numbers to no further treatment, reconstruction or ligament repair. Cartilage was harvested at 1 and 4 weeks post-operatively and histology and RNA-sequencing performed. The generated data served to identify the molecular pathophysiology present in early post-traumatic osteoarthritis (PTOA), as well as differences between surgical treatments.
+
+Protocol Name	P-MTAB-66849	P-MTAB-66848	P-MTAB-66847	P-MTAB-66846	P-MTAB-66845
+Protocol Type	treatment protocol	sample collection protocol	nucleic acid sequencing protocol	nucleic acid library construction protocol	nucleic acid extraction protocol
+Protocol Term Source REF	EFO	EFO	EFO	EFO	EFO
+Protocol Term Accession Number	EFO_0003969	EFO_0005518	EFO_0004170	EFO_0004184	EFO_0002944
+Protocol Description	Forty-two adolescent Yucatan minipigs (Sinclair BioResources, Columbia MO) were allocated to unilateral ACL transection surgery (n=36) or no surgery (INTACT, n=6). Animals receiving ACL transection surgery were allocated to euthanasia and outcome assessment at 1 week (1W, n=18) or 4 weeks (4W, n=18) after surgery. Within each time-point 6 of 18 animals were allocated to no treatment following transection, 6 of 18 to immediate ligament reconstruction surgery, and 6 of 18 to immediate ligament repair surgery. A computer based random permutation stratified for sex determined each animals group allocation and side of unilateral surgery with an equal number of males and females in each group. While the animals were under anesthesia, a medial arthrotomy was performed and the fat pad partially resected to expose the ACL. The ACL was transected between the proximal and middle thirds of the ligament. A clinical exam was performed to verify complete ACL transection. In the animals assigned to receive ACL reconstruction surgery, a fresh-frozen bone-patellar-tendon-bone allograft, which was harvested from an age-, weight-, and sex-matched donor, was implanted as previously described (Murray and Fleming. AJSM 2013). In the animals assigned to ACL repair surgery, an extracellular matrix scaffold in combination with autologous blood was implanted as previously described (Murray and Fleming. AJSM 2013). Knees were thoroughly irrigated with 500 mL of normal saline following ACL transection in the group that did not receive further surgical treatment or following bone tunnel placement in those that received ACL reconstruction or repair. All incisions were closed in layers. No postoperative immobilization was used.	Prior to euthanasia, anesthesia was induced using Telazol (4 mg/Kg) and Xylazine (2 mg/kg) followed by Propofol (3-7 mg/kg) and then maintained with Isoflurane (1-3 MAC) following intubation. Eyes were protected using an eye lubricant. Both limbs were shaved and scrubbed with Chlorhexidine and 70% alcohol until visibly clean, followed by a ten minute evaporation period. Hoofs were covered with unsterile gloves. Animals were then transferred into the adjacent operating room, placed supine on a heating mat, and secured on the operation table. Animal health and anesthesia depth were maintained by monitoring respiratory rate, oxygen saturation, electrocardiogram, blood pressure, and body temperature. The surgical limb and ipsilateral lower body were then scrubbed three times using Betadine. Hoofs were covered with a sterile glove and secured using a sterile elastic wrap. One layer of sterile towels was placed around the surgical area, followed by a layer of sterile drapes, leaving only the surgical limb exposed during the procedure. Animals were euthanized during deep anesthesia using an intravenous injection of a solution containing pentobarbital sodium and phenytoin sodium (Beuthanasia-D, 0.1ml/kg). Death was confirmed by the absence of blood pressure and heart sounds prior to obtaining the tissue samples. Cartilage samples were harvested from the medial femoral condyle for RNA isolation and histopathological analysis. The cartilage posterior to the frontal plane in the center of the medial femoral condyle was allocated to RNA isolation, while the cartilage immediately anterior of the central plane was allocated to histology. Biopsy punches of 5 mm diameter (Miltex, York, PA) were used to obtain 4-8 osteochondral biopsies from each animal. Osteochondral samples were rinsed in water and the cartilage was separated from the subchondral bone. Cartilage samples were immediately frozen in liquid nitrogen and stored at -80C until RNA isolation.	Samples were pooled and sequenced with 10 or 11 libraries per lane on an Illumina HiSeq 2500 machine with 50 basepair paired-end reads (Biopolymers Facility, Harvard Medical School, Boston MA).	The samples were then enriched for polyA+ messenger RNA, reverse transcribed with random hexamers, ligated with indexed adapters and amplified with 17 cycles of PCR using the TruSeq RNA Sample Preparation Kit v2 (Illumina, San Diego, CA).	Total RNA was extracted from the synovial membranes through homogenization, phenol-chloroform separation and on-column purification using the PureLink RNA Mini Kit (Life technologies, Carlsbad, CA). RNA samples were treated with DNAse I (PureLink DNase Set, Life technologies, Carlsbad, CA) and assessed with the 2100 Bioanalyzer (Agilent Technologies, Santa Clara, CA).
+Protocol Parameters					
+Protocol Hardware			Illumina HiSeq 2500		
+Protocol Software					
+Protocol Contact					
+
+Term Source Name	EFO	ArrayExpress
+Term Source File	http://www.ebi.ac.uk/efo/	http://www.ebi.ac.uk/arrayexpress/
+Term Source Version	2.38
+
+SDRF File	E-MTAB-5879.sdrf.txt
+Comment [Submitted Name]	Transcriptional profiling of articular cartilage in a porcine model of early post-traumatic osteoarthritis
+Comment [SecondaryAccession]	ERP024317
+Comment [SequenceDataURI]	http://www.ebi.ac.uk/ena/data/view/ERR2059850-ERR2059891
+Comment [AEExperimentType]	RNA-seq of coding RNA
+Comment[ArrayExpressAccession]	E-MTAB-5879
+Comment [AEMINSEQEScore]	3

@@ -1,0 +1,67 @@
+MAGE-TAB Version	1.1
+Investigation Title	Gene expression analysis in KG1a cells overexpressing GFP-NO66
+
+Experimental Design	case control design
+Experimental Design Term Source REF	EFO
+Experimental Design Term Accession Number	EFO_0001427
+
+Experimental Factor Name	genotype
+Experimental Factor Type	genotype
+Experimental Factor Term Source REF	EFO
+Experimental Factor Term Accession Number
+
+Person Last Name	Schmidt-Zachmann
+Person First Name	Marion
+Person Mid Initials
+Person Email	m.schmidt-zachmann@dkfz.de
+Person Phone
+Person Fax
+Person Affiliation	German Cancer Research Center Clinical Cooperation Unit for Molecular Hematology/Oncology
+Person Address	Im Neuenheimer Feld 280 69120 Heidelberg Germany
+Person Roles	submitter
+Person Roles Term Source REF
+Person Roles Term Accession Number
+
+Quality Control Type
+Quality Control Term Source REF
+Quality Control Term Accession Number
+
+Replicate Type
+Replicate Term Source REF
+Replicate Term Accession Number
+
+Normalization Type
+Normalization Term Source REF
+Normalization Term Accession Number
+
+Date of Experiment	2017-03-23
+Public Release Date	2019-03-22
+
+PubMed ID
+Publication DOI
+Publication Author List
+Publication Title
+Publication Status
+Publication Status Term Source REF
+Publication Status Term Accession Number
+
+Experiment Description	The AML cell line KG1a does not express the nucleolar protein NO66. We generated a stable cell line overexpressing NO66 and want to look for differential expression of genes.
+
+Protocol Name	P-MTAB-54978	P-MTAB-54979	P-MTAB-54980	P-MTAB-54976	P-MTAB-54977
+Protocol Type	nucleic acid labeling protocol	sample collection protocol	nucleic acid hybridization to array protocol	nucleic acid extraction protocol	normalization data transformation protocol
+Protocol Term Source REF	EFO	EFO	EFO	EFO	EFO
+Protocol Term Accession Number	EFO_0003813	EFO_0005518	EFO_0003815	EFO_0002944	EFO_0003816
+Protocol Description	Samples were Cy3 labelled according to Illumina protocol	Control cells (KG1a)  were cultured In DMEM with 10% FKS and transfected with a plasmid encoding GFP-NO66. After selection with 100 micro-g/ml G418 the stable sample cell line was generated (KG1a66).	Hybridized to human HT12-v4 beadchip according to manufacturers protocol	TriZol extraction according to the manufactors protocol Thermo Fisher Scientific	quantile normalized (enforces the individual hybridizations to have equal intensity distributions) across all hybridizations
+Protocol Parameters
+Protocol Hardware
+Protocol Software
+Protocol Contact
+
+Term Source Name	EFO	ArrayExpress
+Term Source File	http://www.ebi.ac.uk/efo/	http://www.ebi.ac.uk/arrayexpress/
+Term Source Version	2.38
+
+SDRF File	E-MTAB-5626.sdrf.txt
+Comment [Submitted Name]	Gene expression analysis in KG1a cells overexpressing GFP-NO66
+Comment [AEExperimentType]	transcription profiling by array
+Comment[ArrayExpressAccession]	E-MTAB-5626

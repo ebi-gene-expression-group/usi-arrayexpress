@@ -1,0 +1,68 @@
+MAGE-TAB Version	1.1
+Investigation Title	Transcriptome analysis of myeloid cells (neutrophils, macrophages and dendritic cells) isolated from the spinal cord of mice with experimental autoimmune encephalomyelitis (EAE)
+
+Experimental Design	cell type comparison design
+Experimental Design Term Source REF	EFO
+Experimental Design Term Accession Number	EFO_0001745
+
+Experimental Factor Name	cell type
+Experimental Factor Type	cell type
+Experimental Factor Term Source REF	EFO
+Experimental Factor Term Accession Number	EFO_0000324
+
+Person Last Name	Vallières
+Person First Name	Luc
+Person Mid Initials	
+Person Email	Luc.Vallieres@crchul.ulaval.ca
+Person Phone	418-654-2296
+Person Fax	418-654-2761
+Person Affiliation	University Hospital Center of Quebec – Laval University
+Person Address	Neuroscience Unit CHU de Québec 2705 Laurier boulevard, room T2-50 Quebec City (Quebec) G1V 4G2 Canada
+Person Roles	investigator;submitter
+Person Roles Term Source REF	
+Person Roles Term Accession Number	
+
+Quality Control Type
+Quality Control Term Source REF
+Quality Control Term Accession Number
+
+Replicate Type
+Replicate Term Source REF
+Replicate Term Accession Number
+
+Normalization Type
+Normalization Term Source REF
+Normalization Term Accession Number
+
+Date of Experiment	2015-04-08
+Public Release Date	2017-11-10
+
+PubMed ID
+Publication DOI	
+Publication Author List	Ryder F. Whittaker Hawkins, Alexandre Patenaude, Aline Dumas, Rajiv Jain, Yodit Tesfagiorgis, Steven Kerfoot, Takeshi Matsui, Matthias Gunzer, Patrice E. Poubelle, Catherine Larochelle, Martin Pelletier, Luc Vallières
+Publication Title	Icam1+ macrophage-like neutrophils promote chronic inflammation via Asprv1 in B cell-dependent EAE
+Publication Status	submitted
+Publication Status Term Source REF	
+Publication Status Term Accession Number	
+
+Experiment Description	We have discovered that neutrophils that infiltrate the spinal cord of mice with EAE, a model of multiple sclerosis, but not intravascular neutrophils that crawl on the luminal endothelial surface, bear on their surface the adhesion molecule Icam1. The goal of this experiment was to use Icam1 to isolate these two neutrophil subpopulations in order to compare their transcriptomes and gain insights into their properties. To this end, EAE was induced in C57BL/6J mice by immunization with myelin oligodendrocyte glycoprotein (MOG) peptide (a.a. 35-55) and adjuvants (i.e. complete Freund’s adjuvant and pertussis toxin). On day 15 post-immunization, intravascular neutrophils (CD45hiCD11b+CD11c−Ly6g+Icam1−) and extravasated neutrophils (CD45hiCD11b+CD11c−Ly6g+Icam1+) were isolated from spinal cords by FACS. For comparison, we simultaneously isolated two other populations of myeloid cells: macrophages (CD45hiCD11b+CD11c−Ly6g−) and dendritic cells (CD45hiCD11b+CD11c+Ly6g−). RNA was analyzed in biological duplicate using Affymetrix GeneChip Mouse Gene 2.0 ST arrays.
+
+Protocol Name	P-MTAB-68598	P-MTAB-68601	P-MTAB-68597	P-MTAB-68596	P-MTAB-68600	P-MTAB-68599
+Protocol Type	nucleic acid labeling protocol	normalization data transformation protocol	nucleic acid extraction protocol	sample collection protocol	array scanning and feature extraction protocol	nucleic acid hybridization to array protocol
+Protocol Term Source REF	EFO	EFO	EFO	EFO	EFO	EFO
+Protocol Term Accession Number	EFO_0003813	EFO_0003816	EFO_0002944	EFO_0005518	EFO_0003814	EFO_0003815
+Protocol Description	RNA (75 ng) was used to produce biotinylated single-strand cDNAs using the Affymetrix GeneChip WT Plus Reagent Kit.	Data were processed using the RMA algorithm in Affymetrix Expression Console.	Total RNA was extracted using the miRNeasy Micro Kit (Qiagen).	Cells were isolated by FACS from the spinal cord of mice at day 15 post-EAE induction. EAE was induced by injecting mice subcutaneously into both flanks with a total of 200 µl of emulsion containing 300 µg of myelin oligodendrocyte glycoprotein peptide 35-55 (Synpeptide) dissolved in saline and mixed with an equal volume of complete Freund's adjuvant containing 500 µg of killed Mycobacterium tuberculosis H37 RA (Difco Laboratories). Mice were also intraperitoneally injected with 20 µg/kg of pertussis toxin (List Biological Laboratories) immediately and 2 days after immunization.	Arrays were washed and stained using the Affymetrix GeneChip Fluidics Station 450, then read using the Affymetrix GeneChip Scanner 3000 7G.	cDNAs were hybridized to Affymetrix Mouse Gene 2.0 ST arrays for 16 h at 45°C with constant rotation at 60 rpm.
+Protocol Parameters						
+Protocol Hardware						
+Protocol Software						
+Protocol Contact						
+
+Term Source Name	EFO	ArrayExpress
+Term Source File	http://www.ebi.ac.uk/efo/	http://www.ebi.ac.uk/arrayexpress/
+Term Source Version	2.38
+
+SDRF File	E-MTAB-6160.sdrf.txt
+Comment [Submitted Name]	Transcriptome analysis of myeloid cells (neutrophils, macrophages and dendritic cells) isolated from the spinal cord of mice with experimental autoimmune encephalomyelitis (EAE)
+Comment [AEMIAMEScore]	4
+Comment [AEExperimentType]	transcription profiling by array
+Comment[ArrayExpressAccession]	E-MTAB-6160

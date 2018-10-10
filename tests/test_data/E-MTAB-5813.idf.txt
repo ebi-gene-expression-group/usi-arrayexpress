@@ -1,0 +1,68 @@
+MAGE-TAB Version	1.1							
+Investigation Title	EARLY NUTRIONAL PROGRAMMING AFFECTS LIVER TRANSCRIPTOME IN DIPLOID AND TRIPLOID ATLANTIC SALMON, Salmo salar							
+								
+Experimental Design								
+Experimental Design Term Source REF								
+Experimental Design Term Accession Number								
+								
+Experimental Factor Name	diet	karyotype						
+Experimental Factor Type	diet	karyotype						
+Experimental Factor Term Source REF	EFO							
+Experimental Factor Term Accession Number	EFO_0002755							
+								
+Person Last Name	Vera							
+Person First Name	Luisa							
+Person Mid Initials	M							
+Person Email	luisa.veraandujar@stir.ac.uk							
+Person Phone								
+Person Fax								
+Person Affiliation	Institute of Aquaculture, University of Stirling, FK9 4LA, Stirling, UK							
+Person Address	Institute of Aquaculture, Pathfoot Building, University of Stirling, FK9 4LA, Stirling, UK							
+Person Roles	submitter							
+Person Roles Term Source REF								
+Person Roles Term Accession Number								
+								
+Quality Control Type								
+Quality Control Term Source REF								
+Quality Control Term Accession Number								
+								
+Replicate Type								
+Replicate Term Source REF								
+Replicate Term Accession Number								
+								
+Normalization Type								
+Normalization Term Source REF								
+Normalization Term Accession Number								
+								
+Date of Experiment								
+Public Release Date	2018-06-02							
+								
+PubMed ID								
+Publication DOI								
+Publication Author List								
+Publication Title								
+Publication Status								
+Publication Status Term Source REF								
+Publication Status Term Accession Number								
+								
+Experiment Description	To ensure sustainability of aquaculture, plant-based ingredients are being used in feeds to replace marine-derived products. However, plants contain secondary metabolites which can affect food intake and nutrient utilisation of fish. The application of nutritional stimuli during early development can induce long-term changes in animal physiology. Recently, we successfully used this approach to improve the utilisation of plant-based diets in diploid and triploid Atlantic salmon. In the present study we explored the molecular mechanisms occurring in the liver of salmon when challenged with a plant-based diet in order to determine the metabolic processes affected, and the effect of ploidy. Microarray analysis revealed that nutritional history had a major impact on the expression of genes. Key pathways of intermediary metabolism were up-regulated, including oxidative phosphorylation, pyruvate metabolism, TCA cycle, glycolysis and fatty acid metabolism. Other differentially expressed pathways affected by diet included protein processing in endoplasmic reticulum, RNA transport, endocytosis and purine metabolism. The interaction between diet and ploidy also had an effect on the hepatic transcriptome of salmon. The biological pathways with the highest number of genes affected by this interaction were related to gene transcription and translation, and cell processes such as proliferation, differentiation, communication and membrane trafficking. The present study revealed that nutritional programming induced changes in a large number of metabolic processes in Atlantic salmon, which may be associated with the improved fish performance and nutrient utilisation demonstrated previously. In addition, differences between diploid and triploid salmon were found, supporting recent data that indicate nutritional requirements of triploid salmon may differ from those of their diploid counterparts.							
+								
+Protocol Name	P-MTAB-65519	P-MTAB-65518	P-MTAB-65517	P-MTAB-65516	P-MTAB-65515	P-MTAB-65514	P-MTAB-65513	P-MTAB-65512
+Protocol Type	normalization data transformation protocol	treatment protocol	sample collection protocol	array scanning and feature extraction protocol	nucleic acid hybridization to array protocol	nucleic acid labeling protocol	nucleic acid extraction protocol	growth protocol
+Protocol Term Source REF	EFO	EFO	EFO	EFO	EFO	EFO	EFO	EFO
+Protocol Term Accession Number	EFO_0003816	EFO_0003969	EFO_0005518	EFO_0003814	EFO_0003815	EFO_0003813	EFO_0002944	EFO_0003789
+Protocol Description	Agilent Feature Extraction Software (v 9.5) was used to identify features and extract background subtracted raw intensity values that were then transferred to GeneSpring GX (v.12) software where the quality filtering and normalisation steps took place. Intensity values < 1 were adjusted to 1 and a Lowess normalisation undertaken. Stringent quality filtering ensured that features that represented technical controls, saturated probes, probe population outliers or probes which were not significantly different from the background were removed.	Two diets formulated and manufactured by BioMar Ltd (TechCentre, Brande, Denmark) were used in the present study. The marine diet (Diet M) was a commercial-like formulation containing fishmeal (80 %) as protein source and fish oil (4 %) as the added lipid. The vegetable-based diet (Diet V) used during the nutritional stimulus and subsequent challenge phases contained only a low proportion of FM (10 %) and a mixture of plant proteins (SPC, PPC and wheat gluten) as the protein sources, whilst rapeseed oil (RO) was the sole added lipid source (0% FO). During the first 3-weeks of exogenous feeding, termed the “stimulus” phase, diploid (2n) and triploid (3n) salmon were divided into triplicate groups (260 fish/tank, n = 3) and either fed Diet M or Diet V to produce four treatment groups (2nM, 3nM, 2nV, 3nV). All fish were then fed Diet M for 15-weeks (marine phase) before all groups were then fed Diet V for 6-weeks (challenge phase).	At the end of the challenge phase, fish were randomly selected and killed with an overdose of MS-222 followed by a blow to the head. Dissected livers samples were collected in RNALater® (Sigma-Aldrich, Poole, UK) for transcriptome analysis (n = 6 / treatment group) and stored according to manufacturer’s instructions until further processing.	Scanning was carried out at 5um resolution on an Axon GenePix Pro scanner at 40% laser power. The “auto PMT” function was enabled to adjust PMT for each channel such that less than 0.1% of features were saturated and so that the mean intensity ratio of Cy3:Cy5 signal was close to one.	Hybridisation was performed over two consecutive days using the Agilent Gene Expression Hybridisation Kit (Agilent Technologies) as per manufacturer’s instructions. For each reaction, 825ng Cy5 labelled reference pool and 825 ng Cy3 labelled individual samples were combined in 35 uL nuclease free water and then 20 uL fragmentation master mix added (consisting of 11 uL of 10X blocking agent, 2uL 25x fragmentation buffer and 7uL nuclease free water). The reactions were then incubated at 60oC in the dark for 30 mins, chilled on ice, and mixed with 57 uL 2x GEx Hybridisation buffer (pre heated to 37oC), Following centrifugation (18000 x g for 1 min) the samples were kept on ice until loaded (103 uL) in a semi randomised order onto the microarray slides. Samples from the six biological replicates were spread across different slides, Cy3 fluorescence content (dye incorporation rate x volume) was also taken into consideration. To aid scanning, samples with the most similar amounts of Cy3 were grouped on the same slide. Hybridisation was carried out in a rotating rack oven (Agilent Technologies) at 65oC, 10 rpm over 17 hours. Following hybridisation, slides were subject to a number of washing steps performed in Easy-DipTM slide staining containers (Canemco Inc., Quebec, Canada). First, each microarray and backing gasket was disassembled in Agilent Wash Buffer 1 and microarray slides were transferred to an Easy Dip Rack submersed in Wash Buffer 1. Following 1 min incubation at room temperature (c. 20°C) and 150 rpm (Stuart Orbital Incubator), slides were briefly dipped into Wash Buffer 1 pre-heated to 31oC, then placed into Wash Buffer 2 (31oC) for 1 min at 150rpm. Finally, the slides were transferred to acetonitrile for 10 s and then Agilent Stabilization and Drying Solution for 30 s. The slides were then air dried in the dark and scanned within two hours.	A dual-label experimental design was used for the microarray hybridisations with Cy3-labelled test samples competitively hybridised to a common Cy5-labelled pooled-reference per array. A total of 24 arrays were employed, one array per individual fish (n = 6 / treatment group). The common reference was a pool of equal amounts of amplified RNA from all test samples. Indirect labelling was employed in preparing the microarray targets. Amplified antisense RNA (aRNA) was produced from each RNA sample using TargetAmpTM 1-Round Aminoallyl-aRNA Amplification Kit 101 (Epicentre, Madison, Wisconsin, USA), as per manufacturer’s methodology, followed by Cy3 or Cy5 fluor (PA23001 or PA25001, GE HealthCare) incorporation through a dye-coupling reaction. Briefly, Cy dye suspensions (Cy3 and Cy5) in sufficient quantity for all labelling reactions were prepared by adding 40 uL high purity dimethyl sulphoxide per tube of Cy dye (PA23001 or PA25001; GE HealthCare). Each sample (2.5 ug aRNA) was denatured at 75°C for 5 min and then 3 uL 0.5 M NaHCO3 pH8.5 and 1.5 uL Cy3 or 1.0 uL Cy5 dye was added achieving a total volume of 15 uL per reaction. Samples were incubated for an hour at 25oC in the dark, purified using Illustra AutoSeq G-50 Dye Terminator Removal Kit and concentration, dye incorporation and purity were assessed via spectrophotometer (NanoDrop) with products also visualised on a fluorescent scanner (Typhoon Trio, GE Healthcare).	Liver samples were homogenised in 1 mL of TRIzol® (Invitrogen, UK) and total RNA extracted in accordance with the manufacturer’s instructions. RNA pellets were rehydrated in MilliQ water and total RNA concentration determined using an ND-1000 Nanodrop spectrophotometer (Labtech Int., East Sussex, UK). RNA integrity was assessed by agarose gel electrophoresis.	Eggs and milt from unrelated Atlantic salmon two sea-winter broodstock (Landcatch Natural Selection Ltd., Ormsary, Scotland) were collected and transferred to the Institute of Aquaculture (University of Stirling, Scotland) where the feeding trial took place in the temperate freshwater recirculation facility. Eggs were divided into two groups (~1680 eggs each) and triploidy induced in one subgroup. Towards the end of the alevin stage (~ 950 degree days, dd), fish were transferred to 0.3 m² tanks under 24 h light and water temperature was increased over 11 days prior to first feeding and maintained at 12.7 ± 0.5 °C for the duration of the feeding trial.
+Protocol Parameters								
+Protocol Hardware								
+Protocol Software								
+Protocol Contact								
+								
+Term Source Name	EFO	ArrayExpress						
+Term Source File	http://www.ebi.ac.uk/efo/	http://www.ebi.ac.uk/arrayexpress/						
+Term Source Version	2.38							
+								
+SDRF File	E-MTAB-5813.sdrf.txt							
+Comment [Submitted Name]	EARLY NUTRIONAL PROGRAMMING AFFECTS LIVER TRANSCRIPTOME IN DIPLOID AND TRIPLOID ATLANTIC SALMON, Salmo salar							
+Comment [AEExperimentType]	transcription profiling by array							
+Comment[ArrayExpressAccession]	E-MTAB-5813							
+Comment [AEExperimentDisplayName]	Transcription profiling by array of liver from diploid and triploid Atlantic salmon fed with marine or vegetable-based diet during early development							
