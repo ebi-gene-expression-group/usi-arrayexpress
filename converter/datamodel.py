@@ -42,4 +42,9 @@ class SeqAssay(Assay):
 
     @classmethod
     def from_sdrf(cls, extract_attributes, assay_attributes):
-        """Intialise assay attributes from sdrf data dicts"""
+        """Intialise assay attributes from sdrf data dicts,
+        Translating parsed SDRF attributes into USI format"""
+
+        comments = extract_attributes.get("comments", None)
+        protocolUses = extract_attributes.get("protocol refs", None)
+        sampleUses = extract_attributes.get("sample refs", None)
