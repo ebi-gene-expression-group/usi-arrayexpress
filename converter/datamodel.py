@@ -19,6 +19,21 @@ class Assay:
             return None
 
 
+    def generate_assay_json(self, study_info):
+
+        assay_json = {
+            "alias": self.alias,
+            "attributes": {
+                "technology_type": self.techtype
+            },
+            "studyRef": "",
+            "sampleUses": "",
+            "protocolUses": "",
+            "team": study_info["team"]
+        }
+        return assay_json
+
+
 class MicroarrayAssay(Assay):
     def __init__(self, assay_obj):
         Assay.__init__(self, assay_obj)
@@ -51,13 +66,23 @@ class SeqAssay(Assay):
         cv = read_json_file("../converter/expected_terms.json")
         lib_attrib_cv = cv["library_terms"]
         # Transform into USI layout
-        lib_attribs = {a.lower(): {"value": comments[a]} for a in lib_attrib_cv if comments.get(a)}
+        lib_attribs = {a.lower(): comments[a] for a in lib_attrib_cv if comments.get(a)}
 
-        protocolUses = extract_attributes.get("protocol refs", None)
-        #protocolUses2 = assay_attributes.get("protocol refs")
-        #protocolrefs = protocolUses + protocolUses2
+        # Get all protocol refs
+        protocolrefs = extract_attributes.get("protocol ref", [])
+        # Also need to add assay protocol refs from assay node
+        for p in assay_attributes.get("protocol ref", []):
+            protocolrefs.append(p)
 
-        sampleUses = extract_attributes.get("sample refs", None)
+        # Get sample refs
+        samplerefs = extract_attributes.get("sample ref", None)
 
-        return cls(alias, techtype, protocolUses, sampleUses, lib_attribs)
+        return cls(alias, techtype, protocolrefs, samplerefs, lib_attribs)
+
+
+    @classmethod
+    def from_json(cls, assay_object):
+
+        pass
+
 

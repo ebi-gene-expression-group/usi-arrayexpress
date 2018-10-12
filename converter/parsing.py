@@ -217,7 +217,7 @@ def parse_sdrf(sdrf_file):
                             sample_attributes["characteristics"][last_attribute]["unit"] = {"value": row[i]}
                             sample_attributes["characteristics"][last_attribute]["unit"]["unit type"] = last_unit
                         else:
-                            logger.log(40, "PARSER ERROR: [column {}] Unit found without Characteristics.".format(i+1))
+                            print("PARSER ERROR: [column {}] Unit found without Characteristics.".format(i+1))
                     # Add Term Source REFs
                     elif "termsourceref" in header_dict and i in header_dict["termsourceref"]:
                         if "characteristics" in header_dict and i-1 in header_dict["characteristics"] and last_attribute:
@@ -227,7 +227,7 @@ def parse_sdrf(sdrf_file):
                             last_termsource = get_name(header[i])
                             sample_attributes["characteristics"][last_attribute]["unit"]["term source"] = row[i]
                         else:
-                            logger.log(40, "PARSER ERROR: [colum {}] \"Term source REF\" found without Characteristics or Unit".format(i+1))
+                            print("PARSER ERROR: [colum {}] \"Term source REF\" found without Characteristics or Unit".format(i+1))
                     # Add Term Accession Number
                     elif "termaccessionnumber" in header_dict and i in header_dict["termaccessionnumber"]:
                         if "termsourceref" in header_dict and i-1 in header_dict["termsourceref"] and last_termsource:
@@ -236,7 +236,7 @@ def parse_sdrf(sdrf_file):
                             elif "unit" in header_dict and i-2 in header_dict["unit"] and last_attribute and last_unit:
                                 sample_attributes["characteristics"][last_attribute]["unit"]["term accession"] = row[i]
                         else:
-                            logger.log(40, "PARSER ERROR: [column {}] \"Term Accession Number\" found without Term Source REF".format(i+1))
+                            print("PARSER ERROR: [column {}] \"Term Accession Number\" found without Term Source REF".format(i+1))
                     # Get Material Type
                     elif "materialtype" in header_dict and i in header_dict["materialtype"]:
                         sample_attributes["material type"] = row[i]
@@ -251,7 +251,7 @@ def parse_sdrf(sdrf_file):
         else:
             # We don't want to log this for each row. Maybe make an error dict and count the occurances and print at the end of the script.
             # Or simpler test this first before going through the rows
-            logger.log(40, "PARSER ERROR: No \"Source Name\" column found, or more than one.")
+            print("PARSER ERROR: No \"Source Name\" column found, or more than one.")
 
 
 
@@ -327,7 +327,7 @@ def parse_sdrf(sdrf_file):
                 assay_names.append(assay_name)
 
                 for i in range(node_range[0]+1, node_range[1]+1):
-                    if get_value(header[i]) == "technologytype":
+                    if get_name(header[i]) == "technologytype":
                         assay_attributes["technology type"] = row[i]
                 assay_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1])
                 assay_attributes["protocol ref"] = [row[i] for i in node_range[2]]
@@ -338,7 +338,7 @@ def parse_sdrf(sdrf_file):
                     continue
                 elif extract_name:
                     assay_attributes["extract ref"].add(extract_name)
-            # We need to allow more than 1 extract per assay for the two-colour case
+            # We allow more than 1 extract per assay for the two-colour case
             else:
                 # Add the extract ref to the previous assay, using set to avoid duplicates
                 if le_name:
