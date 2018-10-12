@@ -7,31 +7,153 @@
     "Person Address": "address",
     "Person Affiliation": "affiliation",
     "Person Phone": "phone",
-    "Person Roles": "roles"
+    "Person Fax": "",
+    "Person Roles": "roles",
+    "Person Roles Term Source REF": "",
+    "Person Roles Term Accession Number": ""
   },
-  "date_terms": {
+  "investigation_terms": {
+    "Investigation Title": "title",
+    "Experiment Description": "description",
     "Date of Experiment": "date of experiment",
-    "Public Release Date": "releaseDate"
+    "Public Release Date": "releaseDate",
   },
   "publication_terms": {
     "PubMed ID": "pubmedId",
     "Publication DOI": "doi",
     "Publication Author List": "authors",
     "Publication Title": "articleTitle",
-    "Publication Status": "status"
+    "Publication Status": "status",
+    "Publication Status Term Source REF": "",
+    "Publication Status Term Accession Number": ""
   },
   "protocol_terms": {
-    "Protocol Type": "protocol_type",
+    "Protocol Type": "protocol type",
     "Protocol Description": "description",
     "Protocol Parameters": "parameters",
     "Protocol Hardware": "hardware",
-    "Protocol Software": "software"
+    "Protocol Software": "software",
+    "Protocol Term Source REF": "",
+    "Protocol Term Source Accession Number": ""
   },
-  "comment_terms": {
-    "AEExperimentType": "comment[aeexperimenttype]",
+  "factor_terms": {
+    "Experimental Factor Name": "experimental factor",
+    "Experimental Factor Type": "",
+    "Experimental Factor Term Source REF": "",
+    "Experimental Factor Accession Number": ""
+  },
+  "reference_terms": {
+    "Term Source Name": "",
+    "Term Source File": "",
+    "Term Source Version": ""
+  },
+  "idf_comment_terms": {
+    "AEExperimentType": "experiment type",
     "RelatedExperiment": "",
     "AdditionalFile": "",
     "SecondaryAccession": ""
-
+  },
+  "node_terms": {
+    "Source Name": "",
+    "Extract Name": "",
+    "Labeled Extract Name": "",
+    "Assay Name": "",
+    "Scan Name": "",
+    "Array Data File": "",
+    "Array Data Matrix File": "",
+    "Derived Array Data File": "",
+    "Derived Array Data Matrix File": "",
+    "Protocol REF": "protocolUses"
+  },
+  "attribute_terms": {
+    "Source Name": {
+      "Characteristics": "attributes",
+      "Provider": "",
+      "Material Type": "",
+      "Description": "",
+      "Comment": ""
+    },
+    "Extract Name": {
+      "Characteristics": "attributes",
+      "Material Type": "",
+      "Description": "",
+      "Comment": ""
+    },
+    "Labeled Extract Name": {
+      "Characteristics": "attributes",
+      "Material Type": "",
+      "Description": "",
+      "Label": "label",
+      "Comment": ""
+    },
+    "Assay Name": {
+      "Technology Type": "",
+      "Array Design REF": "array ref",
+      "Comment": ""
+    },
+    "Array Data File":{
+      "Comment": ""
+    },
+    "Array Data Matrix File":{
+      "Comment": ""
+    },
+    "Derived Array Data File":{
+      "Comment": ""
+    },
+    "Derived Array Data Matrix File":{
+      "Comment": ""
+    },
+    "Scan Name":{
+      "Comment": ""
+    },
+    "Protocol REF": {
+      "Term Source REF": "",
+      "Parameter Value": "",
+      "Performer": "performer",
+      "Comment": ""
+    },
+    "Array Design REF": {
+      "Term Source REF": "",
+      "Comment": ""
+    },
+    "Characteristics": {
+      "Unit": "units",
+      "Term Source REF": ""
+    },
+    "Factor Value": {
+      "Unit": "units",
+      "Term Source REF": ""
+    },
+    "Parameter Value": {
+      "Unit": "units",
+      "Term Source REF": ""
+    },
+    "Unit": {
+      "Term Source REF": ""
+    },
+    "Term Source REF": {
+      "Term Accession Number": ""
+    }
+  },
+  "sdrf_comment_terms": {
+    "ArrayExpress FTP file": "",
+    "FASTQ_URI": "",
+    "BAM_URI": "",
+    "BioSD_SAMPLE": "",
+    "ENA_SAMPLE": "",
+    "ENA_EXPERIMENT": "",
+    "ENA_RUN": "",
+    "technical replicate group": "",
+    "LIBRARY_SELECTION": "",
+    "LIBRARY_STRATEGY": "",
+    "LIBRARY_LAYOUT": "",
+    "LIBRARY_STRAND": "",
+    "NOMINAL_LENGTH": "",
+    "NOMINAL_SDEV": "",
+    "ORIENTATION": "",
+    "single cell isolation": "",
+    "library preparation": "",
+    "end bias": "",
+    "input molecule": ""
   }
 }
