@@ -12,8 +12,15 @@ class Assay:
         self.samplerefs = samplerefs
 
     def get_attributes(self):
+        """This returns a list of all additional attributes that have values"""
         all_attributes = self.__dict__.keys()
-        return all_attributes
+        all_values = self.__dict__
+        fixed_attributes = ("alias", "accession", "techtype", "protocolrefs", "samplerefs")
+        other_attributes = list()
+        for a in all_attributes:
+            if a not in fixed_attributes and all_values[a]:
+                other_attributes.append(a)
+        return other_attributes
 
     def get_techtype(self):
         try:
@@ -53,9 +60,9 @@ class SeqAssay(Assay):
         self.library_strategy = lib_attribs.get("library_strategy")
         self.library_strand = lib_attribs.get("library_strand")
         self.library_source = lib_attribs.get("library_source")
-        self.library_orientation = lib_attribs.get("orientation")
-        self.library_nomlen = lib_attribs.get("nominal_length")
-        self.library_nomsd = lib_attribs.get("nominal_sdev")
+        self.orientation = lib_attribs.get("orientation")
+        self.nominal_length = lib_attribs.get("nominal_length")
+        self.nominal_sdev = lib_attribs.get("nominal_sdev")
 
 
     @classmethod

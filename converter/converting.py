@@ -1,10 +1,16 @@
 """Helper functions for converting from MAGE-TAB to USI JSON and back"""
 
+import codecs
+import json
 import re
-import json
+from collections import OrderedDict, defaultdict
 
-from collections import OrderedDict
-import json
+
+
+REGEX_AE_ACCESSION = r'^[A-Z]-[A-Z]{4}-[0-9]+'
+REGEX_BIOSD_ACCESSION = r'^SAMEA[0-9]+$'
+REGEX_ENA_ACCESSION = r'^ER[RESP][0-9]+$'
+
 
 """
 # Cannot import "common" from fgsubs; it has too many dependencies, so copying this here
@@ -45,14 +51,17 @@ def get_taxon(organism):
                     return taxon_id
 """
 
+
 def generate_usi_assay_object(assay, study_info):
 
     assay_object = OrderedDict()
 
     assay_object['alias'] = assay.alias
 
-
-    assay_object['attributes'] = []
+    attributes = assay.get_attributes()
+    assay_object['attributes'] = OrderedDict()
+    for category in attributes:
+        assay_object['attributes'][category] = generate_usi_attribute_object(getattr(assay, category))
 
     assay_object['studyRef'] = generate_usi_ref_object(study_info.get('alias'), study_info)
 
@@ -62,22 +71,15 @@ def generate_usi_assay_object(assay, study_info):
         sample_refs = [sample_refs]
     assay_object['sampleUses'] = [generate_usi_ref_object(ref, study_info) for ref in sample_refs]
 
-
     return assay_object
 
 
-def usi_object_file_name(object_type, study_info):
-
-    if study_info.get('accession'):
-        return "{}_{}.json".format(study_info('accession'), object_type)
-    elif study_info.get('alias'):
-        return "{}_{}.json".format(study_info.get('alias'), object_type)
-    else:
-        print('ERROR: No study name found in study_info.')
-
-
 def generate_usi_attribute_object(attribute_info):
-    """ "attributes": {
+    """
+    Expected input is a dictionary key and value pair. The value can be a dictionary itsef.
+    In that case, we'll test if we find units and ontology terms and add those accordingly.
+
+     "attributes": {
             "description": "Attributes for describing a submittable.",
             "type": "object",
             "properties": {},
@@ -86,7 +88,9 @@ def generate_usi_attribute_object(attribute_info):
                     "type": "array",
                     "minItems": 1,
                     "items": {
+                        "type": "object",  (this line not in USI template spec!)
                         "properties": {
+
                             "value": { "type": "string", "minLength": 1 },
                             "units": { "type": "string", "minLength": 1 },
                             "terms": {
@@ -103,17 +107,32 @@ def generate_usi_attribute_object(attribute_info):
                         "required": [ "value" ]
     """
 
-    pass
+    # This the attribute entry is always a list even though we only expect one value per attribute
+    attribute_object = list()
+    if isinstance(attribute_info, dict):
+        # Initialise the dictionary (with the value lookup) as the first item in the list
+        attribute_object.append(OrderedDict(("value", attribute_info.get("value"))))
+        if attribute_info.get("unit"):
+            unit_info = attribute_info.get("unit")
+            attribute_object[0]["units"] = unit_info.get("value")
+            if unit_info.get("term accession"):
+                # USI model does support >1 term URIs for a value but we can't distinguish between
+                # the value term and the unit term. For now will only include an ontology URI for
+                # a value term (see below).
+                pass
+        if attribute_info.get("term accession"):
+            # TODO: Function that looks up term accessions and returns EFO/OLS URI
+            # Using term accession for now
+            if attribute_info.get("term accession"):
+                attribute_object[0]["terms"] = {"url": attribute_info.get("term accession")}
+    else:
+        attribute_object.append({"value": attribute_info})
+
+    return attribute_object
 
 
 def generate_usi_ref_object(ref, study_info):
     """ Schema definitions
-
-    "assayRefs": {
-            "description": "Reference(s) to assay(s).",
-            "type": "array",
-            "items": { "$ref": "#/definitions/submittableRef" }
-        }
 
     "submittableRef": {
         "type": "object",
@@ -133,9 +152,29 @@ def generate_usi_ref_object(ref, study_info):
     ref_object['alias'] = str(ref)
     ref_object['team'] = study_info.get('team')
 
-    if re.match('^[A-Z]-[A-Z]{4}-[0-9]+', ref):
+    if re.match(REGEX_AE_ACCESSION, ref) or re.match(REGEX_ENA_ACCESSION, ref) or re.match(REGEX_BIOSD_ACCESSION, ref):
         ref_object['accession'] = str(ref)
 
     return ref_object
 
+
+
+
+def usi_object_file_name(object_type, study_info):
+
+    if study_info.get('accession'):
+        return "{}_{}.json".format(study_info.get('accession'), object_type)
+    elif study_info.get('alias'):
+        return "{}_{}.json".format(study_info.get('alias'), object_type)
+    else:
+        print('ERROR: No study name found in study_info.')
+
+
+
+
+
+def write_json_file(json_object, object_type, study_info):
+    json_file_name = usi_object_file_name(object_type, study_info)
+    with codecs.open(json_file_name, 'w', encoding='utf-8') as jf:
+        json.dump(json_object, jf)
 
