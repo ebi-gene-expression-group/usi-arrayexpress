@@ -155,5 +155,15 @@
     "library preparation": "",
     "end bias": "",
     "input molecule": ""
-  }
+  },
+  "sdrf_comments_ena": {
+    "LIBRARY_SELECTION": "library_selection",
+    "LIBRARY_STRATEGY": "library_strategy",
+    "LIBRARY_LAYOUT": "library_layout",
+    "LIBRARY_STRAND": "library_strand",
+    "NOMINAL_LENGTH": "nominal_length",
+    "NOMINAL_SDEV": "nominal_sdev",
+    "ORIENTATION": "orientation"
+  },
+  "sdrf_comments_singlecell": {}
 }

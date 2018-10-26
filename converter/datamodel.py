@@ -1,15 +1,19 @@
-from parsing import read_json_file
+from parsing import read_json_file, get_controlled_vocabulary
 
 
 class Assay:
 
-    def __init__(self, alias, techtype, protocolrefs, samplerefs):
+    def __init__(self, alias, accession, techtype, protocolrefs, samplerefs):
         # Attributes common to all assay types
         self.alias = alias
+        self.accession = accession
         self.techtype = techtype
         self.protocolrefs = protocolrefs
         self.samplerefs = samplerefs
 
+    def get_attributes(self):
+        all_attributes = self.__dict__.keys()
+        return all_attributes
 
     def get_techtype(self):
         try:
@@ -41,8 +45,9 @@ class MicroarrayAssay(Assay):
 
 
 class SeqAssay(Assay):
-    def __init__(self, alias, techtype, protocolrefs, samplerefs, lib_attribs):
-        Assay.__init__(self, alias, techtype, protocolrefs, samplerefs)
+    def __init__(self, alias, accession, techtype, protocolrefs, samplerefs, lib_attribs):
+        Assay.__init__(self, alias, accession, techtype, protocolrefs, samplerefs)
+
         self.library_layout = lib_attribs.get("library_layout")
         self.library_selection = lib_attribs.get("library_selection")
         self.library_strategy = lib_attribs.get("library_strategy")
@@ -68,6 +73,13 @@ class SeqAssay(Assay):
         # Transform into USI layout
         lib_attribs = {a.lower(): comments[a] for a in lib_attrib_cv if comments.get(a)}
 
+        # Get accession from ENA Experiment in assay comments
+        assay_comments = assay_attributes.get('comments')
+        if assay_comments:
+            accession = assay_comments.get('ENA_EXPERIMENT')
+        else:
+            accession = None
+
         # Get all protocol refs
         protocolrefs = extract_attributes.get("protocol ref", [])
         # Also need to add assay protocol refs from assay node
@@ -77,7 +89,7 @@ class SeqAssay(Assay):
         # Get sample refs
         samplerefs = extract_attributes.get("sample ref", None)
 
-        return cls(alias, techtype, protocolrefs, samplerefs, lib_attribs)
+        return cls(alias, accession, techtype, protocolrefs, samplerefs, lib_attribs)
 
 
     @classmethod

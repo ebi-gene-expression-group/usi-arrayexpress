@@ -32,6 +32,11 @@ def read_sdrf_file(sdrf_file):
     return sdrf_list, header, header_dict
 
 
+def get_controlled_vocabulary(category):
+    all_terms = read_json_file("term_translations.json")
+    return all_terms[category]
+
+
 def get_name(header_string):
     no_spaces = header_string.replace(' ', '')
     field_name = no_spaces.split('[')[0]
