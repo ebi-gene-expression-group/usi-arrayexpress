@@ -6,10 +6,13 @@ import re
 from collections import OrderedDict, defaultdict
 
 
+regex_lookup = {
+    "AE_ACCESSION": "^[A-Z]-[A-Z]{4}-[0-9]+",
+    "BIOSD_ACCESSION": "^SAMEA[0-9]+$",
+    "ENA_ACCESSION": "^ER[RESP][0-9]+$",
+    "BIOSTUDIES_ACCESSION": "^S-[A-Z]+[0-9]+$"}
 
-REGEX_AE_ACCESSION = r'^[A-Z]-[A-Z]{4}-[0-9]+'
-REGEX_BIOSD_ACCESSION = r'^SAMEA[0-9]+$'
-REGEX_ENA_ACCESSION = r'^ER[RESP][0-9]+$'
+REGEX_EBI_ACCESSION = "|".join(regex_lookup.values())
 
 
 """
@@ -56,29 +59,38 @@ def generate_usi_assay_object(assay, study_info):
 
     assay_object = OrderedDict()
 
-    assay_object['alias'] = assay.alias
+    if assay.accession:
+        assay_object['alias'] = assay.accession
+        assay_object['title'] = assay.alias
+    else:
+        assay_object['alias'] = assay.alias
 
     attributes = assay.get_attributes()
     assay_object['attributes'] = OrderedDict()
     for category in attributes:
-        assay_object['attributes'][category] = generate_usi_attribute_object(getattr(assay, category))
+        assay_object['attributes'][category] = generate_usi_attribute_entry(getattr(assay, category))
 
     assay_object['studyRef'] = generate_usi_ref_object(study_info.get('alias'), study_info)
 
-    sample_refs = assay.samplerefs
+    sample_refs = assay.sampleref
     # Can be one or more samples linked to one assay, but schema is expecting an array
     if not isinstance(sample_refs, list):
         sample_refs = [sample_refs]
     assay_object['sampleUses'] = [generate_usi_ref_object(ref, study_info) for ref in sample_refs]
 
+    protocol_refs = assay.protocolrefs
+    if not isinstance(protocol_refs, list):
+        protocol_refs = [protocol_refs]
+    assay_object["protcolUses"] = [generate_usi_ref_object(ref, study_info) for ref in protocol_refs]
+
     return assay_object
 
 
-def generate_usi_attribute_object(attribute_info):
+def generate_usi_attribute_entry(attribute_info):
     """
     Expected input is a dictionary key and value pair. The value can be a dictionary itsef.
     In that case, we'll test if we find units and ontology terms and add those accordingly.
-
+    Schema definition:
      "attributes": {
             "description": "Attributes for describing a submittable.",
             "type": "object",
@@ -90,7 +102,6 @@ def generate_usi_attribute_object(attribute_info):
                     "items": {
                         "type": "object",  (this line not in USI template spec!)
                         "properties": {
-
                             "value": { "type": "string", "minLength": 1 },
                             "units": { "type": "string", "minLength": 1 },
                             "terms": {
@@ -132,8 +143,8 @@ def generate_usi_attribute_object(attribute_info):
 
 
 def generate_usi_ref_object(ref, study_info):
-    """ Schema definitions
-
+    """
+    Schema definition:
     "submittableRef": {
         "type": "object",
         "properties": {
@@ -144,20 +155,16 @@ def generate_usi_ref_object(ref, study_info):
         "anyOf": [
             { "required": [ "alias", "team" ] },
             { "required": [ "accession" ] }
-        ]
-    }
-    "required": [ "alias" ]"""
+    """
 
     ref_object = dict()
     ref_object['alias'] = str(ref)
     ref_object['team'] = study_info.get('team')
 
-    if re.match(REGEX_AE_ACCESSION, ref) or re.match(REGEX_ENA_ACCESSION, ref) or re.match(REGEX_BIOSD_ACCESSION, ref):
+    if re.match(REGEX_EBI_ACCESSION, ref):
         ref_object['accession'] = str(ref)
 
     return ref_object
-
-
 
 
 def usi_object_file_name(object_type, study_info):
@@ -168,9 +175,6 @@ def usi_object_file_name(object_type, study_info):
         return "{}_{}.json".format(study_info.get('alias'), object_type)
     else:
         print('ERROR: No study name found in study_info.')
-
-
-
 
 
 def write_json_file(json_object, object_type, study_info):

@@ -3,19 +3,19 @@ from parsing import read_json_file, get_controlled_vocabulary
 
 class Assay:
 
-    def __init__(self, alias, accession, techtype, protocolrefs, samplerefs):
+    def __init__(self, alias, accession, techtype, protocolrefs, sampleref):
         # Attributes common to all assay types
         self.alias = alias
         self.accession = accession
         self.techtype = techtype
         self.protocolrefs = protocolrefs
-        self.samplerefs = samplerefs
+        self.sampleref = sampleref
 
     def get_attributes(self):
         """This returns a list of all additional attributes that have values"""
         all_attributes = self.__dict__.keys()
         all_values = self.__dict__
-        fixed_attributes = ("alias", "accession", "techtype", "protocolrefs", "samplerefs")
+        fixed_attributes = ("alias", "accession", "techtype", "protocolrefs", "sampleref")
         other_attributes = list()
         for a in all_attributes:
             if a not in fixed_attributes and all_values[a]:
@@ -52,8 +52,8 @@ class MicroarrayAssay(Assay):
 
 
 class SeqAssay(Assay):
-    def __init__(self, alias, accession, techtype, protocolrefs, samplerefs, lib_attribs):
-        Assay.__init__(self, alias, accession, techtype, protocolrefs, samplerefs)
+    def __init__(self, alias, accession, techtype, protocolrefs, sampleref, lib_attribs):
+        Assay.__init__(self, alias, accession, techtype, protocolrefs, sampleref)
 
         self.library_layout = lib_attribs.get("library_layout")
         self.library_selection = lib_attribs.get("library_selection")
@@ -71,37 +71,40 @@ class SeqAssay(Assay):
         Translating parsed SDRF attributes into USI format"""
 
         alias = extract_attributes.get("name")
-        techtype = assay_attributes.get("technology type")
 
         # Get library attributes from extract comments
         comments = extract_attributes.get("comments")
-        cv = read_json_file("../converter/expected_terms.json")
-        lib_attrib_cv = cv["library_terms"]
-        # Transform into USI layout
+        lib_attrib_cv = get_controlled_vocabulary("sdrf_comments_ena").keys()
         lib_attribs = {a.lower(): comments[a] for a in lib_attrib_cv if comments.get(a)}
 
+        # Get technology type(s) from assay attributes
+        techtype = _remove_duplicates([a.get("technology type") for a in assay_attributes])
+
         # Get accession from ENA Experiment in assay comments
-        assay_comments = assay_attributes.get('comments')
-        if assay_comments:
-            accession = assay_comments.get('ENA_EXPERIMENT')
-        else:
-            accession = None
+        accession = _remove_duplicates([a.get('comments', {}).get('ENA_EXPERIMENT', "") for a in assay_attributes])
+        if len(accession) == 1:
+            accession = accession[0]
+        #else: report ERROR
 
         # Get all protocol refs
-        protocolrefs = extract_attributes.get("protocol ref", [])
-        # Also need to add assay protocol refs from assay node
-        for p in assay_attributes.get("protocol ref", []):
-            protocolrefs.append(p)
+        protocolrefs = []
+        for a in assay_attributes:
+            protocolrefs.extend(a.get("protocol ref"))
+        protocolrefs.extend(extract_attributes.get("protocol ref", []))
+        protocolrefs = _remove_duplicates(protocolrefs)
 
         # Get sample refs
-        samplerefs = extract_attributes.get("sample ref", None)
+        samplerefs = extract_attributes.get("sample ref")
 
         return cls(alias, accession, techtype, protocolrefs, samplerefs, lib_attribs)
-
 
     @classmethod
     def from_json(cls, assay_object):
 
         pass
+
+
+def _remove_duplicates(ref_list):
+    return list(set(ref_list))
 
 

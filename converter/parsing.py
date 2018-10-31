@@ -1,9 +1,8 @@
 import json
-
+import pkg_resources
 import codecs
 import re
 from collections import defaultdict
-
 
 def read_json_file(filename):
     try:
@@ -33,7 +32,10 @@ def read_sdrf_file(sdrf_file):
 
 
 def get_controlled_vocabulary(category):
-    all_terms = read_json_file("term_translations.json")
+    resource_package = __name__  # Could be any module/package name
+    resource_path = "term_translations.json"
+    all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
+
     return all_terms[category]
 
 
@@ -50,8 +52,8 @@ def get_value(header_string):
 
 def get_prefix(filename):
     """This takes a filename string as input and strips off the file extension and any patterns to be ignored"""
-    extensions = ('\.fastq\.gz$', '\.fq\.gz$', '\.txt\.gz$', '\.fastq\.bz2$', '\.[a-zA-Z0-9]+$', )
-    ignore = ('_?001$', )
+    extensions = ('\.fastq\.gz$', '\.fq\.gz$', '\.txt\.gz$', '\.fastq\.bz2$', '\.[a-zA-Z0-9]+$',)
+    ignore = ('_?001$',)
     filebase = None
 
     for ext in extensions:
@@ -88,7 +90,7 @@ def get_comment_values(sdrf_row, header, node1_index, node2_index):
     """This collects all comment columns between the given nodes
     and stores the values in the given row as a dictionary."""
     comments_dict = {}
-    for i in range(node1_index, node2_index+1):
+    for i in range(node1_index, node2_index + 1):
         if get_name(header[i]) == 'comment':
             comments_dict[get_value(header[i])] = sdrf_row[i]
     return comments_dict
@@ -107,9 +109,14 @@ def get_node_positions(nodes, header):
     protocols = []
     last_node = None
     node_open = False
+    node_map = dict()
 
     for i, h in enumerate(header):
         h = get_name(h)
+        if h in nodes:
+            node_map[h] = dict()
+
+
         if h in nodes and not node_open:
             last_node = h
             node_breakpoints[last_node].append([i, None, protocols])
@@ -120,7 +127,7 @@ def get_node_positions(nodes, header):
             if node_open:
                 node_breakpoints[last_node][-1][1] = i - 1
                 node_open = False
-            # In case there is no protocol between them
+                # In case there is no protocol between them
         elif h in nodes and node_open:
             node_breakpoints[last_node][-1][1] = i - 1
             last_node = h
@@ -136,7 +143,6 @@ def get_node_positions(nodes, header):
 
 
 def parse_sdrf(sdrf_file):
-
     sample_nodes = ("sourcename",)
     le_nodes = ("labeledextractname",)
     extract_nodes = ("extractname",)
@@ -158,12 +164,10 @@ def parse_sdrf(sdrf_file):
     raw_data = dict()
     processed_data = dict()
 
-
     # Guessing experiment type (SEQ or MA) from SDRF header
     is_microarray = False
     if 'arraydesignref' in header_dict or 'labeledextractname' in header_dict:
         is_microarray = True
-
 
     # Recording the node names, to skip duplicate rows
     sample_names = []
@@ -174,22 +178,21 @@ def parse_sdrf(sdrf_file):
     for row in sdrf_data:
         # new_sample = Sample.from_sdrf()
 
-        #if is_microarray:
+        # if is_microarray:
         #    sdr.assays.append(MicroarrayAssay.from_sdrf(row, header_dict, header))
-        #else:
+        # else:
         #    sdr.assays.append(SeqAssay.from_sdrf(row, header_dict, header))
 
-        #sdr.rawdata.append(RawData.from_sdrf(row, header_dict, header))
+        # sdr.rawdata.append(RawData.from_sdrf(row, header_dict, header))
 
-    #sdr.group_pairedend_files()
+        # sdr.group_pairedend_files()
 
         sample_name = ""
         extract_name = ""
         le_name = ""
         assay_name = ""
 
-
-        #Samples
+        # Samples
 
         last_attribute = None
         last_unit = None
@@ -210,7 +213,7 @@ def parse_sdrf(sdrf_file):
                 sample_attributes["name"] = sample_name
                 sample_names.append(sample_name)
                 # Go through the header values in between the nodes
-                for i in range(node_range[0]+1, node_range[1]+1):
+                for i in range(node_range[0] + 1, node_range[1] + 1):
                     # Get Characteristics
                     if "characteristics" in header_dict and i in header_dict["characteristics"]:
                         last_attribute = get_value(header[i])
@@ -222,26 +225,33 @@ def parse_sdrf(sdrf_file):
                             sample_attributes["characteristics"][last_attribute]["unit"] = {"value": row[i]}
                             sample_attributes["characteristics"][last_attribute]["unit"]["unit type"] = last_unit
                         else:
-                            print("PARSER ERROR: [column {}] Unit found without Characteristics.".format(i+1))
+                            print("PARSER ERROR: [column {}] Unit found without Characteristics.".format(i + 1))
                     # Add Term Source REFs
                     elif "termsourceref" in header_dict and i in header_dict["termsourceref"]:
-                        if "characteristics" in header_dict and i-1 in header_dict["characteristics"] and last_attribute:
+                        if "characteristics" in header_dict and i - 1 in header_dict[
+                            "characteristics"] and last_attribute:
                             last_termsource = get_name(header[i])
                             sample_attributes["characteristics"][last_attribute]["term source"] = row[i]
-                        elif "unit" in header_dict and i-1 in header_dict["unit"] and last_attribute and last_unit:
+                        elif "unit" in header_dict and i - 1 in header_dict["unit"] and last_attribute and last_unit:
                             last_termsource = get_name(header[i])
                             sample_attributes["characteristics"][last_attribute]["unit"]["term source"] = row[i]
                         else:
-                            print("PARSER ERROR: [colum {}] \"Term source REF\" found without Characteristics or Unit".format(i+1))
+                            print(
+                                "PARSER ERROR: [colum {}] \"Term source REF\" found without Characteristics or Unit".format(
+                                    i + 1))
                     # Add Term Accession Number
                     elif "termaccessionnumber" in header_dict and i in header_dict["termaccessionnumber"]:
-                        if "termsourceref" in header_dict and i-1 in header_dict["termsourceref"] and last_termsource:
-                            if "characteristics" in header_dict and i-2 in header_dict["characteristics"] and last_attribute:
+                        if "termsourceref" in header_dict and i - 1 in header_dict["termsourceref"] and last_termsource:
+                            if "characteristics" in header_dict and i - 2 in header_dict[
+                                "characteristics"] and last_attribute:
                                 sample_attributes["characteristics"][last_attribute]["term accession"] = row[i]
-                            elif "unit" in header_dict and i-2 in header_dict["unit"] and last_attribute and last_unit:
+                            elif "unit" in header_dict and i - 2 in header_dict[
+                                "unit"] and last_attribute and last_unit:
                                 sample_attributes["characteristics"][last_attribute]["unit"]["term accession"] = row[i]
                         else:
-                            print("PARSER ERROR: [column {}] \"Term Accession Number\" found without Term Source REF".format(i+1))
+                            print(
+                                "PARSER ERROR: [column {}] \"Term Accession Number\" found without Term Source REF".format(
+                                    i + 1))
                     # Get Material Type
                     elif "materialtype" in header_dict and i in header_dict["materialtype"]:
                         sample_attributes["material type"] = row[i]
@@ -257,8 +267,6 @@ def parse_sdrf(sdrf_file):
             # We don't want to log this for each row. Maybe make an error dict and count the occurances and print at the end of the script.
             # Or simpler test this first before going through the rows
             print("PARSER ERROR: No \"Source Name\" column found, or more than one.")
-
-
 
         # Extract
 
@@ -285,14 +293,12 @@ def parse_sdrf(sdrf_file):
                 extract_attributes["protocol ref"] = [row[i] for i in node_range[2]]
                 extracts[extract_name] = extract_attributes
 
-
-
         # Labeled Extract
 
         le_attributes = {"name": "",
                          "label": "",
                          "comments": {},
-                         "extract ref": "",
+                         "extract ref": [],
                          "protocol ref": []}
 
         if "labeledextractname" in header_dict:
@@ -309,18 +315,17 @@ def parse_sdrf(sdrf_file):
                 # Get comments
                 le_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1] + 1)
                 # Keep reference to sample in that row
-                le_attributes["extract ref"] = extract_name
+                le_attributes["extract ref"].append(extract_name)
 
                 le_attributes["protocol ref"] = [row[i] for i in node_range[2]]
                 le[le_name] = le_attributes
-
 
         # Assay
 
         assay_attributes = {"name": "",
                             "technology type": "",
                             "comments": {},
-                            "extract ref": set(),
+                            "extract ref": [],
                             "protocol ref": []}
 
         if "assayname" in header_dict:
@@ -331,7 +336,7 @@ def parse_sdrf(sdrf_file):
                 assay_attributes["name"] = assay_name
                 assay_names.append(assay_name)
 
-                for i in range(node_range[0]+1, node_range[1]+1):
+                for i in range(node_range[0] + 1, node_range[1] + 1):
                     if get_name(header[i]) == "technologytype":
                         assay_attributes["technology type"] = row[i]
                 assay_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1])
@@ -339,19 +344,18 @@ def parse_sdrf(sdrf_file):
                 assays[assay_name] = assay_attributes
 
                 if le_name:
-                    assay_attributes["extract ref"].add(le_name)
+                    assay_attributes["extract ref"].append(le_name)
                     continue
                 elif extract_name:
-                    assay_attributes["extract ref"].add(extract_name)
+                    assay_attributes["extract ref"].append(extract_name)
             # We allow more than 1 extract per assay for the two-colour case
             else:
                 # Add the extract ref to the previous assay, using set to avoid duplicates
                 if le_name:
-                    assays[assay_name]["extract ref"].add(le_name)
+                    assays[assay_name]["extract ref"].append(le_name)
                     continue
                 elif extract_name:
-                    assays[assay_name]["extract ref"].add(extract_name)
-
+                    assays[assay_name]["extract ref"].append(extract_name)
 
         # Datafiles
 
@@ -370,7 +374,140 @@ def parse_sdrf(sdrf_file):
                 'filename': f,
                 'datatype': datatype,
                 'assayref': '',
-                'comments': get_comment_values(row, header, header_dict[datatype], header_dict.get('derivedarraydatafile', len(header)-1))
+                'comments': get_comment_values(row, header, header_dict[datatype],
+                                               header_dict.get('derivedarraydatafile', len(header) - 1))
             })
 
     return samples, extracts, le, assays, raw_data, processed_data
+
+
+def get_sdrf_header_map(header):
+
+    nodes = {
+        "sourcename": {
+            "sourcename": [],
+            "characteristics": [],
+            "materialtype": [],
+            "description": [],
+            "comment": [],
+            "protocolref": []
+        },
+        "extractname": {
+            "extractname": [],
+            "comment": [],
+            "protocolref": []
+        },
+        "labeledextractname": {
+            "labeledextractname": [],
+            "label": [],
+            "comment": [],
+            "protocolref": []
+        },
+        "assayname": {
+            "assayname": [],
+            "technologytype": [],
+            "arraydesignref": [],
+            "comment": [],
+            "protocolref": []
+        },
+        "arraydatafile": {
+            "arraydatafile": [],
+            "comment": [],
+            "protocolref": []
+        },
+        "arraydatamatrixfile": {
+            "arraydatamatrixfile": [],
+            "comment": []
+        },
+        "derivedarraydatafile": {
+            "derivedarraydatafile": [],
+            "comment": [],
+            "protocolref": []
+        },
+        "derivedarraydatamatrixfile": {
+            "derivedarraydatamatrixfile": [],
+            "comment": [],
+            "protocolref": []
+        },
+        "factorvalue": {
+            "factorvalue": []
+        }
+    }
+
+    attributes = {
+        "protocolref": {
+            "protocolref":  {
+                "protocolref": [],
+                "termsourceref": {
+                    "termsourceref": {
+                        "termsourceref": [],
+                        "termaccessionnumber": []
+                    }
+                }
+            },
+            "performer": [],
+            "parametervalue": []
+        },
+        "factorvalue": {
+            "factorvalue": [],
+            "unit": {
+                "unit": [],
+                "termsourceref": {
+                    "termsourceref": [],
+                    "termaccessionnumber": []
+                }
+            }
+        },
+        "characteristics": {
+            "characteristics": [],
+            "unit": {
+                "unit": [],
+                "termsourceref": {
+                    "termsourceref": [],
+                    "termaccessionnumber": []
+                }
+            }
+        },
+        "arraydesignref": {
+            "arraydesignref": [],
+            "termsourceref": {
+                "termsourceref": [],
+                "termaccessionnumber": []
+            }
+        }
+    }
+
+    node_map = dict()
+    current_node = None
+    current_attribute = None
+
+    for i, h in enumerate(header):
+        h = get_name(h)
+        if h in nodes:
+            current_node = h
+            node_map[current_node] = nodes[current_node]
+            node_map[current_node][current_node].append(i)
+
+        # 1. needs to be in current node sub-dict
+        elif current_node and h in node_map[current_node]:
+            if h in attributes and not current_attribute:
+                current_attribute = h
+                node_map[current_node][current_attribute] = attributes[current_attribute]
+
+            else:
+                # this attribute has no sub-attributes, store index directly
+                node_map[current_node][h].append(i)
+
+        elif current_node and current_attribute:
+            if h == "unit":
+                pass
+
+            elif h == "termsourceref":
+                pass
+
+            elif h in attributes:
+                current_attribute = h
+                node_map[current_node][current_attribute].append(i)
+
+        else:
+            print("ERROR: This is not allowed")

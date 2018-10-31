@@ -16,7 +16,7 @@
     "Investigation Title": "title",
     "Experiment Description": "description",
     "Date of Experiment": "date of experiment",
-    "Public Release Date": "releaseDate",
+    "Public Release Date": "releaseDate"
   },
   "publication_terms": {
     "PubMed ID": "pubmedId",
