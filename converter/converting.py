@@ -142,7 +142,7 @@ def generate_usi_attribute_entry(attribute_info):
     return attribute_object
 
 
-def generate_usi_ref_object(ref, study_info):
+def generate_usi_ref_object(alias, study_info, accession=None):
     """
     Schema definition:
     "submittableRef": {
@@ -158,11 +158,13 @@ def generate_usi_ref_object(ref, study_info):
     """
 
     ref_object = dict()
-    ref_object['alias'] = str(ref)
+    ref_object['alias'] = alias
     ref_object['team'] = study_info.get('team')
 
-    if re.match(REGEX_EBI_ACCESSION, ref):
-        ref_object['accession'] = str(ref)
+    if accession and re.match(REGEX_EBI_ACCESSION, accession):
+        ref_object['accession'] = accession
+    elif re.match(REGEX_EBI_ACCESSION, alias):
+        ref_object['accession'] = alias
 
     return ref_object
 
