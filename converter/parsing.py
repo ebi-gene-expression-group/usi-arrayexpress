@@ -2,7 +2,9 @@ import json
 import pkg_resources
 import codecs
 import re
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
+import csv
+
 
 def read_json_file(filename):
     try:
@@ -31,8 +33,41 @@ def read_sdrf_file(sdrf_file):
     return sdrf_list, header, header_dict
 
 
+def read_idf_file(idf_file):
+    idf_dict = OrderedDict()
+    with codecs.open(idf_file, encoding='utf-8') as fi:
+        idf_raw = fi.readlines()
+
+        for row in idf_raw:
+            idf_row = row.rstrip('\n').split('\t')
+            # Skip empty lines or lines full of just empty spaces/tabs
+            if len(''.join(idf_row).strip()) == 0:
+                continue
+            if re.search(r"^\[SDRF\]", idf_row[0]):
+                # idf_file is a combined idf/sdrf file - stop when you get to the beginning of sdrf section
+                break
+            # In the case of a merged idf/sdrf file - skip the beginning of the idf section)
+            if not re.search(r"^\[IDF\]", idf_row[0]):
+                # Store label in separate variable
+                row_label = idf_row.pop(0)
+                # For comments get the value inside square brackets
+                if re.search('comment', row_label, flags=re.IGNORECASE):
+                    row_label = get_value(row_label)
+                # For normal Row lables remove whitespaces
+                else:
+                    row_label = get_name(row_label)
+                # Skip rows that have a label but no values
+                if not len(''.join(idf_row).strip()) == 0:
+                    # Store values in idf_dict
+                    idf_dict[row_label] = idf_row
+
+    for label, x in idf_dict.items():
+        print(label + ' --> ' + str(x))
+    return idf_dict
+
+
 def get_controlled_vocabulary(category):
-    resource_package = __name__  # Could be any module/package name
+    resource_package = __name__
     resource_path = "term_translations.json"
     all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
 
@@ -115,7 +150,6 @@ def get_node_positions(nodes, header):
         h = get_name(h)
         if h in nodes:
             node_map[h] = dict()
-
 
         if h in nodes and not node_open:
             last_node = h
@@ -381,133 +415,74 @@ def parse_sdrf(sdrf_file):
     return samples, extracts, le, assays, raw_data, processed_data
 
 
-def get_sdrf_header_map(header):
+def parse_idf(idf_file):
 
-    nodes = {
-        "sourcename": {
-            "sourcename": [],
-            "characteristics": [],
-            "materialtype": [],
-            "description": [],
-            "comment": [],
-            "protocolref": []
-        },
-        "extractname": {
-            "extractname": [],
-            "comment": [],
-            "protocolref": []
-        },
-        "labeledextractname": {
-            "labeledextractname": [],
-            "label": [],
-            "comment": [],
-            "protocolref": []
-        },
-        "assayname": {
-            "assayname": [],
-            "technologytype": [],
-            "arraydesignref": [],
-            "comment": [],
-            "protocolref": []
-        },
-        "arraydatafile": {
-            "arraydatafile": [],
-            "comment": [],
-            "protocolref": []
-        },
-        "arraydatamatrixfile": {
-            "arraydatamatrixfile": [],
-            "comment": []
-        },
-        "derivedarraydatafile": {
-            "derivedarraydatafile": [],
-            "comment": [],
-            "protocolref": []
-        },
-        "derivedarraydatamatrixfile": {
-            "derivedarraydatamatrixfile": [],
-            "comment": [],
-            "protocolref": []
-        },
-        "factorvalue": {
-            "factorvalue": []
-        }
+    idf_dict = read_idf_file(idf_file)
+    print(idf_dict)
+
+    study_info = {
+        "title": "",
+        "accession": "",
+        "description": "",
+        "experimental design": [],
+        "experimental factor": [],
+        "release date": "",
+        "date of experiment": "",
+        "contacts": [],
+        "publication": [],
+        "comments": {}
     }
 
-    attributes = {
-        "protocolref": {
-            "protocolref":  {
-                "protocolref": [],
-                "termsourceref": {
-                    "termsourceref": {
-                        "termsourceref": [],
-                        "termaccessionnumber": []
-                    }
-                }
-            },
-            "performer": [],
-            "parametervalue": []
-        },
-        "factorvalue": {
-            "factorvalue": [],
-            "unit": {
-                "unit": [],
-                "termsourceref": {
-                    "termsourceref": [],
-                    "termaccessionnumber": []
-                }
-            }
-        },
-        "characteristics": {
-            "characteristics": [],
-            "unit": {
-                "unit": [],
-                "termsourceref": {
-                    "termsourceref": [],
-                    "termaccessionnumber": []
-                }
-            }
-        },
-        "arraydesignref": {
-            "arraydesignref": [],
-            "termsourceref": {
-                "termsourceref": [],
-                "termaccessionnumber": []
-            }
-        }
-    }
+    protocols = list()
 
-    node_map = dict()
-    current_node = None
-    current_attribute = None
+    value_with_ontology_term = {"value": "",
+                                 "term ref": "",
+                                 "term accession": ""}
 
-    for i, h in enumerate(header):
-        h = get_name(h)
-        if h in nodes:
-            current_node = h
-            node_map[current_node] = nodes[current_node]
-            node_map[current_node][current_node].append(i)
+    # Contacts
+    parse_multi_column_fields(idf_dict, study_info["contacts"], "contact_terms")
 
-        # 1. needs to be in current node sub-dict
-        elif current_node and h in node_map[current_node]:
-            if h in attributes and not current_attribute:
-                current_attribute = h
-                node_map[current_node][current_attribute] = attributes[current_attribute]
+    print(study_info["contacts"])
 
-            else:
-                # this attribute has no sub-attributes, store index directly
-                node_map[current_node][h].append(i)
+    # Publications
+    parse_multi_column_fields(idf_dict, study_info["publication"], "publication_terms")
+    print(study_info["publication"])
 
-        elif current_node and current_attribute:
-            if h == "unit":
-                pass
+    # Factors
+    parse_multi_column_fields(idf_dict, study_info["experimental factor"], "factor_terms")
+    print(study_info["experimental factor"])
 
-            elif h == "termsourceref":
-                pass
+    parse_multi_column_fields(idf_dict, study_info["experimental design"], "design_terms")
+    print(study_info["experimental design"])
 
-            elif h in attributes:
-                current_attribute = h
-                node_map[current_node][current_attribute].append(i)
+    parse_multi_column_fields(idf_dict, protocols, "protocol_terms")
+    for p in protocols:
+        print(p.items())
 
-        else:
-            print("ERROR: This is not allowed")
+    # Comments
+    # Here we allow >1 value but they are not related to the other comment values in the same column
+    comment_terms = get_controlled_vocabulary("idf_comment_terms")
+    for idf_ct, usi_ct in comment_terms.items():
+        if idf_ct in idf_dict:
+            # A new dict entry for the term with the list of values
+            study_info["comments"][usi_ct] = idf_dict[idf_ct]
+    # TODO: Remove trailing empty list entries, e.g. 'related experiment': ['E-MTAB-7236', '', '', '']
+
+    print(study_info["comments"])
+
+    return study_info, protocols
+
+
+def parse_multi_column_fields(idf_dict, category_list, lookup_term):
+    # Get the field names and translation from IDF to USI
+    controlled_terms = get_controlled_vocabulary(lookup_term)
+    # Go through terms
+    for idf_ct, usi_ct in controlled_terms.items():
+        if idf_ct in idf_dict:
+            # Go through IDF value lists
+            for i, contact_value in enumerate(idf_dict[idf_ct]):
+                # Add new list entry for the current position
+                if len(category_list) <= i:
+                    category_list.append(OrderedDict())
+                # Fill in value for this term and position
+                category_list[i][usi_ct] = contact_value

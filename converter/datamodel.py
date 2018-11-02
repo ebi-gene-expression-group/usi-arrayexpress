@@ -30,21 +30,6 @@ class Assay:
             return None
 
 
-    def generate_assay_json(self, study_info):
-
-        assay_json = {
-            "alias": self.alias,
-            "attributes": {
-                "technology_type": self.techtype
-            },
-            "studyRef": "",
-            "sampleUses": "",
-            "protocolUses": "",
-            "team": study_info["team"]
-        }
-        return assay_json
-
-
 class MicroarrayAssay(Assay):
     def __init__(self, assay_obj):
         Assay.__init__(self, assay_obj)
