@@ -51,11 +51,13 @@
     "Termsourceversion": ""
   },
   "idf_comment_terms": {
+    "ArrayExpressAccession": "accession",
     "AEExperimentType": "experiment type",
     "RelatedExperiment": "related experiment",
     "AdditionalFile": "additional file",
     "SecondaryAccession": "secondary accession",
     "SequenceDataURI": "sequence data uri",
+    "AEExperimentDisplayName": "experiment display name",
     "EAExpectedClusters": "ea expected clusters",
     "EAAdditionalAttributes": "ea additional attributes",
     "EAExperimentType": "ea experiment type",

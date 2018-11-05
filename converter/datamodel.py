@@ -1,4 +1,4 @@
-from parsing import read_json_file, get_controlled_vocabulary
+from parsing import read_json_file, get_controlled_vocabulary, remove_duplicates
 
 
 class Assay:
@@ -21,13 +21,6 @@ class Assay:
             if a not in fixed_attributes and all_values[a]:
                 other_attributes.append(a)
         return other_attributes
-
-    def get_techtype(self):
-        try:
-            techtype_value = self.techtype[0]["value"]
-            return techtype_value
-        except KeyError:
-            return None
 
 
 class MicroarrayAssay(Assay):
@@ -63,10 +56,10 @@ class SeqAssay(Assay):
         lib_attribs = {a.lower(): comments[a] for a in lib_attrib_cv if comments.get(a)}
 
         # Get technology type(s) from assay attributes
-        techtype = _remove_duplicates([a.get("technology type") for a in assay_attributes])
+        techtype = remove_duplicates([a.get("technology type") for a in assay_attributes])
 
         # Get accession from ENA Experiment in assay comments
-        accession = _remove_duplicates([a.get('comments', {}).get('ENA_EXPERIMENT', "") for a in assay_attributes])
+        accession = remove_duplicates([a.get('comments', {}).get('ENA_EXPERIMENT', "") for a in assay_attributes])
         if len(accession) == 1:
             accession = accession[0]
         #else: report ERROR
@@ -76,7 +69,7 @@ class SeqAssay(Assay):
         for a in assay_attributes:
             protocolrefs.extend(a.get("protocol ref"))
         protocolrefs.extend(extract_attributes.get("protocol ref", []))
-        protocolrefs = _remove_duplicates(protocolrefs)
+        protocolrefs = remove_duplicates(protocolrefs)
 
         # Get sample refs
         samplerefs = extract_attributes.get("sample ref")
@@ -89,7 +82,26 @@ class SeqAssay(Assay):
         pass
 
 
-def _remove_duplicates(ref_list):
-    return list(set(ref_list))
+class Protocol:
+    def __init__(self, alias, title, description, protocol_type, hardware, software, parameters):
+        self.alias = alias
+        self.title = title
+        self.description = description
+        self.protocol_type = protocol_type
+        self.hardware = hardware
+        self.software = software
+        self.parameters = parameters
+
+    @classmethod
+    def from_idf(cls, protocol_dict):
+        title = protocol_dict.get("title")
+        alias = title
+        description = protocol_dict.get("description")
+        protocol_type = protocol_dict.get("protocol type")
+        hardware = protocol_dict.get("hardware")
+        software = protocol_dict.get("software")
+        parameters = protocol_dict.get("parameters")
+
+        return cls(alias, title, description, protocol_type, hardware, software, parameters)
 
 

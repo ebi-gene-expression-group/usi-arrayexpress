@@ -66,6 +66,10 @@ def read_idf_file(idf_file):
     return idf_dict
 
 
+def remove_duplicates(ref_list):
+    return list(set(ref_list))
+
+
 def get_controlled_vocabulary(category):
     resource_package = __name__
     resource_path = "term_translations.json"
@@ -426,11 +430,12 @@ def parse_idf(idf_file):
         "description": "",
         "experimental design": [],
         "experimental factor": [],
-        "release date": "",
+        "releaseDate": "",
         "date of experiment": "",
         "contacts": [],
         "publication": [],
-        "comments": {}
+        "comments": {},
+        "protocolRefs": []
     }
 
     protocols = list()
@@ -441,7 +446,6 @@ def parse_idf(idf_file):
 
     # Contacts
     parse_multi_column_fields(idf_dict, study_info["contacts"], "contact_terms")
-
     print(study_info["contacts"])
 
     # Publications
@@ -452,23 +456,38 @@ def parse_idf(idf_file):
     parse_multi_column_fields(idf_dict, study_info["experimental factor"], "factor_terms")
     print(study_info["experimental factor"])
 
+    # Experimental Design
     parse_multi_column_fields(idf_dict, study_info["experimental design"], "design_terms")
     print(study_info["experimental design"])
 
+    # Protocols
     parse_multi_column_fields(idf_dict, protocols, "protocol_terms")
     for p in protocols:
         print(p.items())
+
+    study_info["protocolRefs"] = [p.get("title") for p in protocols]
 
     # Comments
     # Here we allow >1 value but they are not related to the other comment values in the same column
     comment_terms = get_controlled_vocabulary("idf_comment_terms")
     for idf_ct, usi_ct in comment_terms.items():
         if idf_ct in idf_dict:
+            # Remove empty list entries, e.g. 'related experiment': ['E-MTAB-7236', '', '', '']
+            comment_values = [x for x in idf_dict[idf_ct] if x]
             # A new dict entry for the term with the list of values
-            study_info["comments"][usi_ct] = idf_dict[idf_ct]
-    # TODO: Remove trailing empty list entries, e.g. 'related experiment': ['E-MTAB-7236', '', '', '']
+            study_info["comments"][usi_ct] = comment_values
 
-    print(study_info["comments"])
+    # General Info
+    general_terms = get_controlled_vocabulary("investigation_terms")
+    for idf_ct, usi_ct in general_terms.items():
+        if idf_ct in idf_dict and idf_dict[idf_ct]:
+            # for these terms we only expect/allow 1 value (the first item in the list)
+            study_info[usi_ct] = idf_dict[idf_ct][0]
+
+    study_info["accession"] = study_info["comments"].get("accession")
+
+    for s, v in study_info.items():
+        print(s, v)
 
     return study_info, protocols
 
@@ -481,8 +500,10 @@ def parse_multi_column_fields(idf_dict, category_list, lookup_term):
         if idf_ct in idf_dict:
             # Go through IDF value lists
             for i, contact_value in enumerate(idf_dict[idf_ct]):
-                # Add new list entry for the current position
-                if len(category_list) <= i:
-                    category_list.append(OrderedDict())
-                # Fill in value for this term and position
-                category_list[i][usi_ct] = contact_value
+                # Not for empty values
+                if contact_value:
+                    # Add new list entry for the current position
+                    if len(category_list) <= i:
+                        category_list.append(dict())
+                    # Fill in value for this term and position
+                    category_list[i][usi_ct] = contact_value
