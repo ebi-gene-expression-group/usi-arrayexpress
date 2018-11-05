@@ -105,3 +105,32 @@ class Protocol:
         return cls(alias, title, description, protocol_type, hardware, software, parameters)
 
 
+class Study:
+    def __init__(self, accession, alias, title, description, protocolrefs, projectref,
+                 experimental_factor, experimental_design, experiment_type, comments):
+        self.accession = accession
+        self.alias = alias
+        self.title = title
+        self.description = description
+        self.protocolrefs = protocolrefs
+        self.projectref = projectref
+        self.experimental_factor = experimental_factor
+        self.experimental_design = experimental_design
+        self.experiment_type = experiment_type
+        self.comments = comments
+
+    @classmethod
+    def from_idf(cls, study_info):
+        accession = study_info.get("accession")
+        alias = study_info.get("title")
+        title = study_info.get("title")
+        description = study_info.get("description")
+        experiment_type = study_info.get("experiment type")
+        experimental_factor = study_info.get("experimental factor")
+        experimental_design = study_info.get("experimental design")
+        protocolrefs = study_info.get("protocolRefs")
+        projectref = "project_" + alias
+        comments = study_info.get("comments")
+
+        return cls(accession, alias, title, description, protocolrefs, projectref,
+                   experimental_factor, experimental_design, experiment_type, comments)
