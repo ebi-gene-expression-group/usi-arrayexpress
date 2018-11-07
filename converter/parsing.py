@@ -34,6 +34,8 @@ def read_sdrf_file(sdrf_file):
 
 
 def read_idf_file(idf_file):
+    """This function reads in an IDF file and determines whether it is a normal or a merged file.
+    It then returns the data as a dictionary with the field names as keys and values as list."""
     idf_dict = OrderedDict()
     with codecs.open(idf_file, encoding='utf-8') as fi:
         idf_raw = fi.readlines()
@@ -420,6 +422,7 @@ def parse_sdrf(sdrf_file):
 
 
 def parse_idf(idf_file):
+    """This parses the raw IDF dictionary and puts the fields and values into a sub-category dictionary."""
 
     idf_dict = read_idf_file(idf_file)
     print(idf_dict)
@@ -493,6 +496,11 @@ def parse_idf(idf_file):
 
 
 def parse_multi_column_fields(idf_dict, category_list, lookup_term):
+    """Helper function to connect the related entries in IDF columns,
+    e.g. for protocols, contacts and factor values.
+    It translates the IDF terms into terms used in the USI data model
+    and safes the values as a list of individual dictionaries."""
+
     # Get the field names and translation from IDF to USI
     controlled_terms = get_controlled_vocabulary(lookup_term)
     # Go through terms
