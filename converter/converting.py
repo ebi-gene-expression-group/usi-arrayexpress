@@ -151,13 +151,14 @@ def generate_usi_ref_object(alias, study_info, accession=None):
     """
 
     ref_object = dict()
-    ref_object['alias'] = alias
-    ref_object['team'] = study_info.get('team')
 
     if accession and is_accession(accession):
         ref_object['accession'] = accession
     elif is_accession(alias):
         ref_object['accession'] = alias
+    else:
+        ref_object['alias'] = alias
+        ref_object['team'] = study_info.get('team')
 
     return ref_object
 
