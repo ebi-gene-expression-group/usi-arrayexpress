@@ -16,7 +16,7 @@ class Assay:
         """This returns a list of all additional attributes that have values"""
         all_attributes = self.__dict__.keys()
         all_values = self.__dict__
-        fixed_attributes = ("alias", "accession", "techtype", "protocolrefs", "sampleref")
+        fixed_attributes = ("alias", "accession", "protocolrefs", "sampleref")
         other_attributes = list()
         for a in all_attributes:
             if a not in fixed_attributes and all_values[a]:
@@ -35,6 +35,8 @@ class MicroarrayAssay(Assay):
 
     @classmethod
     def from_magetab(cls, le_attributes, extract_attributes, assay_attributes):
+        """Intialise assay attributes from MAGE-TAB data dicts.
+        The central node for the microarray assay is the Labeled Extract Name."""
 
         alias = le_attributes.get("name")
         accession = None
@@ -52,9 +54,10 @@ class MicroarrayAssay(Assay):
 
         label = le_attributes.get("label")
 
+        # Get Array design REF, we are only expecting one unique per extract
         arrayref = [a.get("array ref") for a in assay_attributes]
 
-        return cls(alias, accession, techtype, protocolrefs, sampleref, label, arrayref)
+        return cls(alias, accession, techtype[0], protocolrefs, sampleref, label, arrayref[0])
 
 
 class SeqAssay(Assay):
@@ -74,7 +77,8 @@ class SeqAssay(Assay):
 
     @classmethod
     def from_magetab(cls, extract_attributes, assay_attributes, protocols):
-        """Intialise assay attributes from MAGE-TAB data dicts"""
+        """Intialise assay attributes from MAGE-TAB data dicts.
+        The central node for the sequencing assay is the Extract Name."""
 
         alias = extract_attributes.get("name")
 
@@ -113,7 +117,7 @@ class SeqAssay(Assay):
                 # Expecting only one sequencing protocol per assay
                 break
 
-        return cls(alias, accession, techtype, protocolrefs, samplerefs, lib_attribs)
+        return cls(alias, accession, techtype[0], protocolrefs, samplerefs, lib_attribs)
 
     @classmethod
     def from_json(cls, assay_object):
