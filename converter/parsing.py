@@ -379,6 +379,8 @@ def parse_sdrf(sdrf_file):
                 for i in range(node_range[0] + 1, node_range[1] + 1):
                     if get_name(header[i]) == "technologytype":
                         assay_attributes["technology type"] = row[i]
+                    elif get_name(header[i]) == "arraydesignref":
+                        assay_attributes["array ref"] = row[i]
                 assay_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1])
                 assay_attributes["protocol ref"] = [row[i] for i in node_range[2]]
                 assays[assay_name] = assay_attributes
@@ -418,7 +420,7 @@ def parse_sdrf(sdrf_file):
                                                header_dict.get('derivedarraydatafile', len(header) - 1))
             })
 
-    return samples, extracts, le, assays, raw_data, processed_data
+    return samples, extracts, le, assays, raw_data, processed_data, is_microarray
 
 
 def parse_idf(idf_file):

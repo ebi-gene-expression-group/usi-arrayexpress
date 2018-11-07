@@ -23,11 +23,38 @@ class Assay:
                 other_attributes.append(a)
         return other_attributes
 
+    #def import_techtype_from_magetab(cls, assay_attributes):
+    #    techtype = remove_duplicates([a.get("technology type") for a in assay_attributes])
+    #    return techtype
 
 class MicroarrayAssay(Assay):
-    def __init__(self, assay_obj):
-        Assay.__init__(self, assay_obj)
-        self.arrayref = self.attributes.get("array ref", None)
+    def __init__(self, alias, accession, techtype, protocolrefs, sampleref, label, arrayref):
+        Assay.__init__(self, alias, accession, techtype, protocolrefs, sampleref)
+        self.label = label
+        self.arrayref = arrayref
+
+    @classmethod
+    def from_magetab(cls, le_attributes, extract_attributes, assay_attributes):
+
+        alias = le_attributes.get("name")
+        accession = None
+        techtype = remove_duplicates([a.get("technology type") for a in assay_attributes])
+
+        # Get all protocol refs
+        protocolrefs = []
+        for a in assay_attributes:
+            protocolrefs.extend(a.get("protocol ref"))
+        protocolrefs.extend(extract_attributes.get("protocol ref", []))
+        protocolrefs.extend(le_attributes.get("protocol ref", []))
+        protocolrefs = remove_duplicates(protocolrefs)
+
+        sampleref = extract_attributes.get("sample ref")
+
+        label = le_attributes.get("label")
+
+        arrayref = [a.get("array ref") for a in assay_attributes]
+
+        return cls(alias, accession, techtype, protocolrefs, sampleref, label, arrayref)
 
 
 class SeqAssay(Assay):
@@ -46,9 +73,8 @@ class SeqAssay(Assay):
         self.instrument_model = lib_attribs.get("instrument_model")
 
     @classmethod
-    def from_sdrf(cls, extract_attributes, assay_attributes, protocols):
-        """Intialise assay attributes from sdrf data dicts,
-        Translating parsed SDRF attributes into USI format"""
+    def from_magetab(cls, extract_attributes, assay_attributes, protocols):
+        """Intialise assay attributes from MAGE-TAB data dicts"""
 
         alias = extract_attributes.get("name")
 
@@ -106,7 +132,7 @@ class Protocol:
         self.parameters = parameters
 
     @classmethod
-    def from_idf(cls, protocol_dict):
+    def from_magetab(cls, protocol_dict):
         alias = protocol_dict.get("title")
         if is_accession(alias):
             accession = alias
@@ -136,7 +162,7 @@ class Study:
         self.comments = comments
 
     @classmethod
-    def from_idf(cls, study_info):
+    def from_magetab(cls, study_info):
         accession = study_info.get("accession")
         alias = study_info.get("title")
         title = study_info.get("title")
