@@ -1,4 +1,5 @@
 from parsing import read_json_file, get_controlled_vocabulary, remove_duplicates
+from converting import is_accession
 
 
 class Assay:
@@ -41,10 +42,11 @@ class SeqAssay(Assay):
         self.orientation = lib_attribs.get("orientation")
         self.nominal_length = lib_attribs.get("nominal_length")
         self.nominal_sdev = lib_attribs.get("nominal_sdev")
-
+        self.platform_type = lib_attribs.get("platform_type")
+        self.instrument_model = lib_attribs.get("instrument_model")
 
     @classmethod
-    def from_sdrf(cls, extract_attributes, assay_attributes):
+    def from_sdrf(cls, extract_attributes, assay_attributes, protocols):
         """Intialise assay attributes from sdrf data dicts,
         Translating parsed SDRF attributes into USI format"""
 
@@ -74,6 +76,17 @@ class SeqAssay(Assay):
         # Get sample refs
         samplerefs = extract_attributes.get("sample ref")
 
+        # Get platform and instrument from sequencing protocol
+        for p in protocols:
+            if p.get("title") in protocolrefs and p.get("protocol type") == "nucleic acid sequencing protocol":
+                hardware = p.get("hardware")
+                lib_attribs["instrument_model"] = hardware
+                # TODO: need to look up the platform type from ENA's controlled vocab
+                # Using ILLUMINA as placeholder for now as it fits 90% of cases
+                lib_attribs["platform_type"] = "ILLUMINA"
+                # Expecting only one sequencing protocol per assay
+                break
+
         return cls(alias, accession, techtype, protocolrefs, samplerefs, lib_attribs)
 
     @classmethod
@@ -83,9 +96,9 @@ class SeqAssay(Assay):
 
 
 class Protocol:
-    def __init__(self, alias, title, description, protocol_type, hardware, software, parameters):
+    def __init__(self, alias, accession, description, protocol_type, hardware, software, parameters):
         self.alias = alias
-        self.title = title
+        self.accession = accession
         self.description = description
         self.protocol_type = protocol_type
         self.hardware = hardware
@@ -94,15 +107,18 @@ class Protocol:
 
     @classmethod
     def from_idf(cls, protocol_dict):
-        title = protocol_dict.get("title")
-        alias = title
+        alias = protocol_dict.get("title")
+        if is_accession(alias):
+            accession = alias
+        else:
+            accession = None
         description = protocol_dict.get("description")
         protocol_type = protocol_dict.get("protocol type")
         hardware = protocol_dict.get("hardware")
         software = protocol_dict.get("software")
         parameters = protocol_dict.get("parameters")
 
-        return cls(alias, title, description, protocol_type, hardware, software, parameters)
+        return cls(alias, accession, description, protocol_type, hardware, software, parameters)
 
 
 class Study:

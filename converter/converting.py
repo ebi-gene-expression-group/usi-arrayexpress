@@ -6,13 +6,6 @@ import re
 from collections import OrderedDict, defaultdict
 
 
-regex_lookup = {
-    "AE_ACCESSION": "^[A-Z]-[A-Z]{4}-[0-9]+",
-    "BIOSD_ACCESSION": "^SAMEA[0-9]+$",
-    "ENA_ACCESSION": "^ER[RESP][0-9]+$",
-    "BIOSTUDIES_ACCESSION": "^S-[A-Z]+[0-9]+$"}
-
-REGEX_EBI_ACCESSION = "|".join(regex_lookup.values())
 
 
 """
@@ -161,9 +154,9 @@ def generate_usi_ref_object(alias, study_info, accession=None):
     ref_object['alias'] = alias
     ref_object['team'] = study_info.get('team')
 
-    if accession and re.match(REGEX_EBI_ACCESSION, accession):
+    if accession and is_accession(accession):
         ref_object['accession'] = accession
-    elif re.match(REGEX_EBI_ACCESSION, alias):
+    elif is_accession(alias):
         ref_object['accession'] = alias
 
     return ref_object
@@ -184,3 +177,21 @@ def write_json_file(json_object, object_type, study_info):
     with codecs.open(json_file_name, 'w', encoding='utf-8') as jf:
         json.dump(json_object, jf)
 
+
+def is_accession(accession, archive=None):
+    regex_lookup = {
+        "ARRAYEXPRESS": "^[A-Z]-[A-Z]{4}-[0-9]+",
+        "BIOSAMPLES": "^SAMEA[0-9]+$",
+        "ENA": "^ER[RESP][0-9]+$",
+        "BIOSTUDIES": "^S-[A-Z]+[0-9]+$"}
+
+    regex_ebi_accession = "|".join(regex_lookup.values())
+
+    if archive:
+        try:
+            regex = regex_lookup.get(archive)
+            return re.match(regex, accession)
+        except KeyError:
+            print("Not a valid accession type: {}".format(archive))
+    else:
+        return re.match(regex_ebi_accession, accession)
