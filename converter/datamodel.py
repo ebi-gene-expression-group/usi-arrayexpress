@@ -4,13 +4,17 @@ from converting import is_accession
 
 class Assay:
 
-    def __init__(self, alias, accession, techtype, protocolrefs, sampleref):
+    def __init__(self, alias, accession, technology_type, protocolrefs, sampleref):
         # Attributes common to all assay types
         self.alias = alias
         self.accession = accession
-        self.techtype = techtype
+        self.technology_type = technology_type
         self.protocolrefs = protocolrefs
         self.sampleref = sampleref
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.technology_type}, " \
+               "{self.protocolrefs}, {self.sampleref})".format(self=self)
 
     def get_attributes(self):
         """This returns a list of all additional attributes that have values"""
@@ -23,13 +27,13 @@ class Assay:
                 other_attributes.append(a)
         return other_attributes
 
-    #def import_techtype_from_magetab(cls, assay_attributes):
-    #    techtype = remove_duplicates([a.get("technology type") for a in assay_attributes])
-    #    return techtype
+    #def import_technology_type_from_magetab(cls, assay_attributes):
+    #    technology_type = remove_duplicates([a.get("technology_type") for a in assay_attributes])
+    #    return technology_type
 
 class MicroarrayAssay(Assay):
-    def __init__(self, alias, accession, techtype, protocolrefs, sampleref, label, arrayref):
-        Assay.__init__(self, alias, accession, techtype, protocolrefs, sampleref)
+    def __init__(self, alias, accession, technology_type, protocolrefs, sampleref, label, arrayref):
+        Assay.__init__(self, alias, accession, technology_type, protocolrefs, sampleref)
         self.label = label
         self.arrayref = arrayref
 
@@ -40,29 +44,29 @@ class MicroarrayAssay(Assay):
 
         alias = le_attributes.get("name")
         accession = None
-        techtype = remove_duplicates([a.get("technology type") for a in assay_attributes])
+        technology_type = remove_duplicates([a.get("technology_type") for a in assay_attributes])
 
         # Get all protocol refs
         protocolrefs = []
         for a in assay_attributes:
-            protocolrefs.extend(a.get("protocol ref"))
-        protocolrefs.extend(extract_attributes.get("protocol ref", []))
-        protocolrefs.extend(le_attributes.get("protocol ref", []))
+            protocolrefs.extend(a.get("protocol_ref"))
+        protocolrefs.extend(extract_attributes.get("protocol_ref", []))
+        protocolrefs.extend(le_attributes.get("protocol_ref", []))
         protocolrefs = remove_duplicates(protocolrefs)
 
-        sampleref = extract_attributes.get("sample ref")
+        sampleref = extract_attributes.get("sample_ref")
 
         label = le_attributes.get("label")
 
         # Get Array design REF, we are only expecting one unique per extract
-        arrayref = [a.get("array ref") for a in assay_attributes]
+        arrayref = [a.get("array_design") for a in assay_attributes]
 
-        return cls(alias, accession, techtype[0], protocolrefs, sampleref, label, arrayref[0])
+        return cls(alias, accession, technology_type[0], protocolrefs, sampleref, label, arrayref[0])
 
 
 class SeqAssay(Assay):
-    def __init__(self, alias, accession, techtype, protocolrefs, sampleref, lib_attribs):
-        Assay.__init__(self, alias, accession, techtype, protocolrefs, sampleref)
+    def __init__(self, alias, accession, technology_type, protocolrefs, sampleref, lib_attribs):
+        Assay.__init__(self, alias, accession, technology_type, protocolrefs, sampleref)
 
         self.library_layout = lib_attribs.get("library_layout")
         self.library_selection = lib_attribs.get("library_selection")
@@ -88,7 +92,7 @@ class SeqAssay(Assay):
         lib_attribs = {a.lower(): comments[a] for a in lib_attrib_cv if comments.get(a)}
 
         # Get technology type(s) from assay attributes
-        techtype = remove_duplicates([a.get("technology type") for a in assay_attributes])
+        technology_type = remove_duplicates([a.get("technology_type") for a in assay_attributes])
 
         # Get accession from ENA Experiment in assay comments
         accession = remove_duplicates([a.get('comments', {}).get('ENA_EXPERIMENT', "") for a in assay_attributes])
@@ -99,12 +103,12 @@ class SeqAssay(Assay):
         # Get all protocol refs
         protocolrefs = []
         for a in assay_attributes:
-            protocolrefs.extend(a.get("protocol ref"))
-        protocolrefs.extend(extract_attributes.get("protocol ref", []))
+            protocolrefs.extend(a.get("protocol_ref"))
+        protocolrefs.extend(extract_attributes.get("protocol_ref", []))
         protocolrefs = remove_duplicates(protocolrefs)
 
         # Get sample refs
-        samplerefs = extract_attributes.get("sample ref")
+        samplerefs = extract_attributes.get("sample_ref")
 
         # Get platform and instrument from sequencing protocol
         for p in protocols:
@@ -117,7 +121,7 @@ class SeqAssay(Assay):
                 # Expecting only one sequencing protocol per assay
                 break
 
-        return cls(alias, accession, techtype[0], protocolrefs, samplerefs, lib_attribs)
+        return cls(alias, accession, technology_type[0], protocolrefs, samplerefs, lib_attribs)
 
     @classmethod
     def from_json(cls, assay_object):

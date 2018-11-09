@@ -312,8 +312,8 @@ def parse_sdrf(sdrf_file):
 
         extract_attributes = {"name": "",
                               "comments": {},
-                              "sample ref": "",
-                              "protocol ref": []}
+                              "sample_ref": "",
+                              "protocol_ref": []}
 
         if "extractname" in header_dict:
             # This creates separate extract dicts if there is more than one column. Should we allow that?
@@ -328,9 +328,9 @@ def parse_sdrf(sdrf_file):
                 # Get comments
                 extract_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1] + 1)
                 # Keep reference to sample in that row
-                extract_attributes["sample ref"] = sample_name
+                extract_attributes["sample_ref"] = sample_name
 
-                extract_attributes["protocol ref"] = [row[i] for i in node_range[2]]
+                extract_attributes["protocol_ref"] = [row[i] for i in node_range[2]]
                 extracts[extract_name] = extract_attributes
 
         # Labeled Extract
@@ -338,8 +338,8 @@ def parse_sdrf(sdrf_file):
         le_attributes = {"name": "",
                          "label": "",
                          "comments": {},
-                         "extract ref": [],
-                         "protocol ref": []}
+                         "extract_ref": [],
+                         "protocol_ref": []}
 
         if "labeledextractname" in header_dict:
 
@@ -355,18 +355,18 @@ def parse_sdrf(sdrf_file):
                 # Get comments
                 le_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1] + 1)
                 # Keep reference to sample in that row
-                le_attributes["extract ref"].append(extract_name)
+                le_attributes["extract_ref"].append(extract_name)
 
-                le_attributes["protocol ref"] = [row[i] for i in node_range[2]]
+                le_attributes["protocol_ref"] = [row[i] for i in node_range[2]]
                 le[le_name] = le_attributes
 
         # Assay
 
         assay_attributes = {"name": "",
-                            "technology type": "",
+                            "technology_type": "",
                             "comments": {},
-                            "extract ref": [],
-                            "protocol ref": []}
+                            "extract_ref": [],
+                            "protocol_ref": []}
 
         if "assayname" in header_dict:
             node_range = node_map["assayname"][0]
@@ -378,26 +378,26 @@ def parse_sdrf(sdrf_file):
 
                 for i in range(node_range[0] + 1, node_range[1] + 1):
                     if get_name(header[i]) == "technologytype":
-                        assay_attributes["technology type"] = row[i]
+                        assay_attributes["technology_type"] = row[i]
                     elif get_name(header[i]) == "arraydesignref":
-                        assay_attributes["array ref"] = row[i]
+                        assay_attributes["array_design"] = row[i]
                 assay_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1])
-                assay_attributes["protocol ref"] = [row[i] for i in node_range[2]]
+                assay_attributes["protocol_ref"] = [row[i] for i in node_range[2]]
                 assays[assay_name] = assay_attributes
 
                 if le_name:
-                    assay_attributes["extract ref"].append(le_name)
+                    assay_attributes["extract_ref"].append(le_name)
                     continue
                 elif extract_name:
-                    assay_attributes["extract ref"].append(extract_name)
+                    assay_attributes["extract_ref"].append(extract_name)
             # We allow more than 1 extract per assay for the two-colour case
             else:
                 # Add the extract ref to the previous assay, using set to avoid duplicates
                 if le_name:
-                    assays[assay_name]["extract ref"].append(le_name)
+                    assays[assay_name]["extract_ref"].append(le_name)
                     continue
                 elif extract_name:
-                    assays[assay_name]["extract ref"].append(extract_name)
+                    assays[assay_name]["extract_ref"].append(extract_name)
 
         # Datafiles
 

@@ -97,8 +97,8 @@
       "comment": ""
     },
     "Assayname": {
-      "technologytype": "",
-      "arraydesignref": "array ref",
+      "technologytype": "technology_type",
+      "arraydesignref": "array_design",
       "comment": ""
     },
     "Arraydatafile":{

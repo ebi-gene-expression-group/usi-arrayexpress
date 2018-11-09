@@ -14,6 +14,6 @@ assay_data = json_data.get("assays")
 for x in assay_data:
     my_assay = Assay(x)
     print(my_assay.name)
-    print(my_assay.techtype)
-    print(my_assay.get_techtype())
+    print(my_assay.technology_type)
+    print(my_assay.get_technology_type())
 
