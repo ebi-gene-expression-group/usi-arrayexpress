@@ -150,13 +150,9 @@ def get_node_positions(nodes, header):
     protocols = []
     last_node = None
     node_open = False
-    node_map = dict()
 
     for i, h in enumerate(header):
         h = get_name(h)
-        if h in nodes:
-            node_map[h] = dict()
-
         if h in nodes and not node_open:
             last_node = h
             node_breakpoints[last_node].append([i, None, protocols])
@@ -195,7 +191,14 @@ def parse_sdrf(sdrf_file):
     # Read in the file and get data (separated from header), the header row, and a breakdown of header nodes/attributes
     sdrf_data, header, header_dict = read_sdrf_file(sdrf_file)
 
+    # A map of the start, end and protocol refs of each node
     node_map = get_node_positions(nodes, header)
+    print(node_map)
+    # For the raw data parsing we need to know the end
+    if "derivedarraydatafile" in header_dict:
+        end_of_raw_data = max(header_dict.get('derivedarraydatafile'))
+    else:
+        end_of_raw_data = len(header) - 1
 
     samples = dict()
     extracts = dict()
@@ -216,16 +219,6 @@ def parse_sdrf(sdrf_file):
     assay_names = []
 
     for row in sdrf_data:
-        # new_sample = Sample.from_sdrf()
-
-        # if is_microarray:
-        #    sdr.assays.append(MicroarrayAssay.from_sdrf(row, header_dict, header))
-        # else:
-        #    sdr.assays.append(SeqAssay.from_sdrf(row, header_dict, header))
-
-        # sdr.rawdata.append(RawData.from_sdrf(row, header_dict, header))
-
-        # sdr.group_pairedend_files()
 
         sample_name = ""
         extract_name = ""
@@ -302,11 +295,6 @@ def parse_sdrf(sdrf_file):
                     sample_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1])
 
                 samples[sample_name] = sample_attributes
-
-        else:
-            # We don't want to log this for each row. Maybe make an error dict and count the occurances and print at the end of the script.
-            # Or simpler test this first before going through the rows
-            print("PARSER ERROR: No \"Source Name\" column found, or more than one.")
 
         # Extract
 
@@ -387,7 +375,6 @@ def parse_sdrf(sdrf_file):
 
                 if le_name:
                     assay_attributes["extract_ref"].append(le_name)
-                    continue
                 elif extract_name:
                     assay_attributes["extract_ref"].append(extract_name)
             # We allow more than 1 extract per assay for the two-colour case
@@ -395,30 +382,49 @@ def parse_sdrf(sdrf_file):
                 # Add the extract ref to the previous assay, using set to avoid duplicates
                 if le_name:
                     assays[assay_name]["extract_ref"].append(le_name)
-                    continue
                 elif extract_name:
                     assays[assay_name]["extract_ref"].append(extract_name)
 
         # Datafiles
 
-        raw_data = defaultdict()
-        datatype = None
-        files = []
+        file_attributes = {
+            "name": "",
+            "prefix": "",
+            "datatype": "",
+            "assay_ref": [],
+            "le_ref": [],
+            "extract_ref": [],
+            "protocol_ref": [],
+            "comments": []
+        }
 
         for rdn in raw_data_nodes:
-            if rdn in header:
-                files = [row[x] for x in header[rdn]]
-                datatype = rdn
-
-        for f in files:
-            # Make entry in the raw data dict under the file prefix
-            raw_data[get_prefix(f)].append({
-                'filename': f,
-                'datatype': datatype,
-                'assayref': '',
-                'comments': get_comment_values(row, header, header_dict[datatype],
-                                               header_dict.get('derivedarraydatafile', len(header) - 1))
-            })
+            if rdn in header_dict:
+                # To make sure we can handle multiple columns of the same type
+                for node_range in node_map[rdn]:
+                    node_index = node_range[0]
+                    file_name = row[node_index]
+                    # Initialise dict entry for each new file
+                    if file_name not in raw_data:
+                        raw_data[file_name] = file_attributes
+                        raw_data[file_name]["name"] = file_name
+                        raw_data[file_name]["prefix"] = get_prefix(file_name)
+                        raw_data[file_name]["datatype"] = rdn
+                        raw_data[file_name]["comments"] = get_comment_values(row, header, node_index, end_of_raw_data)
+                        raw_data[file_name]["assay_ref"].append(assay_name)
+                        raw_data[file_name]["extract_ref"].append(extract_name)
+                        if le_name:
+                            raw_data[file_name]["le_ref"].append(le_name)
+                        raw_data[file_name]["protocol_ref"].extend([row[i] for i in node_range[2]])
+                    # For microarray we can have several labeled extracts/assays per file
+                    else:
+                        # This may be redundant but recording this for now
+                        if le_name and le_name not in raw_data[file_name]["le_ref"]:
+                            raw_data[file_name]["le_ref"].append(le_name)
+                        if assay_name not in raw_data[file_name]["assay_ref"]:
+                            raw_data[file_name]["assay_ref"].append(assay_name)
+                        if extract_name not in raw_data[file_name]["extract_ref"]:
+                            raw_data[file_name]["extract_ref"].append(extract_name)
 
     return samples, extracts, le, assays, raw_data, processed_data, is_microarray
 
@@ -444,10 +450,6 @@ def parse_idf(idf_file):
     }
 
     protocols = list()
-
-    value_with_ontology_term = {"value": "",
-                                 "term ref": "",
-                                 "term accession": ""}
 
     # Contacts
     parse_multi_column_fields(idf_dict, study_info["contacts"], "contact_terms")
