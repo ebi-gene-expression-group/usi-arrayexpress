@@ -156,8 +156,8 @@ class Protocol:
 
 
 class Study:
-    def __init__(self, accession, alias, title, description, protocolrefs, projectref,
-                 experimental_factor, experimental_design, experiment_type, comments):
+    def __init__(self, alias, accession, title, description, protocolrefs, projectref,
+                 experimental_factor, experimental_design, experiment_type, comments=None):
         self.accession = accession
         self.alias = alias
         self.title = title
@@ -182,5 +182,43 @@ class Study:
         projectref = "project_" + alias
         comments = study_info.get("comments")
 
-        return cls(accession, alias, title, description, protocolrefs, projectref,
+        return cls(alias, accession, title, description, protocolrefs, projectref,
                    experimental_factor, experimental_design, experiment_type, comments)
+
+
+class AssayData:
+    def __init__(self, alias, files, datatype, assayrefs, protocolrefs, accession=None):
+        self.alias = alias
+        self.files = files
+        self.assayrefs = assayrefs
+        self.datatype = datatype
+        self.protocolrefs = protocolrefs
+        self.accession = accession
+
+
+class DataFile:
+    def __init__(self, name, location=None, checksum=None, checksum_method="md5"):
+        self.name = name
+        self.checksum = checksum
+        self.checksum_method = checksum_method
+        self.location = location
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.name}, {self.location}, {self.checksum})".format(self=self)
+
+    @classmethod
+    def from_sdrf(cls, file_attributes):
+        name = file_attributes.get("name")
+
+        comments = file_attributes.get("comments", {})
+        checksum = comments.get("MD5")
+
+        if "ArrayExpress FTP file" in comments:
+            location = comments.get("ArrayExpress FTP file")
+        elif "FASTQ_URI" in comments:
+            location = comments.get("FASTQ_URI")
+        else:
+            location = None
+
+        return cls(name, location, checksum)
+

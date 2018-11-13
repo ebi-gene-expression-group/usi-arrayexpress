@@ -394,6 +394,7 @@ def parse_sdrf(sdrf_file):
             "assay_ref": [],
             "le_ref": [],
             "extract_ref": [],
+            "sample_ref": [],
             "protocol_ref": [],
             "comments": []
         }
@@ -413,6 +414,7 @@ def parse_sdrf(sdrf_file):
                         raw_data[file_name]["comments"] = get_comment_values(row, header, node_index, end_of_raw_data)
                         raw_data[file_name]["assay_ref"].append(assay_name)
                         raw_data[file_name]["extract_ref"].append(extract_name)
+                        raw_data[file_name]["sample_ref"].append(sample_name)
                         if le_name:
                             raw_data[file_name]["le_ref"].append(le_name)
                         raw_data[file_name]["protocol_ref"].extend([row[i] for i in node_range[2]])
@@ -425,6 +427,8 @@ def parse_sdrf(sdrf_file):
                             raw_data[file_name]["assay_ref"].append(assay_name)
                         if extract_name not in raw_data[file_name]["extract_ref"]:
                             raw_data[file_name]["extract_ref"].append(extract_name)
+                        if sample_name not in raw_data[file_name]["sample_ref"]:
+                            raw_data[file_name]["sample_ref"].append(sample_name)
 
     return samples, extracts, le, assays, raw_data, processed_data, is_microarray
 
