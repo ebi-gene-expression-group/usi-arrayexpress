@@ -197,14 +197,14 @@ class AssayData:
 
 
 class DataFile:
-    def __init__(self, name, location=None, checksum=None, checksum_method="md5"):
+    def __init__(self, name, ftp_location=None, checksum=None, checksum_method="md5"):
         self.name = name
         self.checksum = checksum
         self.checksum_method = checksum_method
-        self.location = location
+        self.ftp_location = ftp_location
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.name}, {self.location}, {self.checksum})".format(self=self)
+        return "{self.__class__.__name__}({self.name}, {self.ftp_location}, {self.checksum})".format(self=self)
 
     @classmethod
     def from_sdrf(cls, file_attributes):
@@ -214,11 +214,11 @@ class DataFile:
         checksum = comments.get("MD5")
 
         if "ArrayExpress FTP file" in comments:
-            location = comments.get("ArrayExpress FTP file")
+            ftp_location = comments.get("ArrayExpress FTP file")
         elif "FASTQ_URI" in comments:
-            location = comments.get("FASTQ_URI")
+            ftp_location = comments.get("FASTQ_URI")
         else:
-            location = None
+            ftp_location = None
 
-        return cls(name, location, checksum)
+        return cls(name, ftp_location, checksum)
 
