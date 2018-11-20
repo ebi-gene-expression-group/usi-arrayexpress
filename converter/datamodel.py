@@ -2,6 +2,12 @@ from parsing import read_json_file, get_controlled_vocabulary, remove_duplicates
 from converting import is_accession
 
 
+class Sample:
+
+    def __init__(self, alias, accession, taxon, taxonId, characteristics, factors, material_type, description):
+        pass
+
+
 class Assay:
 
     def __init__(self, alias, accession, technology_type, protocolrefs, sampleref):
@@ -27,9 +33,6 @@ class Assay:
                 other_attributes.append(a)
         return other_attributes
 
-    #def import_technology_type_from_magetab(cls, assay_attributes):
-    #    technology_type = remove_duplicates([a.get("technology_type") for a in assay_attributes])
-    #    return technology_type
 
 class MicroarrayAssay(Assay):
     def __init__(self, alias, accession, technology_type, protocolrefs, sampleref, label, arrayref):
