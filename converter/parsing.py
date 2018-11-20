@@ -155,11 +155,11 @@ def get_node_positions(nodes, header):
             if node_open:
                 node_breakpoints[last_node][-1][1] = i - 1
                 node_open = False
-                # In case there is no protocol between them
+        # In case there is no protocol between the nodes
         elif h in nodes and node_open:
             node_breakpoints[last_node][-1][1] = i - 1
             last_node = h
-            node_breakpoints[last_node].append([i, None, protocols])
+            node_breakpoints[last_node].append([i, None, []])
         elif h == 'factorvalue' and node_open:
             node_breakpoints[last_node][-1][1] = i - 1
             node_open = False
