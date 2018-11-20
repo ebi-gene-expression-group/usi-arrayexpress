@@ -171,12 +171,14 @@ def get_node_positions(nodes, header):
 
 
 def parse_sdrf(sdrf_file):
+
     sample_nodes = ("sourcename",)
     le_nodes = ("labeledextractname",)
     extract_nodes = ("extractname",)
     assay_nodes = ("assayname",)
     raw_data_nodes = ("arraydatafile", "arraydatamatrixfile", "scanname",)
     processed_data_nodes = ("derivedarraydatafile", "derivedarraydatamatrixfile",)
+    factor_nodes = ("factorvalue", )
 
     nodes = sample_nodes + extract_nodes + le_nodes + assay_nodes + raw_data_nodes + processed_data_nodes
 
@@ -186,18 +188,13 @@ def parse_sdrf(sdrf_file):
     # A map of the start, end and protocol refs of each node
     node_map = get_node_positions(nodes, header)
     print(node_map)
-    # For the raw data parsing we need to know the end
-    if "derivedarraydatafile" in header_dict:
-        end_of_raw_data = max(header_dict.get('derivedarraydatafile'))
-    else:
-        end_of_raw_data = len(header) - 1
 
-    samples = dict()
-    extracts = dict()
-    le = dict()
-    assays = dict()
-    raw_data = dict()
-    processed_data = dict()
+    samples = OrderedDict()
+    extracts = OrderedDict()
+    le = OrderedDict()
+    assays = OrderedDict()
+    raw_data = OrderedDict()
+    processed_data = OrderedDict()
 
     # Guessing experiment type (SEQ or MA) from SDRF header
     is_microarray = False
@@ -227,7 +224,9 @@ def parse_sdrf(sdrf_file):
                              "characteristics": defaultdict(list),
                              "material type": "",
                              "description": "",
-                             "comments": {}}
+                             "comments": {},
+                             "factors": {}
+                             }
 
         # Only one Source Name column is allowed
         if "sourcename" in node_map and len(node_map["sourcename"]) == 1:
@@ -248,18 +247,17 @@ def parse_sdrf(sdrf_file):
                         if i - 1 in header_dict["characteristics"] and last_attribute:
                             last_unit = get_value(header[i])
                             sample_attributes["characteristics"][last_attribute]["unit"] = {"value": row[i]}
-                            sample_attributes["characteristics"][last_attribute]["unit"]["unit type"] = last_unit
+                            sample_attributes["characteristics"][last_attribute]["unit"]["unit_type"] = last_unit
                         else:
                             print("PARSER ERROR: [column {}] Unit found without Characteristics.".format(i + 1))
                     # Add Term Source REFs
                     elif "termsourceref" in header_dict and i in header_dict["termsourceref"]:
-                        if "characteristics" in header_dict and i - 1 in header_dict[
-                            "characteristics"] and last_attribute:
+                        if "characteristics" in header_dict and i - 1 in header_dict["characteristics"] and last_attribute:
                             last_termsource = get_name(header[i])
-                            sample_attributes["characteristics"][last_attribute]["term source"] = row[i]
+                            sample_attributes["characteristics"][last_attribute]["term_source"] = row[i]
                         elif "unit" in header_dict and i - 1 in header_dict["unit"] and last_attribute and last_unit:
                             last_termsource = get_name(header[i])
-                            sample_attributes["characteristics"][last_attribute]["unit"]["term source"] = row[i]
+                            sample_attributes["characteristics"][last_attribute]["unit"]["term_source"] = row[i]
                         else:
                             print(
                                 "PARSER ERROR: [colum {}] \"Term source REF\" found without Characteristics or Unit".format(
@@ -267,12 +265,11 @@ def parse_sdrf(sdrf_file):
                     # Add Term Accession Number
                     elif "termaccessionnumber" in header_dict and i in header_dict["termaccessionnumber"]:
                         if "termsourceref" in header_dict and i - 1 in header_dict["termsourceref"] and last_termsource:
-                            if "characteristics" in header_dict and i - 2 in header_dict[
-                                "characteristics"] and last_attribute:
-                                sample_attributes["characteristics"][last_attribute]["term accession"] = row[i]
+                            if "characteristics" in header_dict and i - 2 in header_dict["characteristics"] and last_attribute:
+                                sample_attributes["characteristics"][last_attribute]["term_accession"] = row[i]
                             elif "unit" in header_dict and i - 2 in header_dict[
                                 "unit"] and last_attribute and last_unit:
-                                sample_attributes["characteristics"][last_attribute]["unit"]["term accession"] = row[i]
+                                sample_attributes["characteristics"][last_attribute]["unit"]["term_accession"] = row[i]
                         else:
                             print(
                                 "PARSER ERROR: [column {}] \"Term Accession Number\" found without Term Source REF".format(
@@ -381,19 +378,40 @@ def parse_sdrf(sdrf_file):
         # Datafiles
 
         # Raw data
-        parse_data_file_columns(raw_data_nodes, header_dict, header, node_map, end_of_raw_data, row, raw_data,
+        parse_data_file_columns(raw_data_nodes, header_dict, header, node_map, row, raw_data,
                                 sample_name, extract_name, le_name, assay_name)
 
         # Processed data
 
-        parse_data_file_columns(processed_data_nodes, header_dict, header, node_map, end_of_raw_data, row,
+        parse_data_file_columns(processed_data_nodes, header_dict, header, node_map, row,
                                 processed_data, sample_name, extract_name, le_name, assay_name)
 
 
-    return samples, extracts, le, assays, raw_data, processed_data, factors, is_microarray
+        # Factor Values
+
+        # For now we'll assume that each factor value corresponds to a biological replicate, i.e. sample,
+        # and factor values get added to the sample attributes
+        # This means this won't work for the edge cases where a technical parameter is used as factor,
+        # e.g. comparison of the same sample sequenced with different sequencers
+
+        factors = OrderedDict()
+
+        for i in header_dict.get("factorvalue", []):
+            # Get value and category
+            factor_type = get_value(header[i])
+            factors[factor_type] = {"value": row[i]}
+            # Getting units (simplified)
+            if i+1 in header_dict.get("unit", []):
+                factors[factor_type]["unit"] = {"value": row[i+1],
+                                                "unit_type": get_value(header[i+1])}
+        # Add to the sample attributes of the current sample
+        # Note this will deliberately overwrite if there are different values within one sample (see comment above)
+        samples[sample_name]["factors"] = factors
+
+    return samples, extracts, le, assays, raw_data, processed_data, is_microarray
 
 
-def parse_data_file_columns(data_nodes, header_dict, header, node_map, end_of_raw_data, row, data_dict,
+def parse_data_file_columns(data_nodes, header_dict, header, node_map, row, data_dict,
                             sample_name, extract_name, le_name, assay_name):
     """Parse data file columns and add file attributes to the respective dict.
 
