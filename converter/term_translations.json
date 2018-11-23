@@ -14,7 +14,8 @@
     "investigationtitle": "title",
     "experimentdescription": "description",
     "dateofexperiment": "date_of_experiment",
-    "publicreleasedate": "releaseDate"
+    "publicreleasedate": "releaseDate",
+    "sdrffile": "sdrf_filename"
   },
   "publication_terms": {
     "pubmedid": "pubmedId",

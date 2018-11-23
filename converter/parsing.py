@@ -482,7 +482,7 @@ def parse_idf(idf_file):
         "releaseDate": "",
         "date_of_experiment": "",
         "contacts": [],
-        "publication": [],
+        "publications": [],
         "comments": {},
         "protocolRefs": [],
         "idf_filename": idf_file,
@@ -496,8 +496,8 @@ def parse_idf(idf_file):
     print(study_info["contacts"])
 
     # Publications
-    parse_multi_column_fields(idf_dict, study_info["publication"], "publication_terms")
-    print(study_info["publication"])
+    parse_multi_column_fields(idf_dict, study_info["publications"], "publication_terms")
+    print(study_info["publications"])
 
     # Factors
     parse_multi_column_fields(idf_dict, study_info["experimental_factor"], "factor_terms")
@@ -531,9 +531,7 @@ def parse_idf(idf_file):
             # for these terms we only expect/allow 1 value (the first item in the list)
             study_info[usi_ct] = idf_dict[idf_ct][0]
 
-    study_info["accession"] = study_info["comments"].get("accession", [])[0]
-
-    study_info["sdrf_filename"] = idf_dict.get("sdrffile", [])[0]
+    study_info["accession"] = study_info["comments"].get("accession", None)
 
     for s, v in study_info.items():
         print(s, v)
