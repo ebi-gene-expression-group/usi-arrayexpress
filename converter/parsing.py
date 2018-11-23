@@ -55,13 +55,18 @@ def read_idf_file(idf_file):
                 # For comments get the value inside square brackets
                 if re.search('comment', row_label, flags=re.IGNORECASE):
                     row_label = get_value(row_label)
-                # For normal Row lables remove whitespaces
+                # For normal Row labels remove whitespaces
                 else:
                     row_label = get_name(row_label)
                 # Skip rows that have a label but no values
                 if not len(''.join(idf_row).strip()) == 0:
-                    # Store values in idf_dict
-                    idf_dict[row_label] = idf_row
+                    # Some comments are duplicated
+                    if row_label in idf_dict:
+                        # in that case add to existing entry
+                        idf_dict[row_label].extend(idf_row)
+                    else:
+                        # Store values in idf_dict
+                        idf_dict[row_label] = idf_row
 
     for label, x in idf_dict.items():
         print(label + ' --> ' + str(x))
@@ -472,14 +477,16 @@ def parse_idf(idf_file):
         "title": "",
         "accession": "",
         "description": "",
-        "experimental design": [],
-        "experimental factor": [],
+        "experimental_design": [],
+        "experimental_factor": [],
         "releaseDate": "",
-        "date of experiment": "",
+        "date_of_experiment": "",
         "contacts": [],
         "publication": [],
         "comments": {},
-        "protocolRefs": []
+        "protocolRefs": [],
+        "idf_filename": idf_file,
+        "sdrf_filename": ""
     }
 
     protocols = list()
@@ -493,12 +500,12 @@ def parse_idf(idf_file):
     print(study_info["publication"])
 
     # Factors
-    parse_multi_column_fields(idf_dict, study_info["experimental factor"], "factor_terms")
-    print(study_info["experimental factor"])
+    parse_multi_column_fields(idf_dict, study_info["experimental_factor"], "factor_terms")
+    print(study_info["experimental_factor"])
 
     # Experimental Design
-    parse_multi_column_fields(idf_dict, study_info["experimental design"], "design_terms")
-    print(study_info["experimental design"])
+    parse_multi_column_fields(idf_dict, study_info["experimental_design"], "design_terms")
+    print(study_info["experimental_design"])
 
     # Protocols
     parse_multi_column_fields(idf_dict, protocols, "protocol_terms")
@@ -524,7 +531,9 @@ def parse_idf(idf_file):
             # for these terms we only expect/allow 1 value (the first item in the list)
             study_info[usi_ct] = idf_dict[idf_ct][0]
 
-    study_info["accession"] = study_info["comments"].get("accession")
+    study_info["accession"] = study_info["comments"].get("accession", [])[0]
+
+    study_info["sdrf_filename"] = idf_dict.get("sdrffile", [])[0]
 
     for s, v in study_info.items():
         print(s, v)

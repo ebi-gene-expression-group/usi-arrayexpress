@@ -1,5 +1,7 @@
 from parsing import read_json_file, get_controlled_vocabulary, remove_duplicates
 from converting import is_accession
+import os
+import re
 
 
 class Sample:
@@ -158,11 +160,48 @@ class Protocol:
         return cls(alias, accession, description, protocol_type, hardware, software, parameters)
 
 
+class Project:
+    def __init__(self, alias, accession, title, description, releaseDate, publications, contacts):
+        self.alias = alias
+        self.accession = accession
+        self.title = title
+        self.description = description
+        self.releaseDate = releaseDate
+        self.publications = publications
+        self.contacts = contacts
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.releaseDate})," \
+               "{self.publications}, {self.contacts}".format(self=self)
+
+    @classmethod
+    def from_magetab(cls, study_info):
+        idf_file = os.path.basename(study_info.get("idf_filename", ""))
+        temp_project_name = re.sub("\.idf\.txt$", "", idf_file)
+        alias = "project_" + temp_project_name
+        # The project accession might be the BioStudies accession, which could be saved as IDF comment
+        # Placeholder code which returns None for now
+        comments = study_info.get("comments")
+        accession = comments.get("biostudiesaccession", None)
+        releaseDate = study_info.get("releaseDate", None)
+        publications = study_info.get("publications", [])
+        contacts = study_info.get("contacts", [])
+        # Transform rolse to list
+        for c in contacts:
+            if c.get("roles"):
+                roles = c["roles"]
+                c["roles"] = roles.split(';')
+        title = study_info.get("title")
+        description = study_info.get("description")
+
+        return cls(alias, accession, title, description, releaseDate, publications, contacts)
+
+
 class Study:
     def __init__(self, alias, accession, title, description, protocolrefs, projectref,
                  experimental_factor, experimental_design, experiment_type, comments=None):
-        self.accession = accession
         self.alias = alias
+        self.accession = accession
         self.title = title
         self.description = description
         self.protocolrefs = protocolrefs
@@ -172,18 +211,27 @@ class Study:
         self.experiment_type = experiment_type
         self.comments = comments
 
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.title})," \
+               "{self.description}, {self.protocolrefs}, {self.projectref}, {self.experimental_factor}, " \
+               "{self.experimental_design}, {self.experiment_type}, {self.comments}".format(self=self)
+
     @classmethod
     def from_magetab(cls, study_info):
         accession = study_info.get("accession")
-        alias = study_info.get("title")
+
+        idf_file = os.path.basename(study_info.get("idf_filename", ""))
+        alias = re.sub("\.idf\.txt$", "", idf_file)
+        projectref = "project_" + alias
+
         title = study_info.get("title")
         description = study_info.get("description")
-        experiment_type = study_info.get("experiment type")
-        experimental_factor = study_info.get("experimental factor")
-        experimental_design = study_info.get("experimental design")
-        protocolrefs = study_info.get("protocolRefs")
-        projectref = "project_" + alias
-        comments = study_info.get("comments")
+        experiment_type = study_info.get("experiment_type", [])
+        experimental_factor = study_info.get("experimental_factor", [])
+        experimental_design = study_info.get("experimental_design", [])
+        protocolrefs = study_info.get("protocolRefs", [])
+
+        comments = study_info.get("comments", {})
 
         return cls(alias, accession, title, description, protocolrefs, projectref,
                    experimental_factor, experimental_design, experiment_type, comments)
@@ -224,4 +272,24 @@ class DataFile:
             ftp_location = None
 
         return cls(name, ftp_location, checksum)
+
+
+class Contact:
+    def __init__(self, firstName, lastName, email, affiliation, address, phone, roles):
+        self.firstName = firstName
+        self.lastName = lastName
+        self.email = email
+        self.affiliation = affiliation
+        self.address = address
+        self.phone = phone
+        self.roles = roles
+
+
+class Publication:
+    def __init__(self, articleTitle, authors, pubmedId, doi, status):
+        self.articleTitle = articleTitle
+        self.authors = authors
+        self.pubmedId = pubmedId
+        self.doi = doi,
+        self.status = status
 

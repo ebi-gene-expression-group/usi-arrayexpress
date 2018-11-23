@@ -48,6 +48,24 @@ def get_taxon(organism):
 """
 
 
+def generate_usi_project_object(project):
+    project_object = OrderedDict()
+
+    project_object["alias"] = project.alias
+    project_object["title"] = project.title
+    project_object["description"] = project.description
+    project_object["contacts"] = project.contacts
+    project_object["publications"] = project.publications
+    project_object["releaseDate"] = project.releaseDate
+
+    return project_object
+
+
+def generate_usi_study_object(study):
+    study_object = OrderedDict()
+    pass
+
+
 def generate_usi_assay_object(assay, study_info):
 
     assay_object = OrderedDict()
@@ -81,7 +99,7 @@ def generate_usi_assay_object(assay, study_info):
 
 def generate_usi_attribute_entry(attribute_info):
     """
-    Expected input is a dictionary key and value pair. The value can be a dictionary itsef.
+    Expected input is a dictionary key and value pair. The value can be a dictionary itself.
     In that case, we'll test if we find units and ontology terms and add those accordingly.
     Schema definition:
      "attributes": {
@@ -135,7 +153,7 @@ def generate_usi_attribute_entry(attribute_info):
     return attribute_object
 
 
-def generate_usi_ref_object(alias, study_info, accession=None):
+def generate_usi_ref_object(alias, sub_info, accession=None):
     """
     Schema definition:
     "submittableRef": {
@@ -158,7 +176,7 @@ def generate_usi_ref_object(alias, study_info, accession=None):
         ref_object['accession'] = alias
     else:
         ref_object['alias'] = alias
-        ref_object['team'] = study_info.get('team')
+        ref_object['team'] = sub_info.get('team')
 
     return ref_object
 
@@ -173,8 +191,8 @@ def usi_object_file_name(object_type, study_info):
         print('ERROR: No study name found in study_info.')
 
 
-def write_json_file(json_object, object_type, study_info):
-    json_file_name = usi_object_file_name(object_type, study_info)
+def write_json_file(json_object, object_type, sub_info):
+    json_file_name = usi_object_file_name(object_type, sub_info)
     with codecs.open(json_file_name, 'w', encoding='utf-8') as jf:
         json.dump(json_object, jf)
 

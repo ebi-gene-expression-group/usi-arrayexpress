@@ -13,7 +13,7 @@
   "investigation_terms": {
     "investigationtitle": "title",
     "experimentdescription": "description",
-    "dateofexperiment": "date of experiment",
+    "dateofexperiment": "date_of_experiment",
     "publicreleasedate": "releaseDate"
   },
   "publication_terms": {
@@ -31,17 +31,17 @@
     "protocolparameters": "parameters",
     "protocolhardware": "hardware",
     "protocolsoftware": "software",
-    "protocoltype": "protocol type",
+    "protocoltype": "protocol_type",
     "protocoltermsourceref": "protocol term source",
     "protocoltermaccessionnumber": "protocol term accession"
   },
   "factor_terms": {
-    "experimentalfactorname": "experimental factor",
+    "experimentalfactorname": "experimental_factor",
     "experimentalfactortermsourceref": "factor term source",
     "experimentalfactortermaccessionnumber": "factor term accession"
   },
     "design_terms": {
-    "experimentaldesign": "experimental design",
+    "experimentaldesign": "experimental_design",
     "experimentaldesigntermsourceref": "design term source",
     "experimentaldesigntermaccessionnumber": "design term accession"
   },
@@ -52,7 +52,7 @@
   },
   "idf_comment_terms": {
     "ArrayExpressAccession": "accession",
-    "AEExperimentType": "experiment type",
+    "AEExperimentType": "experiment_type",
     "RelatedExperiment": "related experiment",
     "AdditionalFile": "additional file",
     "SecondaryAccession": "secondary accession",
