@@ -228,13 +228,13 @@ class Study:
 
         title = study_info.get("title")
         description = study_info.get("description")
-        experiment_type = study_info.get("experiment_type", [])
         experimental_factor = study_info.get("experimental_factor", [])
         experimental_design = study_info.get("experimental_design", [])
         protocolrefs = study_info.get("protocolRefs", [])
 
         date_of_experiment = study_info.get("date_of_experiment", None)
         comments = study_info.get("comments", {})
+        experiment_type = comments.get("experiment_type", [])
 
         return cls(alias, accession, title, description, protocolrefs, projectref,
                    experimental_factor, experimental_design, experiment_type, date_of_experiment,

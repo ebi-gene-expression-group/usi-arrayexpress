@@ -61,29 +61,31 @@ def generate_usi_project_object(project):
     return project_object
 
 
-def generate_usi_study_object(study):
+def generate_usi_study_object(study, sub_info):
     study_object = OrderedDict()
     study_object["alias"] = study.alias
     study_object["title"] = study.title
     study_object["description"] = study.description
 
-    study_object["projectRef"] = study.projectref
+    study_object["studyType"] = "FunctionalGenomics"
+
+    study_object["projectRef"] = generate_usi_ref_object(study.projectref, sub_info)
     study_object["protocolRefs"] = study.protocolrefs
-    study_object["studyType"] = "FucntionalGenomics"
+    study_object["protocolRefs"] = [generate_usi_ref_object(ref, sub_info) for ref in study.protocolrefs]
 
     study_attributes = defaultdict(list)
     # The factors and design types need "value" entry
     for factor_dict in study.experimental_factor:
         factor_dict["value"] = factor_dict["experimental_factor"]
         attrib_obj = generate_usi_attribute_entry(factor_dict)
-        study_attributes["experimental_factor"].append(attrib_obj)
+        study_attributes["experimental_factor"].extend(attrib_obj)
 
     for design_dict in study.experimental_design:
         design_dict["value"] = design_dict["experimental_design"]
-        study_attributes["experimental_design"].append(generate_usi_attribute_entry(design_dict))
+        study_attributes["experimental_design"].extend(generate_usi_attribute_entry(design_dict))
 
     for et in study.experiment_type:
-        study_attributes["experiment_type"].append(generate_usi_attribute_entry(et))
+        study_attributes["experiment_type"].extend(generate_usi_attribute_entry(et))
 
     # Optional attributes
     if study.date_of_experiment:
@@ -173,8 +175,7 @@ def generate_usi_attribute_entry(attribute_info):
         if attribute_info.get("term accession"):
             # TODO: Function that looks up term accessions and returns EFO/OLS URI
             # Using term accession for now
-            if attribute_info.get("term accession"):
-                attribute_object[0]["terms"] = {"url": attribute_info.get("term accession")}
+            attribute_object[0]["terms"] = [{"url": attribute_info.get("term accession")}]
     else:
         attribute_object.append({"value": attribute_info})
 
