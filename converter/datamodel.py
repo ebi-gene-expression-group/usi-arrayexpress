@@ -199,7 +199,8 @@ class Project:
 
 class Study:
     def __init__(self, alias, accession, title, description, protocolrefs, projectref,
-                 experimental_factor, experimental_design, experiment_type, comments=None):
+                 experimental_factor, experimental_design, experiment_type, date_of_experiment,
+                 comments=None):
         self.alias = alias
         self.accession = accession
         self.title = title
@@ -209,6 +210,7 @@ class Study:
         self.experimental_factor = experimental_factor
         self.experimental_design = experimental_design
         self.experiment_type = experiment_type
+        self.date_of_experiment = date_of_experiment
         self.comments = comments
 
     def __repr__(self):
@@ -231,10 +233,12 @@ class Study:
         experimental_design = study_info.get("experimental_design", [])
         protocolrefs = study_info.get("protocolRefs", [])
 
+        date_of_experiment = study_info.get("date_of_experiment", None)
         comments = study_info.get("comments", {})
 
         return cls(alias, accession, title, description, protocolrefs, projectref,
-                   experimental_factor, experimental_design, experiment_type, comments)
+                   experimental_factor, experimental_design, experiment_type, date_of_experiment,
+                   comments)
 
 
 class AssayData:

@@ -22,7 +22,7 @@
     "publicationdoi": "doi",
     "publicationauthorlist": "authors",
     "publicationtitle": "articleTitle",
-    "publicationstatus": "status",
+    "publicationstatus": "publicationStatus",
     "publicationstatustermsourceref": "",
     "publicationstatustermaccessionnumber": ""
   },
@@ -33,18 +33,18 @@
     "protocolhardware": "hardware",
     "protocolsoftware": "software",
     "protocoltype": "protocol_type",
-    "protocoltermsourceref": "protocol term source",
-    "protocoltermaccessionnumber": "protocol term accession"
+    "protocoltermsourceref": "term source",
+    "protocoltermaccessionnumber": "term accession"
   },
   "factor_terms": {
     "experimentalfactorname": "experimental_factor",
-    "experimentalfactortermsourceref": "factor term source",
-    "experimentalfactortermaccessionnumber": "factor term accession"
+    "experimentalfactortermsourceref": "term source",
+    "experimentalfactortermaccessionnumber": "term accession"
   },
     "design_terms": {
     "experimentaldesign": "experimental_design",
-    "experimentaldesigntermsourceref": "design term source",
-    "experimentaldesigntermaccessionnumber": "design term accession"
+    "experimentaldesigntermsourceref": "term source",
+    "experimentaldesigntermaccessionnumber": "term accession"
   },
   "reference_terms": {
     "Termsourcename": "",

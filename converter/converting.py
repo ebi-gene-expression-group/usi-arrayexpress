@@ -63,7 +63,35 @@ def generate_usi_project_object(project):
 
 def generate_usi_study_object(study):
     study_object = OrderedDict()
-    pass
+    study_object["alias"] = study.alias
+    study_object["title"] = study.title
+    study_object["description"] = study.description
+
+    study_object["projectRef"] = study.projectref
+    study_object["protocolRefs"] = study.protocolrefs
+    study_object["studyType"] = "FucntionalGenomics"
+
+    study_attributes = defaultdict(list)
+    # The factors and design types need "value" entry
+    for factor_dict in study.experimental_factor:
+        factor_dict["value"] = factor_dict["experimental_factor"]
+        attrib_obj = generate_usi_attribute_entry(factor_dict)
+        study_attributes["experimental_factor"].append(attrib_obj)
+
+    for design_dict in study.experimental_design:
+        design_dict["value"] = design_dict["experimental_design"]
+        study_attributes["experimental_design"].append(generate_usi_attribute_entry(design_dict))
+
+    for et in study.experiment_type:
+        study_attributes["experiment_type"].append(generate_usi_attribute_entry(et))
+
+    # Optional attributes
+    if study.date_of_experiment:
+        study_attributes["date_of_experiment"] = generate_usi_attribute_entry(study.date_of_experiment)
+
+    study_object["attributes"] = study_attributes
+
+    return study_object
 
 
 def generate_usi_assay_object(assay, study_info):
@@ -133,7 +161,7 @@ def generate_usi_attribute_entry(attribute_info):
     attribute_object = list()
     if isinstance(attribute_info, dict):
         # Initialise the dictionary (with the value lookup) as the first item in the list
-        attribute_object.append(OrderedDict(("value", attribute_info.get("value"))))
+        attribute_object.append(OrderedDict([("value", attribute_info.get("value"))]))
         if attribute_info.get("unit"):
             unit_info = attribute_info.get("unit")
             attribute_object[0]["units"] = unit_info.get("value")
