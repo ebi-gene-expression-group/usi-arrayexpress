@@ -144,6 +144,17 @@ class Protocol:
         self.software = software
         self.parameters = parameters
 
+    def get_ae_attributes(self):
+        """Return a list of all AE attributes that have values."""
+        all_attributes = self.__dict__.keys()
+        all_values = self.__dict__
+        ae_attributes = ("protocol_type", "hardware", "software", "parameters")
+        found_attributes = list()
+        for a in all_attributes:
+            if a in ae_attributes and all_values[a]:
+                found_attributes.append(a)
+        return found_attributes
+
     @classmethod
     def from_magetab(cls, protocol_dict):
         alias = protocol_dict.get("title")
@@ -152,7 +163,7 @@ class Protocol:
         else:
             accession = None
         description = protocol_dict.get("description")
-        protocol_type = protocol_dict.get("protocol type")
+        protocol_type = protocol_dict.get("protocol_type")
         hardware = protocol_dict.get("hardware")
         software = protocol_dict.get("software")
         parameters = protocol_dict.get("parameters")

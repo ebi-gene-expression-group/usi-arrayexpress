@@ -3,9 +3,17 @@
 import codecs
 import json
 import re
+import pkg_resources
 from collections import OrderedDict, defaultdict
 
 
+def ontology_lookup(category):
+    """Read the json with expected EFO terms and return the dict for the given category."""
+    resource_package = __name__
+    resource_path = "ontology_terms.json"
+    all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
+
+    return all_terms[category]
 
 
 """
@@ -94,6 +102,21 @@ def generate_usi_study_object(study, sub_info):
     study_object["attributes"] = study_attributes
 
     return study_object
+
+
+def generate_usi_protocol_object(protocol):
+
+    protocol_object = OrderedDict()
+
+    protocol_object["alias"] = protocol.alias
+    protocol_object["description"] = protocol.description
+
+    attribute_names = protocol.get_ae_attributes()
+    protocol_object['attributes'] = OrderedDict()
+    for a in attribute_names:
+        protocol_object["attributes"][a] = generate_usi_attribute_entry(getattr(protocol, a))
+
+    return protocol_object
 
 
 def generate_usi_assay_object(assay, study_info):
