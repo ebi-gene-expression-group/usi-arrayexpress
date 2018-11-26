@@ -1,9 +1,7 @@
-import sys
 
-sys.path.append("../converter/")
 
-from datamodel import Assay, MicroarrayAssay
-from parsing import read_json_file
+from converter.datamodel import Assay, MicroarrayAssay
+from utils.converter_utils import read_json_file
 
 
 json_data = read_json_file("test_data/E-MTAB-4250.usi.json")

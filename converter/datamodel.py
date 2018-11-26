@@ -1,7 +1,7 @@
-from parsing import read_json_file, get_controlled_vocabulary, remove_duplicates
-from converting import is_accession
+
 import os
 import re
+from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates
 
 
 class Sample:

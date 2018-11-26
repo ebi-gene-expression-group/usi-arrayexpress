@@ -2,19 +2,8 @@
 
 import codecs
 import json
-import re
-import pkg_resources
 from collections import OrderedDict, defaultdict
-
-
-def ontology_lookup(category):
-    """Read the json with expected EFO terms and return the dict for the given category."""
-    resource_package = __name__
-    resource_path = "ontology_terms.json"
-    all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
-
-    return all_terms[category]
-
+from utils.converter_utils import is_accession
 
 """
 # Cannot import "common" from fgsubs; it has too many dependencies, so copying this here
@@ -249,20 +238,4 @@ def write_json_file(json_object, object_type, sub_info):
         json.dump(json_object, jf)
 
 
-def is_accession(accession, archive=None):
-    regex_lookup = {
-        "ARRAYEXPRESS": "^[A-Z]-[A-Z]{4}-[0-9]+",
-        "BIOSAMPLES": "^SAMEA[0-9]+$",
-        "ENA": "^ER[RESP][0-9]+$",
-        "BIOSTUDIES": "^S-[A-Z]+[0-9]+$"}
 
-    regex_ebi_accession = "|".join(regex_lookup.values())
-
-    if archive:
-        try:
-            regex = regex_lookup.get(archive)
-            return re.match(regex, accession)
-        except KeyError:
-            print("Not a valid accession type: {}".format(archive))
-    else:
-        return re.match(regex_ebi_accession, accession)

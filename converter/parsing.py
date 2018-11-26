@@ -1,22 +1,9 @@
-import json
-import pkg_resources
+
 import codecs
 import re
 from collections import defaultdict, OrderedDict
-import csv
+from utils.converter_utils import get_controlled_vocabulary
 
-
-def read_json_file(filename):
-    try:
-        with open(filename) as fh:
-            data = json.load(fh, encoding="utf-8")
-            return data
-    except IOError as err:
-        print("Cannot import file: %s" % err)
-        # TODO: system exit
-    except ValueError as j_err:
-        print("Cannot read JSON file: %s" % j_err)
-        raise
 
 
 def read_sdrf_file(sdrf_file):
@@ -71,20 +58,6 @@ def read_idf_file(idf_file):
     for label, x in idf_dict.items():
         print(label + ' --> ' + str(x))
     return idf_dict
-
-
-def remove_duplicates(ref_list):
-    """Return a copy of a list with all duplicated values removed."""
-    return list(set(ref_list))
-
-
-def get_controlled_vocabulary(category):
-    """Read the json with controlled vocab and return the dict for the given category."""
-    resource_package = __name__
-    resource_path = "term_translations.json"
-    all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
-
-    return all_terms[category]
 
 
 def get_name(header_string):
