@@ -5,7 +5,6 @@ from collections import defaultdict, OrderedDict
 from utils.converter_utils import get_controlled_vocabulary
 
 
-
 def read_sdrf_file(sdrf_file):
     with codecs.open(sdrf_file, encoding='utf-8') as sf:
         header = sf.readline().rstrip().split('\t')
@@ -156,7 +155,6 @@ def parse_sdrf(sdrf_file):
     assay_nodes = ("assayname",)
     raw_data_nodes = ("arraydatafile", "arraydatamatrixfile", "scanname",)
     processed_data_nodes = ("derivedarraydatafile", "derivedarraydatamatrixfile",)
-    factor_nodes = ("factorvalue", )
 
     nodes = sample_nodes + extract_nodes + le_nodes + assay_nodes + raw_data_nodes + processed_data_nodes
 
@@ -200,7 +198,7 @@ def parse_sdrf(sdrf_file):
 
         sample_attributes = {"name": "",
                              "characteristics": defaultdict(list),
-                             "material type": "",
+                             "material_type": "",
                              "description": "",
                              "comments": {},
                              "factors": {}
@@ -254,7 +252,7 @@ def parse_sdrf(sdrf_file):
                                     i + 1))
                     # Get Material Type
                     elif "materialtype" in header_dict and i in header_dict["materialtype"]:
-                        sample_attributes["material type"] = row[i]
+                        sample_attributes["material_type"] = row[i]
                     # Get Description
                     elif "description" in header_dict and i in header_dict["description"]:
                         sample_attributes["description"] = row[i]

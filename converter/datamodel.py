@@ -5,8 +5,17 @@ from utils.converter_utils import is_accession, get_controlled_vocabulary, remov
 
 
 class Sample:
+    def __init__(self, alias, accession, taxon, taxonId, attributes, material_type, description):
+        self.alias = alias
+        self.accession = accession
+        self.taxon = taxon
+        self.taxonId = taxonId
+        self.material_type = material_type
+        self.description = description
+        self.attributes = attributes
 
-    def __init__(self, alias, accession, taxon, taxonId, characteristics, factors, material_type, description):
+    @classmethod
+    def from_magetab(cls, sample_attributes):
         pass
 
 
@@ -72,7 +81,6 @@ class MicroarrayAssay(Assay):
 class SeqAssay(Assay):
     def __init__(self, alias, accession, technology_type, protocolrefs, sampleref, lib_attribs):
         Assay.__init__(self, alias, accession, technology_type, protocolrefs, sampleref)
-
         self.library_layout = lib_attribs.get("library_layout")
         self.library_selection = lib_attribs.get("library_selection")
         self.library_strategy = lib_attribs.get("library_strategy")
@@ -262,6 +270,8 @@ class AssayData:
         self.accession = accession
 
 
+# Helper classes
+
 class DataFile:
     def __init__(self, name, ftp_location=None, checksum=None, checksum_method="md5"):
         self.name = name
@@ -273,7 +283,7 @@ class DataFile:
         return "{self.__class__.__name__}({self.name}, {self.ftp_location}, {self.checksum})".format(self=self)
 
     @classmethod
-    def from_sdrf(cls, file_attributes):
+    def from_magetab(cls, file_attributes):
         name = file_attributes.get("name")
 
         comments = file_attributes.get("comments", {})
@@ -305,6 +315,23 @@ class Publication:
         self.articleTitle = articleTitle
         self.authors = authors
         self.pubmedId = pubmedId
-        self.doi = doi,
+        self.doi = doi
         self.status = status
+
+
+class Attribute:
+    def __init__(self, value, unit, term_accession, term_source="EFO"):
+        self.value = value
+        self.unit = unit
+        self.term_source = term_source
+        self.term_accession = term_accession
+
+
+class Unit:
+    def __init__(self, value, unit_type, term_accession, term_source="EFO"):
+        self.value = value
+        self.unit_type = unit_type
+        self.term_source = term_source
+        self.term_accession = term_accession
+
 
