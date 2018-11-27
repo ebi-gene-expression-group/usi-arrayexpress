@@ -1,7 +1,9 @@
 import json
 import pkg_resources
 import re
-from pip._vendor import urllib3
+import requests
+import urllib3.request
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def read_json_file(filename):
@@ -40,6 +42,9 @@ def remove_duplicates(ref_list):
 
 
 def is_accession(accession, archive=None):
+    """Return True if the input is a valid accession format from specified EBI archives.
+    With the optional parameter the test can be performed against a specific archive only."""
+
     regex_lookup = {
         "ARRAYEXPRESS": "^[A-Z]-[A-Z]{4}-[0-9]+",
         "BIOSAMPLES": "^SAMEA[0-9]+$",
@@ -63,19 +68,23 @@ def is_accession(accession, archive=None):
 def get_url(url):
     data = None
     try:
-        r = urllib3.urlopen(url)
-        data = json.load(r)
-    except urllib2.HTTPError as e:
-        print('HTTPError when retrieving url: "' + url + '" : ' + str(e.code))
-    except urllib2.URLError as e:
-        print('URLError when retrieving url: "' + url + '" : ' + str(e.reason))
+        r = requests.get(url)
+        data = json.loads(r.text)
+    except requests.HTTPError as e:
+        print('HTTPError when retrieving url: "' + url + '" : ' + str(e.errno))
+    except requests.ConnectionError as e:
+        print('ConnectionError when retrieving url: "' + url + '" : ' + str(e.errno))
     else:
         return data
 
 
+# To store organisms that we have already looked-up in the taxonomy (this is slow...)
+organism_lookup = {}
+
+
 def get_taxon(organism):
-    taxon_to_id = {}
-    if organism != '':
+    """Return the NCBI taxonomy ID for a given species name."""
+    if organism and organism not in organism_lookup:
         # TODO: Fix urllib.urlencode instead of organism.replace(' ','%20')
         organism_data = get_url(
             'https://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/suggest-for-search/' + organism.replace(
@@ -92,4 +101,8 @@ def get_taxon(organism):
             for organism_entry in organism_data:
                 if organism_entry['scientificName'].lower() == organism.lower():
                     taxon_id = int(organism_entry['taxId'])
+                    organism_lookup[organism] = taxon_id
                     return taxon_id
+
+    else:
+        return organism_lookup.get(organism)

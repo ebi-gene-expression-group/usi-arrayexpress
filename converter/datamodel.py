@@ -1,7 +1,7 @@
 
 import os
 import re
-from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates
+from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, get_taxon
 
 
 class Sample:
@@ -16,7 +16,39 @@ class Sample:
 
     @classmethod
     def from_magetab(cls, sample_attributes):
-        pass
+        alias = sample_attributes.get("name")
+        description = sample_attributes.get("description")
+        material_type = sample_attributes.get("material_type")
+
+        comments = sample_attributes.get("comments")
+        accession = comments.get("BioSD_SAMPLE")
+
+        characteristics = sample_attributes.get("characteristics")
+        factors = sample_attributes.get("factors")
+        organism = characteristics.get("organism", {})
+        taxon = organism.get("value")
+        taxonId = get_taxon(taxon)
+
+        # Note this will overwrite the characteristics values if a factor is also a characteristics
+        raw_attributes = characteristics.copy()
+        raw_attributes.update(factors)
+
+        attributes = {}
+        for c_name, c_attrib in raw_attributes.items():
+            new_unit = None
+            if "unit" in c_attrib:
+                unit_attrib = c_attrib.get("unit")
+                new_unit = Unit(unit_attrib.get("value"),
+                                unit_attrib.get("unit_type"),
+                                unit_attrib.get("term_accession"),
+                                unit_attrib.get("term_source"))
+
+            attributes[c_name] = Attribute(c_attrib.get("value"),
+                                           new_unit,
+                                           c_attrib.get("term_accession"),
+                                           c_attrib.get("term_source"))
+
+        return cls(alias, accession, taxon, taxonId, attributes, material_type, description)
 
 
 class Assay:
@@ -326,6 +358,9 @@ class Attribute:
         self.term_source = term_source
         self.term_accession = term_accession
 
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.value}, {self.unit}, {self.term_accession})".format(self=self)
+
 
 class Unit:
     def __init__(self, value, unit_type, term_accession, term_source="EFO"):
@@ -334,4 +369,5 @@ class Unit:
         self.term_source = term_source
         self.term_accession = term_accession
 
-
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.value}, {self.unit_type}, {self.term_accession})".format(self=self)

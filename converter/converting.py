@@ -5,45 +5,6 @@ import json
 from collections import OrderedDict, defaultdict
 from utils.converter_utils import is_accession
 
-"""
-# Cannot import "common" from fgsubs; it has too many dependencies, so copying this here
-def get_url(url):
-    data = None
-    try:
-        r = urllib3.urlopen(url)
-        data = json.load(r)
-    except urllib2.HTTPError as e:
-        print('HTTPError when retrieving url: "' + url + '" : ' + str(e.code))
-    except urllib2.URLError as e:
-        print('URLError when retrieving url: "' + url + '" : ' + str(e.reason))
-    except httplib.HTTPException as e:
-        print('HTTPException when retrieving url: "' + url + '"')
-    else:
-        return data
-
-
-def get_taxon(organism):
-    taxon_to_id = {}
-    if organism != '':
-        # TODO: Fix urllib.urlencode instead of organism.replace(' ','%20')
-        organism_data = get_url(
-            'https://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/suggest-for-search/' + organism.replace(
-                ' ', '%20') + '?limit=200')
-        if not organism_data:
-            if re.search(r" and | \+ ", organism):
-                # It looks as if we have more than one organism mixed in one sample - in the case assign the 'mixed
-                # sample' taxon_id (c.f. https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1427524) - as
-                # per instructions on https://www.ebi.ac.uk/seqdb/confluence/display/GXA/Curation+Look-up
-                return 1427524
-            else:
-                print("Failed to retrieve organism data from ENA taxonomy service for: " + organism)
-        else:
-            for organism_entry in organism_data:
-                if organism_entry['scientificName'].lower() == organism.lower():
-                    taxon_id = int(organism_entry['taxId'])
-                    return taxon_id
-"""
-
 
 def generate_usi_project_object(project):
     project_object = OrderedDict()
