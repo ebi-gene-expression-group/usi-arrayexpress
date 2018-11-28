@@ -101,6 +101,5 @@ def get_taxon(organism):
                     taxon_id = int(organism_entry['taxId'])
                     organism_lookup[organism] = taxon_id
                     return taxon_id
-
     else:
         return organism_lookup.get(organism)

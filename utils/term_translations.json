@@ -33,18 +33,18 @@
     "protocolhardware": "hardware",
     "protocolsoftware": "software",
     "protocoltype": "protocol_type",
-    "protocoltermsourceref": "term source",
-    "protocoltermaccessionnumber": "term accession"
+    "protocoltermsourceref": "term_source",
+    "protocoltermaccessionnumber": "term_accession"
   },
   "factor_terms": {
     "experimentalfactorname": "experimental_factor",
-    "experimentalfactortermsourceref": "term source",
-    "experimentalfactortermaccessionnumber": "term accession"
+    "experimentalfactortermsourceref": "term_source",
+    "experimentalfactortermaccessionnumber": "term_accession"
   },
     "design_terms": {
     "experimentaldesign": "experimental_design",
-    "experimentaldesigntermsourceref": "term source",
-    "experimentaldesigntermaccessionnumber": "term accession"
+    "experimentaldesigntermsourceref": "term_source",
+    "experimentaldesigntermaccessionnumber": "term_accession"
   },
   "reference_terms": {
     "Termsourcename": "",

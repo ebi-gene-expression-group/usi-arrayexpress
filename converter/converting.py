@@ -4,6 +4,7 @@ import codecs
 import json
 from collections import OrderedDict, defaultdict
 from utils.converter_utils import is_accession
+from converter.datamodel import Attribute
 
 
 def generate_usi_project_object(project):
@@ -67,6 +68,24 @@ def generate_usi_protocol_object(protocol):
         protocol_object["attributes"][a] = generate_usi_attribute_entry(getattr(protocol, a))
 
     return protocol_object
+
+
+def generate_usi_sample_object(sample):
+
+    sample_object = OrderedDict()
+    sample_object['alias'] = sample.alias
+    sample_object['taxon'] = sample.taxon
+    sample_object['taxonId'] = sample.taxonId
+
+    if sample.description:
+        sample_object['description'] = sample
+
+    attributes = {}
+    for a_name, a_attrib in sample.attributes.items():
+        attributes[a_name] = generate_usi_attribute_entry(a_attrib)
+    sample_object['attributes'] = attributes
+
+    return sample_object
 
 
 def generate_usi_assay_object(assay, study_info):
@@ -140,15 +159,22 @@ def generate_usi_attribute_entry(attribute_info):
         if attribute_info.get("unit"):
             unit_info = attribute_info.get("unit")
             attribute_object[0]["units"] = unit_info.get("value")
-            if unit_info.get("term accession"):
+            if unit_info.get("term_accession"):
                 # USI model does support >1 term URIs for a value but we can't distinguish between
                 # the value term and the unit term. For now will only include an ontology URI for
                 # a value term (see below).
                 pass
-        if attribute_info.get("term accession"):
+        if attribute_info.get("term_accession"):
             # TODO: Function that looks up term accessions and returns EFO/OLS URI
             # Using term accession for now
-            attribute_object[0]["terms"] = [{"url": attribute_info.get("term accession")}]
+            attribute_object[0]["terms"] = [{"url": attribute_info.get("term_accession")}]
+    elif isinstance(attribute_info, Attribute):
+        attribute_object.append(OrderedDict([("value", attribute_info.value)]))
+        if attribute_info.unit:
+            unit_info = attribute_info.unit
+            attribute_object[0]["units"] = unit_info.value
+        if attribute_info.term_accession:
+            attribute_object[0]["terms"] = [{"url": attribute_info.term_accession}]
     else:
         attribute_object.append({"value": attribute_info})
 
