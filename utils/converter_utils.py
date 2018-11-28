@@ -47,8 +47,8 @@ def is_accession(accession, archive=None):
 
     regex_lookup = {
         "ARRAYEXPRESS": "^[A-Z]-[A-Z]{4}-[0-9]+",
-        "BIOSAMPLES": "^SAMEA[0-9]+$",
-        "ENA": "^ER[RESP][0-9]+$",
+        "BIOSAMPLES": "^SAM[END][AG]?[0-9]+",
+        "ENA": "^ER[RXSP][0-9]+$",
         "BIOSTUDIES": "^S-[A-Z]+[0-9]+$"}
 
     regex_ebi_accession = "|".join(regex_lookup.values())
@@ -63,19 +63,18 @@ def is_accession(accession, archive=None):
         return re.match(regex_ebi_accession, accession)
 
 
-
-# Cannot import "common" from fgsubs; it has too many dependencies, so copying this here
 def get_url(url):
-    data = None
     try:
         r = requests.get(url)
         data = json.loads(r.text)
+        return data
     except requests.HTTPError as e:
         print('HTTPError when retrieving url: "' + url + '" : ' + str(e.errno))
     except requests.ConnectionError as e:
         print('ConnectionError when retrieving url: "' + url + '" : ' + str(e.errno))
-    else:
-        return data
+    except json.JSONDecodeError:
+        print('JSONDecodeError: The result is not a valid JSON response: ' + url)
+    return None
 
 
 # To store organisms that we have already looked-up in the taxonomy (this is slow...)
@@ -85,10 +84,9 @@ organism_lookup = {}
 def get_taxon(organism):
     """Return the NCBI taxonomy ID for a given species name."""
     if organism and organism not in organism_lookup:
-        # TODO: Fix urllib.urlencode instead of organism.replace(' ','%20')
-        organism_data = get_url(
-            'https://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/suggest-for-search/' + organism.replace(
-                ' ', '%20') + '?limit=200')
+        url = 'https://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/suggest-for-search/' + organism.replace(
+                ' ', '%20') + '?limit=200'
+        organism_data = get_url(url)
         if not organism_data:
             if re.search(r" and | \+ ", organism):
                 # It looks as if we have more than one organism mixed in one sample - in the case assign the 'mixed
