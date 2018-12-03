@@ -66,7 +66,7 @@ class Assay:
                "{self.protocolrefs}, {self.sampleref})".format(self=self)
 
     def get_attributes(self):
-        """This returns a list of all additional attributes that have values"""
+        """Return a list of all additional attributes that have values"""
         all_attributes = self.__dict__.keys()
         all_values = self.__dict__
         fixed_attributes = ("alias", "accession", "protocolrefs", "sampleref")
@@ -108,6 +108,10 @@ class MicroarrayAssay(Assay):
         arrayref = [a.get("array_design") for a in assay_attributes]
 
         return cls(alias, accession, technology_type[0], protocolrefs, sampleref, label, arrayref[0])
+
+    @classmethod
+    def from_json(self):
+        pass
 
 
 class SeqAssay(Assay):
