@@ -77,7 +77,8 @@ def get_taxon(organism):
         try:
             taxon_id = int(a['esearchresult']['idlist'][0])
             organism_lookup[organism] = taxon_id
-        except KeyError:
+            return taxon_id
+        except IndexError:
             if re.search(r" and | \+ ", organism):
                 # It looks as if we have more than one organism mixed in one sample - in the case assign the 'mixed
                 # sample' taxon_id (c.f. https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1427524) - as
