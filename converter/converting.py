@@ -119,6 +119,33 @@ def generate_usi_assay_object(assay, study_info):
     return assay_object
 
 
+def generate_usi_data_object(assay_data, sub_info):
+    """
+
+    :param assay_data:
+    :type:
+    :param sub_info:
+    :return:
+    """
+    ad_object = OrderedDict()
+
+    ad_object["alias"] = assay_data.alias
+    ad_object["data_type"] = assay_data.data_type
+
+    ad_object["files"] = []
+    files = assay_data.files
+    for fo in files:
+        file_object = OrderedDict()
+        for a in fo.__dict__:
+            if getattr(fo, a):
+                file_object[a] = getattr(fo, a)
+        ad_object["files"].append(file_object)
+
+    ad_object["AssayRefs"] = [generate_usi_ref_object(x, sub_info) for x in assay_data.assayrefs]
+
+    return ad_object
+
+
 def generate_usi_attribute_entry(attribute_info):
     """
     Expected input is a dictionary key and value pair. The value can be a dictionary itself.

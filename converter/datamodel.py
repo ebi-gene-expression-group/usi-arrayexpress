@@ -314,7 +314,7 @@ class AssayData:
 
         alias = assay_attributes.get("name")
 
-        assayrefs = assay_attributes.get("extract_ref")
+        assayrefs = remove_duplicates(assay_attributes.get("extract_ref"))
 
         mage_data_type = common_file_attributes.get("data_type")
         if mage_data_type == "arraydatafile" or mage_data_type == "scanname":
@@ -335,7 +335,7 @@ class AssayData:
 # Helper classes
 
 class DataFile:
-    def __init__(self, name, ftp_location=None, checksum=None, checksum_method="md5"):
+    def __init__(self, name, ftp_location=None, checksum=None, checksum_method=None):
         self.name = name
         self.checksum = checksum
         self.checksum_method = checksum_method
