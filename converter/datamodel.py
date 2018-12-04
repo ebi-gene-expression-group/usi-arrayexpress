@@ -1,7 +1,7 @@
 
 import os
 import re
-from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, get_taxon
+from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, get_taxon, strip_extension
 
 
 class Sample:
@@ -297,13 +297,39 @@ class Study:
 
 
 class AssayData:
-    def __init__(self, alias, files, datatype, assayrefs, protocolrefs, accession=None):
+    def __init__(self, alias, files, data_type, assayrefs, protocolrefs, accession=None):
         self.alias = alias
-        self.files = files
+        self.files = files  # List of DataFile objects
+        self.data_type = data_type  # "raw" or "raw matrix"
         self.assayrefs = assayrefs
-        self.datatype = datatype
         self.protocolrefs = protocolrefs
         self.accession = accession
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.alias}, {self.files}, {self.data_type}, " \
+               "{self.assayrefs}, {self.protocolrefs}, {self.accession})".format(self=self)
+
+    @classmethod
+    def from_magetab(cls, assay_attributes, datafile_objects, common_file_attributes):
+
+        alias = assay_attributes.get("name")
+
+        assayrefs = assay_attributes.get("extract_ref")
+
+        mage_data_type = common_file_attributes.get("data_type")
+        if mage_data_type == "arraydatafile" or mage_data_type == "scanname":
+            data_type = "raw"
+        elif mage_data_type == "arraydatamatrixfile":
+            data_type = "raw matrix"
+        else:
+            data_type = None
+
+        comments = common_file_attributes.get("comments")
+        accession = comments.get("ENA_RUN")
+
+        protocolrefs = common_file_attributes.get("protocol_ref")
+
+        return cls(alias, datafile_objects, data_type, assayrefs, protocolrefs, accession)
 
 
 # Helper classes
