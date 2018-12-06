@@ -1,11 +1,20 @@
 
 import os
 import re
-from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, get_taxon, strip_extension
+from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, get_taxon
 
 
 class Sample:
     def __init__(self, alias, accession, taxon, taxonId, attributes, material_type, description):
+        """
+        :param alias: string, unique sample name in the experiment
+        :param accession: string, BioSamples accession
+        :param taxon: string, latin species name
+        :param taxonId: int, NCBI taxonomy identifier for the species
+        :param attributes: dictionary of attribute categories as keys and Attribute class object as value
+        :param material_type: string, (optional) one of: whole organism, organism part, cell, RNA, DNA
+        :param description: string, (optional) free-text description of sample
+        """
         self.alias = alias
         self.accession = accession
         self.taxon = taxon
@@ -52,9 +61,15 @@ class Sample:
 
 
 class Assay:
-
     def __init__(self, alias, accession, technology_type, protocolrefs, sampleref):
-        # Attributes common to all assay types
+        """
+        Attributes common to all assay types
+        :param alias: string, unique name of the assay
+        :param accession: string, (not for microarray) ENA experiment accession
+        :param technology_type: string, one of: array assay, sequencing assay
+        :param protocolrefs: list, protocol accessions/name used to generate assay data
+        :param sampleref: string, sample accession/name
+        """
         self.alias = alias
         self.accession = accession
         self.technology_type = technology_type
@@ -79,6 +94,12 @@ class Assay:
 
 class MicroarrayAssay(Assay):
     def __init__(self, alias, accession, technology_type, protocolrefs, sampleref, label, arrayref):
+        """
+        Assay attributes specific to microarray assays
+
+        :param label: string, the label type
+        :param arrayref: string, ArrayExpress array design format accession
+        """
         Assay.__init__(self, alias, accession, technology_type, protocolrefs, sampleref)
         self.label = label
         self.arrayref = arrayref
@@ -116,6 +137,13 @@ class MicroarrayAssay(Assay):
 
 class SeqAssay(Assay):
     def __init__(self, alias, accession, technology_type, protocolrefs, sampleref, lib_attribs):
+        """
+        Assay attributes specific to sequencing assays
+
+        :param lib_attribs: dictionary of sequencing specific attributes that are required for ENA brokering
+                            keys: library attribute
+                            values: values from SRA's controlled vocabulary
+        """
         Assay.__init__(self, alias, accession, technology_type, protocolrefs, sampleref)
         self.library_layout = lib_attribs.get("library_layout")
         self.library_selection = lib_attribs.get("library_selection")
@@ -180,6 +208,16 @@ class SeqAssay(Assay):
 
 class Protocol:
     def __init__(self, alias, accession, description, protocol_type, hardware, software, parameters):
+        """
+        Attributes of a protocol
+        :param alias: string, protocol accession or unique name in experiment
+        :param accession: string, ArrayExpress protocol accession
+        :param description: string, free-text description of protocol
+        :param protocol_type: string, experiment type ontology term
+        :param hardware: string, free-text hardware description, sequencer model for sequencing experiments
+        :param software: string, free-text software description
+        :param parameters: list, parameter values
+        """
         self.alias = alias
         self.accession = accession
         self.description = description
@@ -217,6 +255,16 @@ class Protocol:
 
 class Project:
     def __init__(self, alias, accession, title, description, releaseDate, publications, contacts):
+        """
+        Attributes of the project
+        :param alias: string, unique project name (auto-generated from MAGE-TAB file name)
+        :param accession: string, BioStudies accession
+        :param title: (optional) string, submitter provided project description
+        :param description: string, (optional) free-text project description
+        :param releaseDate: string, date of public release
+        :param publications: list, Publication class objects
+        :param contacts: list, Contact class objects
+        """
         self.alias = alias
         self.accession = accession
         self.title = title
@@ -256,6 +304,22 @@ class Study:
     def __init__(self, alias, accession, title, description, protocolrefs, projectref,
                  experimental_factor, experimental_design, experiment_type, date_of_experiment,
                  comments=None):
+        """
+        Attributes of the study
+        :param alias: string, unique study name (auto-generated from MAGE-TAB file name)
+        :param accession: string, ArrayExpress experiment accession
+        :param title: string, (optional)
+        :param description: string, free-text description of study background and aim
+        :param protocolrefs: list,  protocol accessions/name used in the study
+        :param projectref: string, project alias or accession
+        :param experimental_factor: list, Attribute class objects
+        :param experimental_design: list, Attribute class objects
+        :param experiment_type: list, experiment type ontology terms
+        :param date_of_experiment: string, (optional) date of experiment
+        :param comments: dictionary, (optional) known IDF comments
+                        keys: string, comment category
+                        values: list, comment values
+        """
         self.alias = alias
         self.accession = accession
         self.title = title
@@ -283,8 +347,14 @@ class Study:
 
         title = study_info.get("title")
         description = study_info.get("description")
-        experimental_factor = study_info.get("experimental_factor", [])
-        experimental_design = study_info.get("experimental_design", [])
+        ef = study_info.get("experimental_factor", [])
+        ef_objects = [Attribute(d.get("experimental_factor"), None,
+                                d.get("term_source"),
+                                d.get("term_accession")) for d in ef]
+        ed = study_info.get("experimental_design", [])
+        ed_objects = [Attribute(d.get("experimental_design"), None,
+                                d.get("term_source"),
+                                d.get("term_accession")) for d in ed]
         protocolrefs = study_info.get("protocolRefs", [])
 
         date_of_experiment = study_info.get("date_of_experiment", None)
@@ -292,12 +362,21 @@ class Study:
         experiment_type = comments.get("experiment_type", [])
 
         return cls(alias, accession, title, description, protocolrefs, projectref,
-                   experimental_factor, experimental_design, experiment_type, date_of_experiment,
+                   ef_objects, ed_objects, experiment_type, date_of_experiment,
                    comments)
 
 
 class AssayData:
     def __init__(self, alias, files, data_type, assayrefs, protocolrefs, accession=None):
+        """
+        Attributes of the assay data
+        :param alias: string, unique name in the experiment (auto-generated from Assay Name in SDRF)
+        :param files: list, DataFile class objects
+        :param data_type: string, raw or raw matrix
+        :param assayrefs: list, assay name/accessions
+        :param protocolrefs: list, protocol name/accessions used to generate data file
+        :param accession: string, (not for microarray) ENA run accession
+        """
         self.alias = alias
         self.files = files  # List of DataFile objects
         self.data_type = data_type  # "raw" or "raw matrix"

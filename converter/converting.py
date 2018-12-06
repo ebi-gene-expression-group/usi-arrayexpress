@@ -34,14 +34,12 @@ def generate_usi_study_object(study, sub_info):
 
     study_attributes = defaultdict(list)
     # The factors and design types need "value" entry
-    for factor_dict in study.experimental_factor:
-        factor_dict["value"] = factor_dict["experimental_factor"]
-        attrib_obj = generate_usi_attribute_entry(factor_dict)
+    for factor in study.experimental_factor:
+        attrib_obj = generate_usi_attribute_entry(factor)
         study_attributes["experimental_factor"].extend(attrib_obj)
 
-    for design_dict in study.experimental_design:
-        design_dict["value"] = design_dict["experimental_design"]
-        study_attributes["experimental_design"].extend(generate_usi_attribute_entry(design_dict))
+    for design in study.experimental_design:
+        study_attributes["experimental_design"].extend(generate_usi_attribute_entry(design))
 
     for et in study.experiment_type:
         study_attributes["experiment_type"].extend(generate_usi_attribute_entry(et))
