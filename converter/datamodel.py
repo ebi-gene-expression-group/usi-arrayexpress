@@ -310,11 +310,18 @@ class AssayData:
                "{self.assayrefs}, {self.protocolrefs}, {self.accession})".format(self=self)
 
     @classmethod
-    def from_magetab(cls, assay_attributes, datafile_objects, common_file_attributes):
+    def from_magetab(cls, name, datafile_objects, file_attributes):
 
-        alias = assay_attributes.get("name")
+        alias = name
 
-        assayrefs = remove_duplicates(assay_attributes.get("extract_ref"))
+        # Assuming here that attributes of grouped files are the same
+        common_file_attributes = file_attributes[0]
+
+        # Try getting le_ref first for MA
+        if common_file_attributes.get("le_ref"):
+            assayrefs = remove_duplicates(common_file_attributes.get("le_ref"))
+        else:
+            assayrefs = remove_duplicates(common_file_attributes.get("extract_ref"))
 
         mage_data_type = common_file_attributes.get("data_type")
         if mage_data_type == "arraydatafile" or mage_data_type == "scanname":

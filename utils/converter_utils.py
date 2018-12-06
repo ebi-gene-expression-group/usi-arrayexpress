@@ -1,6 +1,7 @@
 import json
 import pkg_resources
 import re
+import time
 import requests
 import urllib3.request
 
@@ -86,7 +87,9 @@ def get_taxon(organism):
                 return 1427524
             else:
                 print("Failed to retrieve organism data from ENA taxonomy service for: " + organism)
-
+        #except KeyError:
+        #    time.sleep(10)
+        #    return esearch(db, organism)
     else:
         return organism_lookup.get(organism)
 
