@@ -114,6 +114,20 @@ def get_taxon(organism):
         return organism_lookup.get(organism)
 
 
+def get_efo_url(term_accession):
+    """Return URI for a given EFO ontology term
+
+    To simplify this, it seems there is an easy pattern to the URL structure:
+    ebi/efo for EFO terms, purl.obolibrary.org/obo/ for imported terms
+    """
+
+    url_friendly_term = re.sub(':', '_', term_accession)
+    if term_accession.startswith("EFO"):
+        return "http://www.ebi.ac.uk/efo/" + url_friendly_term
+    else:
+        return "http://purl.obolibrary.org/obo/" + url_friendly_term
+
+
 def strip_extension(filename):
     """Take a filename string as input and strip off the file extension and any patterns to be ignored"""
     extensions = ('\.fastq\.gz$', '\.fq\.gz$', '\.txt\.gz$', '\.fastq\.bz2$', '\.[a-zA-Z0-9]+$', )

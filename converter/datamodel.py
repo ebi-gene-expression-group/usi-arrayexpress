@@ -245,10 +245,13 @@ class Protocol:
         else:
             accession = None
         description = protocol_dict.get("description")
-        protocol_type = protocol_dict.get("protocol_type")
         hardware = protocol_dict.get("hardware")
         software = protocol_dict.get("software")
         parameters = protocol_dict.get("parameters")
+
+        protocol_type = Attribute(protocol_dict.get("protocol_type"), None,
+                                  protocol_dict.get("term_accession"),
+                                  protocol_dict.get("term_source"))
 
         return cls(alias, accession, description, protocol_type, hardware, software, parameters)
 
@@ -348,13 +351,14 @@ class Study:
         title = study_info.get("title")
         description = study_info.get("description")
         ef = study_info.get("experimental_factor", [])
+
         ef_objects = [Attribute(d.get("experimental_factor"), None,
-                                d.get("term_source"),
-                                d.get("term_accession")) for d in ef]
+                                d.get("term_accession"),
+                                d.get("term_source")) for d in ef]
         ed = study_info.get("experimental_design", [])
         ed_objects = [Attribute(d.get("experimental_design"), None,
-                                d.get("term_source"),
-                                d.get("term_accession")) for d in ed]
+                                d.get("term_accession"),
+                                d.get("term_source")) for d in ed]
         protocolrefs = study_info.get("protocolRefs", [])
 
         date_of_experiment = study_info.get("date_of_experiment", None)
@@ -487,3 +491,29 @@ class Unit:
 
     def __repr__(self):
         return "{self.__class__.__name__}({self.value}, {self.unit_type}, {self.term_accession})".format(self=self)
+
+
+class Submission:
+    def __init__(self, info, project, study, protocol, sample, assay, assay_data, analysis):
+        """
+        The submission class holds all objects that make up an ArrayExpress experiment
+
+        :param info: dictionary, information about the submission (file names, submitter details, etc.)
+        :param project: object, Project class object
+        :param study: object, Study class object
+        :param protocol: list, Protocol class objects
+        :param sample: list, Sample class objects
+        :param assay: list, SeqAssay or MicroarrayAssay class objects
+        :param assay_data: list, AssayData class objects
+        :param analysis: list, Analysis class objects
+        """
+        self.info = info
+        self.project = project
+        self.study = study
+        self.protocol = protocol
+        self.sample = sample
+        self.assay = assay
+        self.assay_data = assay_data
+        self.analysis = analysis
+
+

@@ -3,7 +3,7 @@
 import codecs
 import json
 from collections import OrderedDict, defaultdict
-from utils.converter_utils import is_accession
+from utils.converter_utils import is_accession, get_efo_url
 from converter.datamodel import Attribute
 
 
@@ -190,16 +190,15 @@ def generate_usi_attribute_entry(attribute_info):
                 # a value term (see below).
                 pass
         if attribute_info.get("term_accession"):
-            # TODO: Function that looks up term accessions and returns EFO/OLS URI
-            # Using term accession for now
-            attribute_object[0]["terms"] = [{"url": attribute_info.get("term_accession")}]
+            term_acc = attribute_info.get("term_accession")
+            attribute_object[0]["terms"] = [{"url": get_efo_url(term_acc)}]
     elif isinstance(attribute_info, Attribute):
         attribute_object.append(OrderedDict([("value", attribute_info.value)]))
         if attribute_info.unit:
             unit_info = attribute_info.unit
             attribute_object[0]["units"] = unit_info.value
         if attribute_info.term_accession:
-            attribute_object[0]["terms"] = [{"url": attribute_info.term_accession}]
+            attribute_object[0]["terms"] = [{"url": get_efo_url(attribute_info.term_accession)}]
     else:
         attribute_object.append({"value": attribute_info})
 

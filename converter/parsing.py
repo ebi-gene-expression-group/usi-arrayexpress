@@ -502,7 +502,9 @@ def parse_idf(idf_file):
             # for these terms we only expect/allow 1 value (the first item in the list)
             study_info[usi_ct] = idf_dict[idf_ct][0]
 
-    study_info["accession"] = study_info["comments"].get("accession", None)
+    accession = study_info["comments"].get("accession", None)
+    if accession:
+        study_info["comments"]["accession"] = accession[0]
 
     for s, v in study_info.items():
         print(s, v)
