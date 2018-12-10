@@ -1,11 +1,12 @@
 import json
 import pkg_resources
 import re
-import time
-import requests
-import urllib3.request
+import os
+import codecs
 
 from utils.eutils import esearch
+
+USI_JSON_DIRECTORY = "usijson"
 
 
 def read_json_file(filename):
@@ -18,6 +19,25 @@ def read_json_file(filename):
     except ValueError as j_err:
         print("Cannot read JSON file: %s" % j_err)
         raise
+
+
+def usi_object_file_name(object_type, study_info):
+
+    if study_info.get('accession'):
+        return "{}_{}.json".format(study_info.get('accession'), object_type)
+    elif study_info.get('alias'):
+        return "{}_{}.json".format(study_info.get('alias'), object_type)
+    else:
+        print('ERROR: No study name found in study_info.')
+
+
+def write_json_file(wd, json_object, object_type, sub_info):
+
+    json_file_name = usi_object_file_name(object_type, sub_info)
+    json_file_path = os.path.join(wd, USI_JSON_DIRECTORY, json_file_name)
+    os.makedirs(os.path.dirname(json_file_path), exist_ok=True)
+    with codecs.open(json_file_path, 'w', encoding='utf-8') as jf:
+        json.dump(json_object, jf)
 
 
 def ontology_lookup(category):
@@ -112,3 +132,5 @@ def strip_extension(filename):
         return filebase
     else:
         return filename
+
+

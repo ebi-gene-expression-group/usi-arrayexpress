@@ -234,20 +234,6 @@ def generate_usi_ref_object(alias, sub_info, accession=None):
     return ref_object
 
 
-def usi_object_file_name(object_type, study_info):
-
-    if study_info.get('accession'):
-        return "{}_{}.json".format(study_info.get('accession'), object_type)
-    elif study_info.get('alias'):
-        return "{}_{}.json".format(study_info.get('alias'), object_type)
-    else:
-        print('ERROR: No study name found in study_info.')
-
-
-def write_json_file(json_object, object_type, sub_info):
-    json_file_name = usi_object_file_name(object_type, sub_info)
-    with codecs.open(json_file_name, 'w', encoding='utf-8') as jf:
-        json.dump(json_object, jf)
 
 
 
