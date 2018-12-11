@@ -14,6 +14,16 @@ DATA_DIRECTORY = "unpacked"
 
 
 def mtab2usi_conversion(idf_file_path):
+    """
+    Run data transformation from a set of IDF/SDRF files to a set of USI JSON files
+
+    This function ties together the two parts of
+    - reading in MAGE-TAB data into common data model via the function "data_objects_from_magetab"
+    - writing JSON files from data in common data model via the function "datamodel2json_conversion"
+
+    :param idf_file_path: string, file path to IDF file
+    :return: None
+    """
     process_name = "mtab2usi_conversion"
 
     current_dir = os.path.dirname(idf_file_path)

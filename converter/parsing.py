@@ -6,6 +6,12 @@ from utils.converter_utils import get_controlled_vocabulary
 
 
 def read_sdrf_file(sdrf_file):
+    """
+    Read SDRF file and return the table content as nested list,
+    the header row as list, and a dictionary of the fields and their indexes
+    :param sdrf_file: string, path to SDRF file
+    """
+
     with codecs.open(sdrf_file, encoding='utf-8') as sf:
         header = sf.readline().rstrip().split('\t')
         sdrf_raw = sf.readlines()
@@ -148,7 +154,15 @@ def get_node_positions(nodes, header):
 
 
 def parse_sdrf(sdrf_file):
+    """
+    Read SDRF data table and return dictionaries for the different nodes
 
+    The function returns a dictionary for each node (samples, extracts, labeled extracts, assays,
+    raw_data, processed_data). Each dict contains all unique entries and their attributes and
+    links to other nodes.
+
+    :param sdrf_file: string, path to SDRF file
+    """
     sample_nodes = ("sourcename",)
     le_nodes = ("labeledextractname",)
     extract_nodes = ("extractname",)
