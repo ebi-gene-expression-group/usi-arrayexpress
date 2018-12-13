@@ -1,7 +1,7 @@
 
-from collections import OrderedDict
-import re
 import json
+import re
+from collections import OrderedDict
 
 
 def create_idf(sdrf_file_name, project, study, protocols, translations):

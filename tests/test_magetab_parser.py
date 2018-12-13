@@ -1,7 +1,7 @@
 
 import os
-from converter.parsing import parse_sdrf
 
+from converter.parsing import parse_sdrf
 
 sdrf_files = ["test_data/" + f for f in os.listdir("test_data") if f.endswith("sdrf.txt")]
 for filename in sdrf_files:

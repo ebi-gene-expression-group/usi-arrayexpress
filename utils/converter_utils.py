@@ -1,8 +1,9 @@
-import json
-import pkg_resources
-import re
-import os
 import codecs
+import json
+import os
+import re
+
+import pkg_resources
 
 from utils.eutils import esearch
 

@@ -1,13 +1,11 @@
 """Module to convert experiment metadata in MAGE-TAB (IDF/SDRF) format to USI submittable JSON format"""
 
 
-from converter.parsing import parse_idf, parse_sdrf
-from converter.datamodel import *
 from converter.converting import *
-
+from converter.datamodel import *
+from converter.parsing import parse_idf, parse_sdrf
 from utils.common_utils import create_logger
 from utils.converter_utils import write_json_file, strip_extension
-
 
 SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
 DATA_DIRECTORY = "unpacked"

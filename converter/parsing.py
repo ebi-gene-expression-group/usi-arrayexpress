@@ -2,6 +2,7 @@
 import codecs
 import re
 from collections import defaultdict, OrderedDict
+
 from utils.converter_utils import get_controlled_vocabulary
 
 

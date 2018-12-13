@@ -1,6 +1,6 @@
 
 
-from converter.datamodel import Assay, MicroarrayAssay
+from converter.datamodel import Assay
 from utils.converter_utils import read_json_file
 
 

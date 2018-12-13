@@ -1,6 +1,7 @@
 import json
-import requests
 import time
+
+import requests
 
 __author__ = 'Ahmed G. Ali'
 

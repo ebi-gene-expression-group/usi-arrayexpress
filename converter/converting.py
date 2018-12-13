@@ -1,10 +1,9 @@
-"""Helper functions for converting from MAGE-TAB to USI JSON and back"""
+"""Helper functions for converting from common data model to USI JSON objects"""
 
-import codecs
-import json
 from collections import OrderedDict, defaultdict
-from utils.converter_utils import is_accession, get_efo_url
+
 from converter.datamodel import Attribute
+from utils.converter_utils import is_accession, get_efo_url
 
 
 def generate_usi_project_object(project):
