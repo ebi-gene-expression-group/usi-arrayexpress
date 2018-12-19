@@ -1,0 +1,181 @@
+{
+  "contact_terms": {
+    "personfirstname": "firstName",
+    "personmidinitials": "middleInitials",
+    "personlastname": "lastName",
+    "personemail": "email",
+    "personaddress": "address",
+    "personaffiliation": "affiliation",
+    "personphone": "phone",
+    "personfax": "fax",
+    "personroles": "roles"
+  },
+  "investigation_terms": {
+    "investigationtitle": "title",
+    "experimentdescription": "description",
+    "dateofexperiment": "date_of_experiment",
+    "publicreleasedate": "releaseDate",
+    "sdrffile": "sdrf_filename"
+  },
+  "publication_terms": {
+    "pubmedid": "pubmedId",
+    "publicationdoi": "doi",
+    "publicationauthorlist": "authors",
+    "publicationtitle": "articleTitle",
+    "publicationstatus": "publicationStatus",
+    "publicationstatustermsourceref": "",
+    "publicationstatustermaccessionnumber": ""
+  },
+  "protocol_terms": {
+    "protocolname": "title",
+    "protocoldescription": "description",
+    "protocolparameters": "parameters",
+    "protocolhardware": "hardware",
+    "protocolsoftware": "software",
+    "protocoltype": "protocol_type",
+    "protocoltermsourceref": "term_source",
+    "protocoltermaccessionnumber": "term_accession"
+  },
+  "factor_terms": {
+    "experimentalfactorname": "experimental_factor",
+    "experimentalfactortermsourceref": "term_source",
+    "experimentalfactortermaccessionnumber": "term_accession"
+  },
+    "design_terms": {
+    "experimentaldesign": "experimental_design",
+    "experimentaldesigntermsourceref": "term_source",
+    "experimentaldesigntermaccessionnumber": "term_accession"
+  },
+  "reference_terms": {
+    "Termsourcename": "",
+    "Termsourcefile": "",
+    "Termsourceversion": ""
+  },
+  "idf_comment_terms": {
+    "ArrayExpressAccession": "accession",
+    "AEExperimentType": "experiment_type",
+    "RelatedExperiment": "related experiment",
+    "AdditionalFile": "additional file",
+    "SecondaryAccession": "secondary accession",
+    "SequenceDataURI": "sequence data uri",
+    "AEExperimentDisplayName": "experiment display name",
+    "EAExpectedClusters": "ea expected clusters",
+    "EAAdditionalAttributes": "ea additional attributes",
+    "EAExperimentType": "ea experiment type",
+    "EACurator": "ea curator"
+  },
+  "node_terms": {
+    "Sourcename": "",
+    "Extractname": "",
+    "Labeled Extractname": "",
+    "Assayname": "",
+    "Scanname": "",
+    "Arraydatafile": "",
+    "Arraydata Matrixfile": "",
+    "Derived Arraydatafile": "",
+    "Derived Arraydata Matrixfile": "",
+    "Protocolref": "protocolUses"
+  },
+  "attribute_terms": {
+    "Sourcename": {
+      "Characteristics": "attributes",
+      "Provider": "",
+      "Materialtype": "",
+      "Description": "",
+      "Comment": ""
+    },
+    "Extractname": {
+      "characteristics": "attributes",
+      "materialtype": "",
+      "description": "",
+      "comment": ""
+    },
+    "Labeled Extractname": {
+      "characteristics": "attributes",
+      "materialtype": "",
+      "description": "",
+      "label": "label",
+      "comment": ""
+    },
+    "Assayname": {
+      "technologytype": "technology_type",
+      "arraydesignref": "array_design",
+      "comment": ""
+    },
+    "Arraydatafile":{
+      "comment": ""
+    },
+    "Arraydata Matrixfile":{
+      "Comment": ""
+    },
+    "Derived Arraydatafile":{
+      "Comment": ""
+    },
+    "Derived Arraydata Matrixfile":{
+      "Comment": ""
+    },
+    "Scanname":{
+      "Comment": ""
+    },
+    "Protocolref": {
+      "Termsourceref": "",
+      "Parameter Value": "",
+      "Performer": "performer",
+      "Comment": ""
+    },
+    "Array Designref": {
+      "Termsourceref": "",
+      "Comment": ""
+    },
+    "characteristics": {
+      "Unit": "units",
+      "Termsourceref": ""
+    },
+    "Factor Value": {
+      "Unit": "units",
+      "Termsourceref": ""
+    },
+    "Parameter Value": {
+      "Unit": "units",
+      "Termsourceref": ""
+    },
+    "Unit": {
+      "Termsourceref": ""
+    },
+    "Termsourceref": {
+      "Term Accession Number": ""
+    }
+  },
+  "sdrf_comment_terms": {
+    "ArrayExpress FTP file": "",
+    "FASTQ_URI": "",
+    "BAM_URI": "",
+    "BioSD_SAMPLE": "",
+    "ENA_SAMPLE": "",
+    "ENA_EXPERIMENT": "",
+    "ENA_RUN": "",
+    "technical replicate group": "",
+    "LIBRARY_SELECTION": "",
+    "LIBRARY_STRATEGY": "",
+    "LIBRARY_LAYOUT": "",
+    "LIBRARY_STRAND": "",
+    "NOMINAL_LENGTH": "",
+    "NOMINAL_SDEV": "",
+    "ORIENTATION": "",
+    "single cell isolation": "",
+    "library preparation": "",
+    "end bias": "",
+    "input molecule": ""
+  },
+  "sdrf_comments_ena": {
+    "LIBRARY_LAYOUT": "library_layout",
+    "LIBRARY_SOURCE": "library_source",
+    "LIBRARY_SELECTION": "library_selection",
+    "LIBRARY_STRATEGY": "library_strategy",
+    "LIBRARY_STRAND": "library_strand",
+    "NOMINAL_LENGTH": "nominal_length",
+    "NOMINAL_SDEV": "nominal_sdev",
+    "ORIENTATION": "orientation"
+  },
+  "sdrf_comments_singlecell": {}
+}

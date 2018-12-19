@@ -1,0 +1,33 @@
+MAGE-TAB Version	1.1			
+Investigation Title	Herbal formula YYJD induces lung cancer cell apoptosis via activation of EGR1 (RNA-seq)			
+Experiment Description	In this study,we demonstrated the transcription factor EGR1 is activated by TCM YYJD and such activation mediated YYJD-induced apoptosis in lung cancer cells and provided a novel insight to understand the anti-tumor mechanism of Chinese herb YYJD.			
+Experimental Design	case control design			
+Experimental Design Term Source REF	EFO			
+Experimental Design Term Accession Number	EFO:0001427			
+Experimental Factor Name	compound			
+Experimental Factor Type	compound			
+Experimental Factor Term Source REF				
+Experimental Factor Term Accession Number				
+Person Last Name	Qiang			
+Person First Name	Zhao			
+Person Mid Initials				
+Person Email	zhaoqiang@sjtu.edu.cn			
+Person Phone				
+Person Fax				
+Person Address	800 Dongchuan RD. Minhang District, Shanghai, China			
+Person Affiliation	School of biomedical engineering，Shanghai Jiao Tong University			
+Person Roles	submitter			
+Public Release Date	2018-11-01			
+Protocol Name	Protocol 1	Protocol 2	Protocol 3	Protocol 4
+Protocol Type	sample collection protocol	nucleic acid extraction protocol	nucleic acid library construction protocol	nucleic acid sequencing protocol
+Protocol Term Source REF	EFO	EFO	EFO	EFO
+Protocol Term Accession Number	EFO_0005518	EFO_0002944	EFO_0004184	EFO_0004170
+Protocol Description	A549 was maintained in RPMI 1640 medium (Corning) supplemented with 10% FBS (Gibco) and 100 units per ml penicillin–streptomycin solution at 37℃, 5% CO2 in a humidified incubator, then treated with anti-tumor drug YYJD. 	Total RNA of untreated A549 and treated A549  were extracted using TRIzol regent (Ambio) according to the Ambion standard RNA isolation procedure, and resuspend in RNase free water. 	Approximately 1ug Total RNA was purified using the NEBNext Poly (A) mRNA Magnetic Isolation Module (E7490, NEB). Libraries were constructed using the NEBNext Ultra Directional RNA Library Prep Kit for Illumina (E7420, NEB). 	Libraries concentration and size were detected by Qubit and Agilent 2100, and then sequenced by Illumina NextSeq 500 following the manufacturer's protocols. 
+Protocol Hardware				NextSeq 500
+Protocol Software				
+Term Source Name	EFO			
+Term Source File	http://www.ebi.ac.uk/efo/			
+Term Source Version				
+SDRF File	submission7138_annotare_v3.sdrf.txt			
+Comment[AEExperimentType]	RNA-seq of coding RNA			
+Comment[RelatedExperiment]	E-MTAB-7236			
