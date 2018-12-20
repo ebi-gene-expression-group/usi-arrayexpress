@@ -24,18 +24,21 @@ class TestMetaDataValidation(unittest.TestCase):
 
         # Creating duplicated protocol name, should give error PROT-E04
         self.sub.protocol[0].alias = "P-MTAB-48204"
+        # Protocol type not from controlled vocabulary, should give error PROT-E05
+        self.sub.protocol[1].protocol_type.value = "nonexiting protocol"
         error_codes = metadata_validation.run_protocol_checks(self.sub, self.logger)
         self.assertIn("PROT-E04", error_codes)
+        self.assertIn("PROT-E05", error_codes)
 
         # Empty alias should give error PROT-E02
         self.sub.protocol[0].alias = ""
         error_codes = metadata_validation.run_protocol_checks(self.sub, self.logger)
         self.assertIn("PROT-E02", error_codes)
 
-        # Deleting all protocols should give error PROT-E01
+        # Deleting all protocols should only give error PROT-E01
         self.sub.protocol = []
         error_codes = metadata_validation.run_protocol_checks(self.sub, self.logger)
-        self.assertIn("PROT-E01", error_codes)
+        self.assertEqual(["PROT-E01"], error_codes)
 
 
 if __name__ == '__main__':
