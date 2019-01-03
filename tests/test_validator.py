@@ -1,6 +1,7 @@
 import os
 import unittest
 
+from converter import datamodel
 from converter.converting import data_objects_from_magetab
 from validator import metadata_validation
 from utils.common_utils import create_logger
@@ -39,6 +40,21 @@ class TestMetaDataValidation(unittest.TestCase):
         self.sub.protocol = []
         error_codes = metadata_validation.run_protocol_checks(self.sub, self.logger)
         self.assertEqual(["PROT-E01"], error_codes)
+
+    def test_sample_validation(self):
+        # Everything should be fine, no errors expected
+        error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
+        self.assertEqual(error_codes, [])
+
+        # Non-annotated factor should give error SAMP-E05
+        self.sub.study.experimental_factor.append(datamodel.Attribute("forgotten_factor", None, None))
+        error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
+        self.assertIn("SAMP-E05", error_codes)
+
+        # Add nonsense unit, should give error SAMP-E04
+        self.sub.sample[0].attributes["organism"].unit = datamodel.Unit("xxx", "silly unit", None, None)
+        error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
+        self.assertIn("SAMP-E04", error_codes)
 
 
 if __name__ == '__main__':

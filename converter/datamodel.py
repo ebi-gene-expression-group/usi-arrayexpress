@@ -214,7 +214,7 @@ class Protocol:
         :param alias: string, protocol accession or unique name in experiment
         :param accession: string, ArrayExpress protocol accession
         :param description: string, free-text description of protocol
-        :param protocol_type: string, experiment type ontology term
+        :param protocol_type: object, Attribute class object, experiment type ontology term
         :param hardware: string, free-text hardware description, sequencer model for sequencing experiments
         :param software: string, free-text software description
         :param parameters: list, parameter values

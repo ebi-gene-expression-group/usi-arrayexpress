@@ -41,7 +41,7 @@ def write_json_file(wd, json_object, object_type, sub_info):
         json.dump(json_object, jf)
 
 
-def ontology_lookup(category):
+def ontology_term(category):
     """Read the json with expected EFO terms and return the dict for the given category."""
     resource_package = __name__
     resource_path = "ontology_terms.json"
