@@ -1,9 +1,11 @@
+import re
 
 from converter import datamodel
-from utils.converter_utils import ontology_term
+from utils.converter_utils import ontology_term, get_controlled_vocabulary, is_accession
 from utils.common_utils import get_term_descendants
 
-# Input is a Submission object generated from MAGE-TAB or JSON
+
+REGEX_DATE_FORMAT = r"([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))"
 
 
 def run_protocol_checks(sub: datamodel.Submission, logger):
@@ -123,8 +125,62 @@ def run_sample_checks(sub: datamodel.Submission, logger):
     return codes
 
 
+def run_study_checks(sub: datamodel.Submission, logger):
+    """Run checks on study objects and return list of error codes."""
 
+    study = sub.study
+    codes = []
 
+    # Title
+    if not study.title:
+        logger.error("Study does not have a title.")
+        codes.append("STUD-E01")
+    elif len(study.title) > 255:
+        logger.warn("Study title may be too long. Max 255 characters are allowed.")
+        codes.append("STUD-W01")
+    # Description
+    if not study.description:
+        logger.error("Study does not have a description. Experiment description must be specified.")
+        codes.append("STUD-E02")
+    # Experiment types
+    if not study.experiment_type:
+        logger.error("Study does not have any experiment types.")
+        codes.append("STUD-E03")
+    else:
+        allowed_types = ontology_term("experiment_type")
+        for et in study.experiment_type:
+            if et not in allowed_types:
+                logger.error("Experiment type \"{}\" is not an allowed experiment type.".format(et))
+                codes.append("STUD-E04")
+    # Protocol refs
+    if len(study.protocolrefs) < 1:
+        logger.error("At least one protocol must be used in an experiment")
+    # Experimental factors
+    if not study.experimental_factor:
+        logger.error("Study does not have any experimental variables. At least one must be included.")
+    # Experimental design
+    if study.experimental_design:
+        design_term = ontology_term("study_design")
+        allowed_designs = get_term_descendants(design_term["ontology"], design_term["uri"], logger)
+        for dt in study.experimental_design:
+            if dt.value not in allowed_designs:
+                logger.warn("Experimental design \"{}\" is not an allowed term.".format(dt.value))
+                codes.append("STUD-W02")
+    # Date format
+    if study.date_of_experiment:
+        if not re.match(REGEX_DATE_FORMAT, study.date_of_experiment):
+            logger.error("Date of experiment must be in YYYY-MM-DD format.")
+            codes.append("STUD-E05")
+    # Accession format of related experiments
+    allowed_comments = get_controlled_vocabulary("idf_comment_terms")
+    rel_exp_label = allowed_comments["RelatedExperiment"]
+    if rel_exp_label in study.comments:
+        for acc in study.comments[rel_exp_label]:
+            if not is_accession(acc):
+                logger.error("Related experiment \"{}\" does not match allowed accession pattern.".format(acc))
+                codes.append("STUD-E06")
+
+    return codes
 
 
 

@@ -69,10 +69,11 @@ def is_accession(accession, archive=None):
     With the optional parameter the test can be performed against a specific archive only."""
 
     regex_lookup = {
-        "ARRAYEXPRESS": "^[A-Z]-[A-Z]{4}-[0-9]+",
-        "BIOSAMPLES": "^SAM[END][AG]?[0-9]+",
-        "ENA": "^ER[RXSP][0-9]+$",
-        "BIOSTUDIES": "^S-[A-Z]+[0-9]+$"}
+        "ARRAYEXPRESS": "^\s*[A-Z]-[A-Z]{4}-[0-9]+\s*$",
+        "BIOSAMPLES": "^\s*SAM[END][AG]?[0-9]+\s*$",
+        "ENA": "^\s*ER[RXSP][0-9]+\s*$",
+        "BIOSTUDIES": "^\s*S-[A-Z]+[0-9]+\s*$",
+        "PRIDE": "^\s*PXD[0-9]+\s*$"}
 
     regex_ebi_accession = "|".join(regex_lookup.values())
 
