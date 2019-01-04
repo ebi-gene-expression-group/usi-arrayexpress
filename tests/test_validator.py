@@ -48,15 +48,31 @@ class TestMetaDataValidation(unittest.TestCase):
         error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
         self.assertEqual(error_codes, [])
 
+        # Sample with no name should give error SAMP-E02
+        self.sub.sample[1].alias = ""
+
+        # Empty organism, should give error SAMP-E03
+        self.sub.sample[2].taxon = ""
+
+        # Organism not from taxonomy, should give error SAMP-E08
+        self.sub.sample[0].taxon = "unknown species"
+
         # Non-annotated factor should give error SAMP-E05
         self.sub.study.experimental_factor.append(datamodel.Attribute("forgotten_factor", None, None))
-        error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
-        self.assertIn("SAMP-E05", error_codes)
 
         # Add nonsense unit, should give error SAMP-E04
         self.sub.sample[0].attributes["organism"].unit = datamodel.Unit("xxx", "silly unit", None, None)
         error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
+        self.assertIn("SAMP-E02", error_codes)
+        self.assertIn("SAMP-E03", error_codes)
         self.assertIn("SAMP-E04", error_codes)
+        self.assertIn("SAMP-E05", error_codes)
+        self.assertIn("SAMP-E08", error_codes)
+
+        # Removing all samples, should only give error "SAMP-E01"
+        self.sub.sample = []
+        error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
+        self.assertEqual(["SAMP-E01"], error_codes)
 
     def test_study_validation(self):
         error_codes = metadata_validation.run_study_checks(self.sub, self.logger)

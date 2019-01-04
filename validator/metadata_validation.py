@@ -1,6 +1,7 @@
 import re
 
 from converter import datamodel
+from utils import converter_utils
 from utils.converter_utils import ontology_term, get_controlled_vocabulary, is_accession
 from utils.common_utils import get_term_descendants
 
@@ -83,6 +84,7 @@ def run_sample_checks(sub: datamodel.Submission, logger):
 
     samples = sub.sample
     factors = [f.value for f in sub.study.experimental_factor]
+    organisms = set()
     units = set()
     characteristics = []
     codes = []
@@ -101,12 +103,24 @@ def run_sample_checks(sub: datamodel.Submission, logger):
         if not s.taxon:
             logger.error("Sample \"{}\" has no organism specified.".format(s.alias))
             codes.append("SAMP-E03")
+        else:
+            organisms.add(s.taxon)
         # Collecting units and categories
         for a, a_attr in s.attributes.items():
-            if a_attr.unit and a_attr.unit.value not in units:
-                units.add(a_attr.unit.value)
+            if a_attr.unit and a_attr.unit.value:
+                if a_attr.unit.value not in units:
+                    units.add(a_attr.unit.value)
             if a not in characteristics:
                 characteristics.append(a)
+
+    # Check organism name is in taxonomy
+    print(organisms)
+    for o in organisms:
+        taxon_id = converter_utils.get_taxon(o)
+        print(taxon_id)
+        if not isinstance(taxon_id, int):
+            logger.error("Organism \"{}\" was not found in NCBI taxonomy.".format(o))
+            codes.append("SAMP-E08")
 
     # Check units
     unit_term = ontology_term("unit")
@@ -122,11 +136,43 @@ def run_sample_checks(sub: datamodel.Submission, logger):
         logger.error("The following factors are declared but not annotated: {}".format(", ".join(undefined_factors)))
         codes.append("SAMP-E05")
 
+    # Check that factor values vary
+    unique_factor_values = {}
+    for f in factors:
+        if f not in undefined_factors:
+            factor_values = [s.attributes[f].value for s in samples]
+            unique_factor_values[f.lower()] = converter_utils.remove_duplicates(factor_values)
+
+    non_factors = [f_name for f_name, values in unique_factor_values.items() if len(values) < 2]
+    good_factors = [f_name for f_name, values in unique_factor_values.items() if len(values) > 1]
+
+    for f in non_factors:
+        # Special case dose
+        if f == "dose":
+            # Error if both dose + compound/irradiade do not vary
+            if "compound" in non_factors or "irradiate" in non_factors:
+                logger.error("For factor values including dose, at least one must vary.")
+                codes.append("SAMP-E07")
+            # Allow dose to not vary if compound/irradiate do
+            elif "compound" in good_factors or "irradiate" in good_factors:
+                continue
+        # For compound/irradiate, we already check this above. Need to skip here to suppress second error message
+        elif f == "compound" and "dose" in non_factors:
+            continue
+        elif f == "irradiate" and "dose" in non_factors:
+            continue
+        # Special case immunoprecipitate
+        elif f == "immunoprecipitate":
+            logger.info("Found factor \"immunoprecipitate\". This doesn't need to vary.")
+        else:
+            logger.error("Factor value \"{}\" does not vary.".format(f))
+            codes.append("SAMP-E06")
+
     return codes
 
 
 def run_study_checks(sub: datamodel.Submission, logger):
-    """Run checks on study objects and return list of error codes."""
+    """Run checks on study object and return list of error codes."""
 
     study = sub.study
     codes = []
