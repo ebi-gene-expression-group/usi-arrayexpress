@@ -114,7 +114,6 @@ def run_sample_checks(sub: datamodel.Submission, logger):
                 characteristics.append(a)
 
     # Check organism name is in taxonomy
-    print(organisms)
     for o in organisms:
         taxon_id = converter_utils.get_taxon(o)
         print(taxon_id)
@@ -140,7 +139,7 @@ def run_sample_checks(sub: datamodel.Submission, logger):
     unique_factor_values = {}
     for f in factors:
         if f not in undefined_factors:
-            factor_values = [s.attributes[f].value for s in samples]
+            factor_values = [s.attributes[f].value.rstrip() for s in samples]
             unique_factor_values[f.lower()] = converter_utils.remove_duplicates(factor_values)
 
     non_factors = [f_name for f_name, values in unique_factor_values.items() if len(values) < 2]
