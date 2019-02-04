@@ -82,7 +82,7 @@ def is_accession(accession, archive=None):
             regex = regex_lookup.get(archive)
             return re.match(regex, accession)
         except KeyError:
-            print("Not a valid accession type: {}".format(archive))
+            print("Not a valid archive type: {}".format(archive))
     else:
         return re.match(regex_ebi_accession, accession)
 
