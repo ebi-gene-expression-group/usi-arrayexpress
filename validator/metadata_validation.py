@@ -7,6 +7,7 @@ from utils.common_utils import get_term_descendants
 
 
 REGEX_DATE_FORMAT = r"([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))"
+REGEX_DOI_FORMAT = r"^10.\d{4,9}/[-._;()/:A-Z0-9]+$"
 
 
 def run_protocol_checks(sub: datamodel.Submission, logger):
@@ -224,6 +225,61 @@ def run_study_checks(sub: datamodel.Submission, logger):
             if not is_accession(acc):
                 logger.error("Related experiment \"{}\" does not match allowed accession pattern.".format(acc))
                 codes.append("STUD-E06")
+
+    return codes
+
+
+def run_project_checks(sub: datamodel.Submission, logger):
+    """Run checks on project object and return list of error codes."""
+
+    project = sub.project
+    codes = []
+    found_submitter = False
+    found_submitter_details = False
+
+    # Contacts
+    if not project.contacts:
+        logger.error("No contacts found. At least one contact must be included.")
+        codes.append("PROJ-E01")
+    else:
+        # Roles
+        role_term = ontology_term("role")
+        allowed_roles = get_term_descendants(role_term["ontology"], role_term["uri"], logger)
+        for i, c in enumerate(project.contacts):
+            if c.roles:
+                for r in c.roles:
+                    role_value = r.lower().rstrip()
+                    if role_value not in allowed_roles:
+                        logger.warn("Contact role \"{}\" is not an allowed term.".format(role_value))
+                        codes.append("PROJ-E05")
+                    elif role_value == "submitter":
+                        found_submitter = True
+                        if c.email and c.affiliation:
+                            found_submitter_details = True
+            if not c.lastName:
+                logger.error("A contact must have last name specified: {}.".format(c))
+                codes.append("PROJ-E02")
+        # At least one contact must have role "submitter"
+        if not found_submitter:
+            logger.error("At least one contact must have role \"submitter\".")
+            codes.append("PROJ-E03")
+        # At least one submitter contact needs email and affiliation
+        if not found_submitter_details:
+            logger.error("At least one contact with role \"submitter\" must have email and affiliation specified.")
+            codes.append("PROJ-E04")
+    # Format of PubMed ID and DOI
+    if project.publications:
+        for pub in project.publications:
+            if pub.pubmedId:
+                try:
+                    int(pub.pubmedId)
+                except ValueError:
+                    logger.error("PubMed ID must be numerical. Got \"{}\".".format(pub.pubmedId))
+                    codes.append("PROJ-E06")
+            if pub.doi:
+                if not re.match(REGEX_DOI_FORMAT, pub.doi.rstrip()):
+                    logger.error("Publication DOI \"{}\" does not match expected pattern.".format(pub.doi))
+                    codes.append("PROJ-E07")
 
     return codes
 

@@ -18,7 +18,7 @@ Person Email	ajmizoi@mail.ecc.u-tokyo.ac.jp
 Person Phone						
 Person Fax						
 Person Address						
-Person Affiliation						
+Person Affiliation	test-affiliation					
 Person Roles	submitter					
 Date of Experiment	2015-12-17					
 Public Release Date	2017-08-17					

@@ -96,6 +96,30 @@ class TestMetaDataValidation(unittest.TestCase):
         error_codes = metadata_validation.run_study_checks(self.sub, self.logger)
         self.assertIn("STUD-E03", error_codes)
 
+    def test_project_validation(self):
+        # All should be fine
+        error_codes = metadata_validation.run_project_checks(self.sub, self.logger)
+        self.assertEqual(error_codes, [])
+        # Contact with no last name should give error PROJ-E02
+        self.sub.project.contacts[0].lastName = ""
+        # False role (and no submitter) should give error PROJ-E03 and PROJ-05
+        self.sub.project.contacts[0].roles = ["fake"]
+        # No email should give PROJ-E-04 (no submitter details found)
+        self.sub.project.contacts[0].email = ""
+        # Wrong PubMed ID and DOI should give PROJ-E06 and PROJ-E07
+        self.sub.project.publications = [datamodel.Publication("Test Article Title", "everyone", "haha", "000", "")]
+        error_codes = metadata_validation.run_project_checks(self.sub, self.logger)
+        self.assertIn("PROJ-E02", error_codes)
+        self.assertIn("PROJ-E03", error_codes)
+        self.assertIn("PROJ-E04", error_codes)
+        self.assertIn("PROJ-E05", error_codes)
+        self.assertIn("PROJ-E06", error_codes)
+        self.assertIn("PROJ-E07", error_codes)
+        # Deleting all contacts, should give error PROJ-E01
+        self.sub.project.contacts = []
+        error_codes = metadata_validation.run_project_checks(self.sub, self.logger)
+        self.assertIn("PROJ-E01", error_codes)
+
 
 if __name__ == '__main__':
     unittest.main()
