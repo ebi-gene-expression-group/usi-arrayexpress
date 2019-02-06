@@ -6,8 +6,8 @@ from utils.converter_utils import ontology_term, get_controlled_vocabulary, is_a
 from utils.common_utils import get_term_descendants
 
 
-REGEX_DATE_FORMAT = r"([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))"
-REGEX_DOI_FORMAT = r"^10.\d{4,9}/[-._;()/:A-Z0-9]+$"
+REGEX_DATE_FORMAT = re.compile("([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))")
+REGEX_DOI_FORMAT = re.compile("^10.\d{4,9}/[-._;()/:A-Z0-9]+$")
 
 
 def run_protocol_checks(sub: datamodel.Submission, logger):
@@ -223,7 +223,7 @@ def run_study_checks(sub: datamodel.Submission, logger):
 
     # Date format
     if study.date_of_experiment:
-        if not re.match(REGEX_DATE_FORMAT, study.date_of_experiment):
+        if not REGEX_DATE_FORMAT.match(study.date_of_experiment):
             logger.error("Date of experiment must be in YYYY-MM-DD format.")
             codes.append("STUD-E05")
 
@@ -288,13 +288,13 @@ def run_project_checks(sub: datamodel.Submission, logger):
                     logger.error("PubMed ID must be numerical. Got \"{}\".".format(pub.pubmedId))
                     codes.append("PROJ-E06")
             if pub.doi:
-                if not re.match(REGEX_DOI_FORMAT, pub.doi.rstrip()):
+                if not REGEX_DOI_FORMAT.match(pub.doi.rstrip()):
                     logger.error("Publication DOI \"{}\" does not match expected pattern.".format(pub.doi))
                     codes.append("PROJ-E07")
 
     # Release date
     if project.releaseDate:
-        if not re.match(REGEX_DATE_FORMAT, project.releaseDate):
+        if not REGEX_DATE_FORMAT.match(project.releaseDate):
             logger.error("Release date \"{}\" is not in YYYY-MM-DD format.".format(project.releaseDate))
             codes.append("PROJ-E09")
     else:
