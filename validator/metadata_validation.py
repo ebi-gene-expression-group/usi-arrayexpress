@@ -184,10 +184,12 @@ def run_study_checks(sub: datamodel.Submission, logger):
     elif len(study.title) > 255:
         logger.warn("Study title may be too long. Max 255 characters are allowed.")
         codes.append("STUD-W01")
+
     # Description
     if not study.description:
         logger.error("Study does not have a description. Experiment description must be specified.")
         codes.append("STUD-E02")
+
     # Experiment types
     if not study.experiment_type:
         logger.error("Study does not have any experiment types.")
@@ -198,12 +200,15 @@ def run_study_checks(sub: datamodel.Submission, logger):
             if et not in allowed_types:
                 logger.error("Experiment type \"{}\" is not an allowed experiment type.".format(et))
                 codes.append("STUD-E04")
+
     # Protocol refs
     if len(study.protocolrefs) < 1:
         logger.error("At least one protocol must be used in an experiment")
+
     # Experimental factors
     if not study.experimental_factor:
         logger.error("Study does not have any experimental variables. At least one must be included.")
+
     # Experimental design
     if study.experimental_design:
         design_term = ontology_term("study_design")
@@ -212,11 +217,13 @@ def run_study_checks(sub: datamodel.Submission, logger):
             if dt.value not in allowed_designs:
                 logger.warn("Experimental design \"{}\" is not an allowed term.".format(dt.value))
                 codes.append("STUD-W02")
+
     # Date format
     if study.date_of_experiment:
         if not re.match(REGEX_DATE_FORMAT, study.date_of_experiment):
             logger.error("Date of experiment must be in YYYY-MM-DD format.")
             codes.append("STUD-E05")
+
     # Accession format of related experiments
     allowed_comments = get_controlled_vocabulary("idf_comment_terms")
     rel_exp_label = allowed_comments["RelatedExperiment"]
@@ -267,6 +274,7 @@ def run_project_checks(sub: datamodel.Submission, logger):
         if not found_submitter_details:
             logger.error("At least one contact with role \"submitter\" must have email and affiliation specified.")
             codes.append("PROJ-E04")
+
     # Format of PubMed ID and DOI
     if project.publications:
         for pub in project.publications:
@@ -280,6 +288,15 @@ def run_project_checks(sub: datamodel.Submission, logger):
                 if not re.match(REGEX_DOI_FORMAT, pub.doi.rstrip()):
                     logger.error("Publication DOI \"{}\" does not match expected pattern.".format(pub.doi))
                     codes.append("PROJ-E07")
+
+    # Release date
+    if project.releaseDate:
+        if not re.match(REGEX_DATE_FORMAT, project.releaseDate):
+            logger.error("Release date \"{}\" is not in YYYY-MM-DD format.".format(project.releaseDate))
+            codes.append("PROJ-E09")
+    else:
+        logger.error("No release date found. Project must have release date specified.")
+        codes.append("PROJ-E08")
 
     return codes
 

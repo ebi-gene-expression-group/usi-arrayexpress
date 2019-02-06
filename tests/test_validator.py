@@ -50,16 +50,12 @@ class TestMetaDataValidation(unittest.TestCase):
 
         # Sample with no name should give error SAMP-E02
         self.sub.sample[1].alias = ""
-
         # Empty organism, should give error SAMP-E03
         self.sub.sample[2].taxon = ""
-
         # Organism not from taxonomy, should give error SAMP-E08
         self.sub.sample[0].taxon = "unknown species"
-
         # Non-annotated factor should give error SAMP-E05
         self.sub.study.experimental_factor.append(datamodel.Attribute("forgotten_factor", None, None))
-
         # Add nonsense unit, should give error SAMP-E04
         self.sub.sample[0].attributes["organism"].unit = datamodel.Unit("xxx", "silly unit", None, None)
         error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
@@ -77,6 +73,7 @@ class TestMetaDataValidation(unittest.TestCase):
     def test_study_validation(self):
         error_codes = metadata_validation.run_study_checks(self.sub, self.logger)
         self.assertEqual(error_codes, [])
+
         # No title should give error STUD-E01
         self.sub.study.title = ""
         # No description should give error STUD-E02
@@ -100,6 +97,7 @@ class TestMetaDataValidation(unittest.TestCase):
         # All should be fine
         error_codes = metadata_validation.run_project_checks(self.sub, self.logger)
         self.assertEqual(error_codes, [])
+
         # Contact with no last name should give error PROJ-E02
         self.sub.project.contacts[0].lastName = ""
         # False role (and no submitter) should give error PROJ-E03 and PROJ-05
@@ -108,6 +106,8 @@ class TestMetaDataValidation(unittest.TestCase):
         self.sub.project.contacts[0].email = ""
         # Wrong PubMed ID and DOI should give PROJ-E06 and PROJ-E07
         self.sub.project.publications = [datamodel.Publication("Test Article Title", "everyone", "haha", "000", "")]
+        # Wrong release date format should give error PROJ-E09
+        self.sub.project.releaseDate = "17.03.2012"
         error_codes = metadata_validation.run_project_checks(self.sub, self.logger)
         self.assertIn("PROJ-E02", error_codes)
         self.assertIn("PROJ-E03", error_codes)
@@ -115,10 +115,15 @@ class TestMetaDataValidation(unittest.TestCase):
         self.assertIn("PROJ-E05", error_codes)
         self.assertIn("PROJ-E06", error_codes)
         self.assertIn("PROJ-E07", error_codes)
+        self.assertIn("PROJ-E09", error_codes)
+
         # Deleting all contacts, should give error PROJ-E01
         self.sub.project.contacts = []
+        # Deleting release date should give error PROJ-E08
+        self.sub.project.releaseDate = ""
         error_codes = metadata_validation.run_project_checks(self.sub, self.logger)
         self.assertIn("PROJ-E01", error_codes)
+        self.assertIn("PROJ-E08", error_codes)
 
 
 if __name__ == '__main__':
