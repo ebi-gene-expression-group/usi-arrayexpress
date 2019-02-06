@@ -64,7 +64,7 @@ def run_protocol_checks(sub: datamodel.Submission, logger):
         else:
             # Protocol must have a protocol type
             logger.warn("Protocol \"{}\" has no protocol type.".format(p.alias))
-            codes.append("PROT-W02")
+            codes.append("PROT-E07")
 
     # Mandatory protocol types (for all experiment types) must be present
     for p_type in mandatory:
@@ -140,12 +140,13 @@ def run_sample_checks(sub: datamodel.Submission, logger):
     unique_factor_values = {}
     for f in factors:
         if f not in undefined_factors:
+            # Get all values for a given factor
             factor_values = [s.attributes[f].value.rstrip() for s in samples]
+            # Filter duplicated values to get the number of unique entries
             unique_factor_values[f.lower()] = converter_utils.remove_duplicates(factor_values)
-
     non_factors = [f_name for f_name, values in unique_factor_values.items() if len(values) < 2]
     good_factors = [f_name for f_name, values in unique_factor_values.items() if len(values) > 1]
-
+    # Go through factors and check for special cases that are exempt from the rule
     for f in non_factors:
         # Special case dose
         if f == "dose":
@@ -204,10 +205,12 @@ def run_study_checks(sub: datamodel.Submission, logger):
     # Protocol refs
     if len(study.protocolrefs) < 1:
         logger.error("At least one protocol must be used in an experiment")
+        codes.append("STUD-E07")
 
     # Experimental factors
     if not study.experimental_factor:
         logger.error("Study does not have any experimental variables. At least one must be included.")
+        codes.append("STUD-E08")
 
     # Experimental design
     if study.experimental_design:
@@ -215,8 +218,8 @@ def run_study_checks(sub: datamodel.Submission, logger):
         allowed_designs = get_term_descendants(design_term["ontology"], design_term["uri"], logger)
         for dt in study.experimental_design:
             if dt.value not in allowed_designs:
-                logger.warn("Experimental design \"{}\" is not an allowed term.".format(dt.value))
-                codes.append("STUD-W02")
+                logger.error("Experimental design \"{}\" is not an allowed term.".format(dt.value))
+                codes.append("STUD-E09")
 
     # Date format
     if study.date_of_experiment:
