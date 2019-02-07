@@ -1,6 +1,6 @@
 import argparse
 
-from converter.mtab2json import mtab2usi_conversion
+from converter.converting import mtab2usi_conversion
 
 
 def parse_args():

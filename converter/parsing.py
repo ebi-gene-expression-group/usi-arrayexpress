@@ -531,7 +531,7 @@ def parse_multi_column_fields(idf_dict, category_list, lookup_term):
     """Helper function to connect the related entries in IDF columns,
     e.g. for protocols, contacts and factor values.
     It translates the IDF terms into terms used in the USI data model
-    and safes the values as a list of individual dictionaries."""
+    and saves the values as a list of individual dictionaries."""
 
     # Get the field names and translation from IDF to USI
     controlled_terms = get_controlled_vocabulary(lookup_term)

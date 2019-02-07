@@ -1,12 +1,12 @@
-Comment[ArrayExpressAccession]	E-MTAB-4250
+Comment[ArrayExpressAccession]	E-MTAB-4250					
 MAGE-TAB Version	1.1					
 Comment[AEExperimentDisplyName]	Transcription profiling of Arabidopsis thaliana wild-type plants under a high salinity stress condition.					
 Investigation Title	Transcription profiling of Arabidopsis thaliana wild-type plants under a high salinity stress condition					
-Comment[Submitted Name]	Transcription profiling of Arabidopsis thaliana wild-type plants under a high salinity stress condition
+Comment[Submitted Name]	Transcription profiling of Arabidopsis thaliana wild-type plants under a high salinity stress condition					
 Experiment Description	Transcriptional profiles were compared between untreated and NaCl-treared wild-type seedlings.					
-Experimental Design	growth chamber study	stimulus or stress design	validation by real time PCR design	dye swap design	quality control testing design	
-Experimental Design Term Source REF	EFO	EFO	EFO	EFO	EFO	
-Experimental Design Term Accession Number	EO_0007269	EFO_0001762	OBI_0001166	EFO_0001765	EFO_0001774	
+Experimental Design	stimulus or stress design	validation by real time PCR design	dye swap design	quality control testing design		
+Experimental Design Term Source REF	EFO	EFO	EFO	EFO		
+Experimental Design Term Accession Number	EFO_0001762	OBI_0001166	EFO_0001765	EFO_0001774		
 Experimental Factor Name	compound	dose				
 Experimental Factor Type	compound	dose				
 Experimental Factor Term Source REF						
@@ -18,7 +18,7 @@ Person Email	ajmizoi@mail.ecc.u-tokyo.ac.jp
 Person Phone						
 Person Fax						
 Person Address						
-Person Affiliation						
+Person Affiliation	test-affiliation					
 Person Roles	submitter					
 Date of Experiment	2015-12-17					
 Public Release Date	2017-08-17					
@@ -29,9 +29,9 @@ Protocol Term Accession Number	EFO_0005518	EFO_0003789	EFO_0002944	EFO_0003813	E
 Protocol Description	Whole seedlings were picked up from the medium, untreated or treated with 200 mM NaCl for 4h, and frozen in liquid nitrogen.	Arabidopsis thaliana wild type plants were grown on germination medium (GM; Murashige & Skoog salts, Gamborg's B5 vitamins, 3% sucrose, 0.05% MES-KOH, pH5.7) agar plates at 22C under a day/night photo regime with a 16-h photoperiod at a photon flux density of 40 umol m-2 s-1.	Total RNAs were isolated from frozen samples using the RNAiso Plus Reagent (Takara, Japan) according to the manufacturers protocol. Five to six seedlings were pooled to prepare an RNA sample.	Total RNA (200 ng) was labeled with a Low RNA Input Linear Amplification/Labeling Kit (Agilent Technologies) according to the manufacturer's instructions.	For each experiment, in which wild type and the srk2abgh quadruple mutant were compared, two sets of microarrays were analyzed using a Cy3 and Cy5 dye swap.	Microarray slides were scanned (scanner model G2505C with scan control software, version A.8.4; Agilent Technologies) and the data were analyzed using Feature Extraction software, version 11.5.1.1 (Agilent technologies) using the default settings. 
 Protocol Hardware						
 Protocol Software						
-Term Source Name	ArrayExpress	EFO
+Term Source Name	ArrayExpress	EFO				
 Term Source File	http://www.ebi.ac.uk/arrayexpress/	http://www.ebi.ac.uk/efo/				
 Term Source Version						
 Comment[AEExperimentType]	transcription profiling by array					
 Comment[RelatedExperiment]	E-MTAB-4249					
-SDRF File	E-MTAB-4250.sdrf.txt
+SDRF File	E-MTAB-4250.sdrf.txt					

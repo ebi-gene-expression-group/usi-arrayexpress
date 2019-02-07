@@ -41,7 +41,7 @@ def write_json_file(wd, json_object, object_type, sub_info):
         json.dump(json_object, jf)
 
 
-def ontology_lookup(category):
+def ontology_term(category):
     """Read the json with expected EFO terms and return the dict for the given category."""
     resource_package = __name__
     resource_path = "ontology_terms.json"
@@ -69,10 +69,11 @@ def is_accession(accession, archive=None):
     With the optional parameter the test can be performed against a specific archive only."""
 
     regex_lookup = {
-        "ARRAYEXPRESS": "^[A-Z]-[A-Z]{4}-[0-9]+",
-        "BIOSAMPLES": "^SAM[END][AG]?[0-9]+",
-        "ENA": "^ER[RXSP][0-9]+$",
-        "BIOSTUDIES": "^S-[A-Z]+[0-9]+$"}
+        "ARRAYEXPRESS": "^\s*[A-Z]-[A-Z]{4}-[0-9]+\s*$",
+        "BIOSAMPLES": "^\s*SAM[END][AG]?[0-9]+\s*$",
+        "ENA": "^\s*ER[RXSP][0-9]+\s*$",
+        "BIOSTUDIES": "^\s*S-[A-Z]+[0-9]+\s*$",
+        "PRIDE": "^\s*PXD[0-9]+\s*$"}
 
     regex_ebi_accession = "|".join(regex_lookup.values())
 
@@ -81,7 +82,7 @@ def is_accession(accession, archive=None):
             regex = regex_lookup.get(archive)
             return re.match(regex, accession)
         except KeyError:
-            print("Not a valid accession type: {}".format(archive))
+            print("Not a valid archive type: {}".format(archive))
     else:
         return re.match(regex_ebi_accession, accession)
 

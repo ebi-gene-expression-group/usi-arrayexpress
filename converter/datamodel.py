@@ -214,7 +214,7 @@ class Protocol:
         :param alias: string, protocol accession or unique name in experiment
         :param accession: string, ArrayExpress protocol accession
         :param description: string, free-text description of protocol
-        :param protocol_type: string, experiment type ontology term
+        :param protocol_type: object, Attribute class object, experiment type ontology term
         :param hardware: string, free-text hardware description, sequencer model for sequencing experiments
         :param software: string, free-text software description
         :param parameters: list, parameter values
@@ -278,8 +278,8 @@ class Project:
         self.contacts = contacts
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.releaseDate})," \
-               "{self.publications}, {self.contacts}".format(self=self)
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.releaseDate}," \
+               "{self.publications}, {self.contacts})".format(self=self)
 
     @classmethod
     def from_magetab(cls, study_info):
@@ -291,13 +291,33 @@ class Project:
         comments = study_info.get("comments")
         accession = comments.get("biostudiesaccession", None)
         releaseDate = study_info.get("releaseDate", None)
-        publications = study_info.get("publications", [])
-        contacts = study_info.get("contacts", [])
-        # Transform rolse to list
+
+        contact_terms = get_controlled_vocabulary("contact_terms")
+        contacts_raw = study_info.get("contacts", [])
+        contacts = [Contact(c.get(contact_terms["personfirstname"]),
+                            c.get(contact_terms["personlastname"]),
+                            c.get(contact_terms["personemail"]),
+                            c.get(contact_terms["personaffiliation"]),
+                            c.get(contact_terms["personaddress"]),
+                            c.get(contact_terms["personphone"]),
+                            c.get(contact_terms["personroles"]),
+                            c.get(contact_terms["personmidinitials"]),
+                            c.get(contact_terms["personfax"])
+                            ) for c in contacts_raw]
+        # Transform roles to list
         for c in contacts:
-            if c.get("roles"):
-                roles = c["roles"]
-                c["roles"] = roles.split(';')
+            if c.roles:
+                roles = c.roles
+                c.roles = roles.split(';')
+        # Get publication terms and create list of
+        publications_raw = study_info.get("publications", [])
+        pub_terms = get_controlled_vocabulary("publication_terms")
+        publications = [Publication(pub.get(pub_terms["publicationtitle"]),
+                                    pub.get(pub_terms["publicationauthorlist"]),
+                                    pub.get(pub_terms["pubmedid"]),
+                                    pub.get(pub_terms["publicationdoi"]),
+                                    pub.get(pub_terms["publicationstatus"])) for pub in publications_raw]
+
         title = study_info.get("title")
         description = study_info.get("description")
 
@@ -337,9 +357,9 @@ class Study:
         self.comments = comments
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.title})," \
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.title}," \
                "{self.description}, {self.protocolrefs}, {self.projectref}, {self.experimental_factor}, " \
-               "{self.experimental_design}, {self.experiment_type}, {self.comments}".format(self=self)
+               "{self.experimental_design}, {self.experiment_type}, {self.comments})".format(self=self)
 
     @classmethod
     def from_magetab(cls, study_info):
@@ -453,7 +473,7 @@ class DataFile:
 
 
 class Contact:
-    def __init__(self, firstName, lastName, email, affiliation, address, phone, roles):
+    def __init__(self, firstName, lastName, email, affiliation, address, phone, roles, middleInitials, fax):
         self.firstName = firstName
         self.lastName = lastName
         self.email = email
@@ -461,6 +481,13 @@ class Contact:
         self.address = address
         self.phone = phone
         self.roles = roles
+        self.middleInitials = middleInitials
+        self.fax = fax
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.firstName}, {self.lastName}, {self.email}," \
+               "{self.affiliation}, {self.address}, {self.phone}, {self.roles}, " \
+               "{self.middleInitials}, {self.fax})".format(self=self)
 
 
 class Publication:
