@@ -443,6 +443,20 @@ class AssayData:
         return cls(alias, datafile_objects, data_type, assayrefs, protocolrefs, accession)
 
 
+class Analysis:
+    def __init__(self, alias, files, data_type, assaydatarefs, protocolrefs):
+        self.alias = alias
+        self.files = files
+        self.data_type = data_type
+        self.assaydatarefs = assaydatarefs
+        self.protocolrefs = protocolrefs
+
+    @classmethod
+    def from_metadata(cls, datafile_objects, file_attributes):
+        pass
+
+
+
 # Helper classes
 
 class DataFile:
@@ -470,6 +484,9 @@ class DataFile:
             ftp_location = None
 
         return cls(name, ftp_location, checksum)
+
+    def processed_from_magetab(self, file_attributes):
+        pass
 
 
 class Contact:

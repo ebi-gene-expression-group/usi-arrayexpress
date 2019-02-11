@@ -20,8 +20,8 @@ def generate_usi_project_object(project):
     project_object["alias"] = project.alias
     project_object["title"] = project.title
     project_object["description"] = project.description
-    project_object["contacts"] = project.contacts
-    project_object["publications"] = project.publications
+    project_object["contacts"] = [attrib2dict(contact) for contact in project.contacts]
+    project_object["publications"] = [attrib2dict(pub) for pub in project.publications]
     project_object["releaseDate"] = project.releaseDate
 
     return project_object
@@ -140,10 +140,7 @@ def generate_usi_data_object(assay_data, sub_info):
     ad_object["files"] = []
     files = assay_data.files
     for fo in files:
-        file_object = OrderedDict()
-        for a in fo.__dict__:
-            if getattr(fo, a):
-                file_object[a] = getattr(fo, a)
+        file_object = attrib2dict(fo)
         ad_object["files"].append(file_object)
 
     ad_object["AssayRefs"] = [generate_usi_ref_object(x, sub_info) for x in assay_data.assayrefs]
@@ -210,6 +207,17 @@ def generate_usi_attribute_entry(attribute_info):
         attribute_object.append({"value": attribute_info})
 
     return attribute_object
+
+
+def attrib2dict(ob):
+    """Get all attributes of an object (ob) and turn them into a dictionary.
+    the attributes will become the keys of the dict and the object values the dict values."""
+
+    attrib_dict = OrderedDict()
+    for a in ob.__dict__:
+        if getattr(ob, a):
+            attrib_dict[a] = getattr(ob, a)
+    return attrib_dict
 
 
 def generate_usi_ref_object(alias, sub_info, accession=None):
@@ -334,23 +342,19 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
             # Get all assays referencing this extract
             linked_assays = []
             for assay_name, assay_attributes in assays.items():
-
                 if le_name in assay_attributes["extract_ref"]:
                     linked_assays.append(assay_attributes)
 
             new_assay = MicroarrayAssay.from_magetab(le_attributes, linked_extracts, linked_assays)
             assay_objects.append(new_assay)
-
+    # Sequencing assays
     else:
         for extract_name, extract_attributes in extracts.items():
-
             # Get all assays referencing this extract
             linked_assays = []
             for assay_name, assay_attributes in assays.items():
                 if extract_name in assay_attributes["extract_ref"]:
                     linked_assays.append(assay_attributes)
-
-            print(extract_name, len(linked_assays))
 
             new_assay = SeqAssay.from_magetab(extract_attributes, linked_assays, protocols)
             assay_objects.append(new_assay)
@@ -374,6 +378,12 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
         assay_data = AssayData.from_magetab(name, file_objects, group)
         ad_objects.append(assay_data)
 
+    # Analysis (processed data)
+    print(processed_data)
+    analysis_objects = []
+
+
+
     sub = Submission(sub_info,
                      project_object,
                      study_object,
@@ -381,7 +391,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
                      sample_objects,
                      assay_objects,
                      ad_objects,
-                     [])
+                     analysis_objects)
 
     return sub
 
