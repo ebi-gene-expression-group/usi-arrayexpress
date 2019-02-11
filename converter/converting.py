@@ -8,7 +8,7 @@ import re
 from collections import OrderedDict, defaultdict
 
 from converter.datamodel import Attribute, Project, Study, Protocol, Sample, MicroarrayAssay, SeqAssay, DataFile, \
-    AssayData, Submission
+    AssayData, Analysis, Submission
 from converter.parsing import parse_idf, parse_sdrf
 from utils.common_utils import create_logger
 from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file
@@ -381,8 +381,11 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
     # Analysis (processed data)
     print(processed_data)
     analysis_objects = []
-
-
+    for f_name, f_attrib in processed_data.items():
+        # Here loading the data into the datamodel is a bit simpler
+        processed_file_object = DataFile.from_magetab(f_attrib)
+        # We only want one Analysis object per file but the standard structure of the objects is a list
+        analysis_objects.append(Analysis.from_magetab(processed_file_object, f_attrib))
 
     sub = Submission(sub_info,
                      project_object,
