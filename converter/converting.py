@@ -125,13 +125,7 @@ def generate_usi_assay_object(assay, study_info):
 
 
 def generate_usi_data_object(assay_data, sub_info):
-    """
 
-    :param assay_data:
-    :type:
-    :param sub_info:
-    :return:
-    """
     ad_object = OrderedDict()
 
     ad_object["alias"] = assay_data.alias
@@ -143,9 +137,21 @@ def generate_usi_data_object(assay_data, sub_info):
         file_object = attrib2dict(fo)
         ad_object["files"].append(file_object)
 
-    ad_object["AssayRefs"] = [generate_usi_ref_object(x, sub_info) for x in assay_data.assayrefs]
+    ad_object["assayRefs"] = [generate_usi_ref_object(x, sub_info) for x in assay_data.assayrefs]
 
     return ad_object
+
+
+def generate_usi_analysis_object(analysis, sub_info):
+
+    analysis_object = OrderedDict()
+    analysis_object["alias"] = analysis.alias
+    analysis_object["files"] = [attrib2dict(fo) for fo in analysis.files]
+    analysis_object["data_type"] = analysis.data_type
+    analysis_object["assayDataRefs"] = [generate_usi_ref_object(x, sub_info) for x in analysis.assaydatarefs]
+    analysis_object["protocolRefs"] = [generate_usi_ref_object(p, sub_info) for p in analysis.protocolrefs]
+
+    return analysis_object
 
 
 def generate_usi_attribute_entry(attribute_info):
@@ -383,7 +389,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
     analysis_objects = []
     for f_name, f_attrib in processed_data.items():
         # Here loading the data into the datamodel is a bit simpler
-        processed_file_object = DataFile.from_magetab(f_attrib)
+        processed_file_object = [DataFile.from_magetab(f_attrib)]
         # We only want one Analysis object per file but the standard structure of the objects is a list
         analysis_objects.append(Analysis.from_magetab(processed_file_object, f_attrib))
 
@@ -416,8 +422,11 @@ def datamodel2json_conversion(submission, working_dir, logger):
         "protocol": [generate_usi_protocol_object(p) for p in submission.protocol],
         "sample": [generate_usi_sample_object(s) for s in submission.sample],
         "assay": [generate_usi_assay_object(a, submission.info) for a in submission.assay],
-        "assay_data": [generate_usi_data_object(ad, submission.info) for ad in submission.assay_data]
+        "assay_data": [generate_usi_data_object(ad, submission.info) for ad in submission.assay_data],
     }
+    # Analysis is optional
+    if submission.analysis:
+        json_objects["analysis"] = [generate_usi_analysis_object(a, submission.info) for a in submission.analysis]
 
     # Write individual JSON files
     for submittable_type, objects in json_objects.items():

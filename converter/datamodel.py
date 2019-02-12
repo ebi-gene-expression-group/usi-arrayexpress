@@ -436,6 +436,7 @@ class AssayData:
             data_type = None
 
         comments = common_file_attributes.get("comments")
+        print(comments)
         accession = comments.get("ENA_RUN")
 
         protocolrefs = common_file_attributes.get("protocol_ref")
@@ -453,9 +454,17 @@ class Analysis:
 
     @classmethod
     def from_magetab(cls, datafile_objects, file_attributes):
+
         alias = file_attributes.get("name")
-        data_type = file_attributes.get("data_type")
+
+        mage_data_type = file_attributes.get("data_type")
+        if mage_data_type == "derivedarraydatamatrixfile":
+            data_type = "processed matrix"
+        else:
+            data_type = "processed"
+
         protocolrefs = file_attributes.get("protocol_ref")
+
         # Assay ref is generated based on le_ref (for MA) or extract_ref (for HTS)
         if file_attributes.get("le_ref"):
             assaydatarefs = remove_duplicates(file_attributes.get("le_ref"))
