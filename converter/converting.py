@@ -11,12 +11,12 @@ from converter.datamodel import Attribute, Project, Study, Protocol, Sample, Mic
     AssayData, Analysis, Submission
 from converter.parsing import parse_idf, parse_sdrf
 from utils.common_utils import create_logger
-from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file
+from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict
 
 
 def generate_usi_project_object(project):
-    project_object = OrderedDict()
 
+    project_object = OrderedDict()
     project_object["alias"] = project.alias
     project_object["title"] = project.title
     project_object["description"] = project.description
@@ -213,17 +213,6 @@ def generate_usi_attribute_entry(attribute_info):
         attribute_object.append({"value": attribute_info})
 
     return attribute_object
-
-
-def attrib2dict(ob):
-    """Get all attributes of an object (ob) and turn them into a dictionary.
-    the attributes will become the keys of the dict and the object values the dict values."""
-
-    attrib_dict = OrderedDict()
-    for a in ob.__dict__:
-        if getattr(ob, a):
-            attrib_dict[a] = getattr(ob, a)
-    return attrib_dict
 
 
 def generate_usi_ref_object(alias, sub_info, accession=None):

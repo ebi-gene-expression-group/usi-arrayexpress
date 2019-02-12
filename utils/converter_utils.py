@@ -2,8 +2,9 @@ import codecs
 import json
 import os
 import re
-
 import pkg_resources
+
+from collections import OrderedDict
 
 from utils.eutils import esearch
 
@@ -149,4 +150,14 @@ def strip_extension(filename):
     else:
         return filename
 
+
+def attrib2dict(ob):
+    """Get all attributes of an object (ob) and turn them into a dictionary.
+    the attributes will become the keys of the dict and the object values the dict values."""
+
+    attrib_dict = OrderedDict()
+    for a in ob.__dict__:
+        if getattr(ob, a):
+            attrib_dict[a] = getattr(ob, a)
+    return attrib_dict
 
