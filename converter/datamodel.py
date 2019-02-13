@@ -436,11 +436,42 @@ class AssayData:
             data_type = None
 
         comments = common_file_attributes.get("comments")
+        print(comments)
         accession = comments.get("ENA_RUN")
 
         protocolrefs = common_file_attributes.get("protocol_ref")
 
         return cls(alias, datafile_objects, data_type, assayrefs, protocolrefs, accession)
+
+
+class Analysis:
+    def __init__(self, alias, files, data_type, assaydatarefs, protocolrefs):
+        self.alias = alias
+        self.files = files
+        self.data_type = data_type
+        self.assaydatarefs = assaydatarefs
+        self.protocolrefs = protocolrefs
+
+    @classmethod
+    def from_magetab(cls, datafile_objects, file_attributes):
+
+        alias = file_attributes.get("name")
+
+        mage_data_type = file_attributes.get("data_type")
+        if mage_data_type == "derivedarraydatamatrixfile":
+            data_type = "processed matrix"
+        else:
+            data_type = "processed"
+
+        protocolrefs = file_attributes.get("protocol_ref")
+
+        # Assay ref is generated based on le_ref (for MA) or extract_ref (for HTS)
+        if file_attributes.get("le_ref"):
+            assaydatarefs = remove_duplicates(file_attributes.get("le_ref"))
+        else:
+            assaydatarefs = remove_duplicates(file_attributes.get("extract_ref"))
+
+        return cls(alias, datafile_objects, data_type, assaydatarefs, protocolrefs)
 
 
 # Helper classes
@@ -457,8 +488,8 @@ class DataFile:
 
     @classmethod
     def from_magetab(cls, file_attributes):
-        name = file_attributes.get("name")
 
+        name = file_attributes.get("name")
         comments = file_attributes.get("comments", {})
         checksum = comments.get("MD5")
 
@@ -466,6 +497,8 @@ class DataFile:
             ftp_location = comments.get("ArrayExpress FTP file")
         elif "FASTQ_URI" in comments:
             ftp_location = comments.get("FASTQ_URI")
+        elif "Derived ArrayExpress FTP file" in comments:
+            ftp_location = comments.get("Derived ArrayExpress FTP file")
         else:
             ftp_location = None
 
