@@ -355,33 +355,38 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
             assay_objects.append(new_assay)
 
     # Assay data
+    # We need to group all files that belong to the same run/hybridisation into 1 assay_data object
+    # E.g. the two paired-end files of a sequencing run
     ad_objects = []
-
     file_groups = OrderedDict()
     for f_name, f_attrib in raw_data.items():
+        # For matrix files, we want one object per file not per assay ref
         if len(f_attrib.get("assay_ref")) > 1:
-            # For matrix files, one object per file
             file_groups[strip_extension(f_name)] = [f_attrib]
-
+        # In the other cases we can infer the assay data group from the assay ref of the file
         elif len(f_attrib.get("assay_ref")) == 1:
             a_ref = f_attrib.get("assay_ref")[0]
             # Get the other files with the same assay ref
-            file_groups[a_ref] = [f_attrib for f_attrib in raw_data.values() if a_ref in f_attrib.get("assay_ref")]
+            file_groups[a_ref] = [f_attrib for f_attrib in raw_data.values()
+                                  if a_ref in f_attrib.get("assay_ref")]
 
+    # We use the assay ref (Assay Name) as the alias for the assay_data object
     for name, group in file_groups.items():
+        # Create dataFile object for each individual file within the group
         file_objects = [DataFile.from_magetab(f_attrib) for f_attrib in group]
+        # The assay_data has a common alias and holds the file objects + common attributes of the group)
         assay_data = AssayData.from_magetab(name, file_objects, group)
         ad_objects.append(assay_data)
 
     # Analysis (processed data)
     print(processed_data)
-    analysis_objects = []
-    for f_name, f_attrib in processed_data.items():
-        # Here loading the data into the datamodel is a bit simpler
-        processed_file_object = [DataFile.from_magetab(f_attrib)]
-        # We only want one Analysis object per file but the standard structure of the objects is a list
-        analysis_objects.append(Analysis.from_magetab(processed_file_object, f_attrib))
+    # Here loading the data into the datamodel is a bit simpler: create dataFile objects for each file
+    # and then Analysis object with the additional attributes
+    # We only want one Analysis object per file but the standard structure of the objects is a list
+    analysis_objects = [Analysis.from_magetab([DataFile.from_magetab(f_attrib)], f_attrib)
+                        for f_attrib in processed_data.values()]
 
+    # Assembling it all into a submission object
     sub = Submission(sub_info,
                      project_object,
                      study_object,
@@ -411,7 +416,7 @@ def datamodel2json_conversion(submission, working_dir, logger):
         "protocol": [generate_usi_protocol_object(p) for p in submission.protocol],
         "sample": [generate_usi_sample_object(s) for s in submission.sample],
         "assay": [generate_usi_assay_object(a, submission.info) for a in submission.assay],
-        "assay_data": [generate_usi_data_object(ad, submission.info) for ad in submission.assay_data],
+        "assay_data": [generate_usi_data_object(ad, submission.info) for ad in submission.assay_data]
     }
     # Analysis is optional
     if submission.analysis:

@@ -152,12 +152,10 @@ def strip_extension(filename):
 
 
 def attrib2dict(ob):
-    """Get all attributes of an object (ob) and turn them into a dictionary.
-    the attributes will become the keys of the dict and the object values the dict values."""
+    """Get all attributes of an object (ob) that have a value and turn them into a dictionary.
+    The attributes will become the keys of the dict and the object values the dict values."""
 
-    attrib_dict = OrderedDict()
-    for a in ob.__dict__:
-        if getattr(ob, a):
-            attrib_dict[a] = getattr(ob, a)
+    attrib_dict = OrderedDict([(a, getattr(ob, a)) for a in vars(ob) if getattr(ob, a)])
+
     return attrib_dict
 
