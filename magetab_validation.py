@@ -41,11 +41,19 @@ def main():
     # Read in MAGE-TAB and convert to common data model
     sub = data_objects_from_magetab(idf_file, sdrf_file_path)
 
+    # Collect error codes
+    error_codes = []
+
     # Validate metadata in common data model
-    mv.run_project_checks(sub, logger)
-    mv.run_study_checks(sub, logger)
-    mv.run_protocol_checks(sub, logger)
-    mv.run_sample_checks(sub, logger)
+    error_codes.extend(mv.run_project_checks(sub, logger))
+    error_codes.extend(mv.run_study_checks(sub, logger))
+    error_codes.extend(mv.run_protocol_checks(sub, logger))
+    error_codes.extend(mv.run_sample_checks(sub, logger))
+
+    if error_codes:
+        logger.info("Validation finished with the following error codes: \n{}".format("\n".join(error_codes)))
+    else:
+        logger.info("Validation was successful!")
 
 
 if __name__ == '__main__':
