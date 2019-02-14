@@ -1,7 +1,6 @@
 """Module to convert experiment metadata in MAGE-TAB (IDF/SDRF) format to USI submittable JSON format and
 helper functions for converting from common data model to USI JSON objects"""
 
-import codecs
 import os
 import re
 
@@ -11,7 +10,7 @@ from converter.datamodel import Attribute, Project, Study, Protocol, Sample, Mic
     AssayData, Analysis, Submission
 from converter.parsing import parse_idf, parse_sdrf
 from utils.common_utils import create_logger
-from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict
+from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict, get_sdrf_path
 
 
 def generate_usi_project_object(project):
@@ -243,10 +242,6 @@ def generate_usi_ref_object(alias, sub_info, accession=None):
     return ref_object
 
 
-SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
-DATA_DIRECTORY = "unpacked"
-
-
 def mtab2usi_conversion(idf_file_path):
     """
     Run data transformation from a set of IDF/SDRF files to a set of USI JSON files
@@ -260,25 +255,11 @@ def mtab2usi_conversion(idf_file_path):
     """
     process_name = "mtab2usi_conversion"
 
-    current_dir = os.path.dirname(idf_file_path)
-    idf_file_name = os.path.basename(idf_file_path)
-    sdrf_file_path = None
-
     # Create logger
+    current_dir, idf_file_name = os.path.split(idf_file_path)
     logger = create_logger(current_dir, process_name, idf_file_name)
 
-    # Figure out the name and location of sdrf files
-    with codecs.open(idf_file_path, 'rU', encoding='utf-8') as f:
-        # U flag makes it portable across in unix and windows (\n and \r\n are treated the same)
-        for line in f:
-            if re.search(SDRF_FILE_NAME_REGEX, line):
-                sdrf_file_name = line.split("\t")[1].strip()
-                if os.path.exists(current_dir + DATA_DIRECTORY):
-                    sdrf_file_path = os.path.join(current_dir, DATA_DIRECTORY, sdrf_file_name)
-                else:
-                    sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
-
-    logger.debug("Found SDRF file: {}".format(sdrf_file_path))
+    sdrf_file_path = get_sdrf_path(idf_file_path, logger)
 
     sub = data_objects_from_magetab(idf_file_path, sdrf_file_path)
 

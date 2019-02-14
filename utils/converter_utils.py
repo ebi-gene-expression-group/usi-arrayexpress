@@ -9,6 +9,8 @@ from collections import OrderedDict
 from utils.eutils import esearch
 
 USI_JSON_DIRECTORY = "usijson"
+SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
+DATA_DIRECTORY = "unpacked"
 
 
 def read_json_file(filename):
@@ -159,3 +161,30 @@ def attrib2dict(ob):
 
     return attrib_dict
 
+
+def get_sdrf_path(idf_file_path, logger):
+    """Read IDF and get the SDRF file name, look for the SDRF in the data directory (i.e. "unpacked")
+    or in the same directory as the IDF.
+
+    :param idf_file_path: full or relative path to IDF file
+    :param logger: log handler
+    :return: path to SDRF file
+    """
+
+    current_dir = os.path.dirname(idf_file_path)
+    sdrf_file_path = None
+    # Figure out the name and location of sdrf files
+    with codecs.open(idf_file_path, 'rU', encoding='utf-8') as f:
+        # U flag makes it portable across in unix and windows (\n and \r\n are treated the same)
+        for line in f:
+            if re.search(SDRF_FILE_NAME_REGEX, line):
+                sdrf_file_name = line.split('\t')[1].strip()
+                if os.path.exists(current_dir + DATA_DIRECTORY):
+                    sdrf_file_path = os.path.join(current_dir, DATA_DIRECTORY, sdrf_file_name)
+                else:
+                    sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
+    logger.debug("Generated SDRF file path: {}".format(sdrf_file_path))
+    if not os.path.exists(sdrf_file_path):
+        logger.error("SDRF file {} does not exist".format(sdrf_file_path))
+
+    return sdrf_file_path
