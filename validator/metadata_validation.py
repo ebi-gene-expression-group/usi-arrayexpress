@@ -7,7 +7,7 @@ from utils.common_utils import get_term_descendants
 
 
 REGEX_DATE_FORMAT = re.compile("([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))")
-REGEX_DOI_FORMAT = re.compile("^10.\d{4,9}/[-._;()/:A-Z0-9]+$")
+REGEX_DOI_FORMAT = re.compile("^10\.\d{4,9}\/\S+$")
 
 
 def run_protocol_checks(sub: datamodel.Submission, logger):
@@ -228,8 +228,7 @@ def run_study_checks(sub: datamodel.Submission, logger):
             codes.append("STUD-E05")
 
     # Accession format of related experiments
-    allowed_comments = get_controlled_vocabulary("idf_comment_terms")
-    rel_exp_label = allowed_comments["RelatedExperiment"]
+    rel_exp_label = "RelatedExperiment"
     if rel_exp_label in study.comments:
         for acc in study.comments[rel_exp_label]:
             if not is_accession(acc):
