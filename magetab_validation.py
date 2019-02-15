@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 This script takes an IDF file as input and runs validation of the metadata in the common datamodel.
 """
