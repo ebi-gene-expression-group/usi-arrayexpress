@@ -10,8 +10,10 @@ import logging
 
 from utils.common_utils import create_logger
 from utils.converter_utils import get_sdrf_path
+from converter.parsing import read_sdrf_file
 from converter.converting import data_objects_from_magetab
 
+import validator.magetab_prevalidation as pre
 import validator.metadata_validation as mv
 
 
@@ -39,6 +41,11 @@ def main():
 
     # Get path to SDRF file
     sdrf_file_path = get_sdrf_path(idf_file, logger)
+
+    # Perform prevalidation checks on MAGE-TAB format
+    is_microarray = True
+    sdrf_data, header, header_dict = read_sdrf_file(sdrf_file_path)
+    pre.sdrf_prevalidation(sdrf_data, header, header_dict, is_microarray, logger)
 
     # Read in MAGE-TAB and convert to common data model
     sub = data_objects_from_magetab(idf_file, sdrf_file_path)
