@@ -7,6 +7,7 @@ import pkg_resources
 from collections import OrderedDict
 
 from utils.eutils import esearch
+from converter.parsing import read_sdrf_file, get_value
 
 USI_JSON_DIRECTORY = "usijson"
 SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
@@ -188,3 +189,26 @@ def get_sdrf_path(idf_file_path, logger):
         logger.error("SDRF file {} does not exist".format(sdrf_file_path))
 
     return sdrf_file_path
+
+
+def guess_submission_type_from_sdrf(sdrf_path):
+    """ Guess the basic experiment type (microarray or sequencing) from SDRF header"""
+
+    sdrf_data, header, header_dict = read_sdrf_file(sdrf_path)
+    if 'arraydesignref' in header_dict or 'labeledextractname' in header_dict:
+        return "microarray"
+    elif "comment" in header_dict:
+        for comment_index in header_dict.get("comment"):
+            if get_value(header[comment_index]) == "library construction" \
+                    or get_value(header[comment_index]) == "single cell isolation":
+                return "singlecell"
+    elif "technologytype" in header_dict:
+        index = header_dict.get("technologytype")
+        if sdrf_data[0][index] == "array assay":
+            return "microarray"
+        elif sdrf_data[0][index] == "sequencing assay":
+            return "sequencing"
+
+
+def guess_submission_type_from_idf(idf_path):
+    pass

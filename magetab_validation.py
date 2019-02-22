@@ -9,7 +9,7 @@ import os
 import logging
 
 from utils.common_utils import create_logger
-from utils.converter_utils import get_sdrf_path
+from utils.converter_utils import get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf
 from converter.parsing import read_sdrf_file
 from converter.converting import data_objects_from_magetab
 
@@ -43,9 +43,13 @@ def main():
     sdrf_file_path = get_sdrf_path(idf_file, logger)
 
     # Perform prevalidation checks on MAGE-TAB format
-    is_microarray = True
+
     sdrf_data, header, header_dict = read_sdrf_file(sdrf_file_path)
-    pre.sdrf_prevalidation(sdrf_data, header, header_dict, is_microarray, logger)
+    submission_type = guess_submission_type_from_sdrf(sdrf_file_path)
+    if not submission_type:
+        # Place holder this doesn't exist yet
+        guess_submission_type_from_idf(idf_file)
+    pre.sdrf_prevalidation(sdrf_data, header, header_dict, submission_type, logger)
 
     # Read in MAGE-TAB and convert to common data model
     sub = data_objects_from_magetab(idf_file, sdrf_file_path)

@@ -60,9 +60,6 @@ def read_idf_file(idf_file):
                     else:
                         # Store values in idf_dict
                         idf_dict[row_label] = idf_row
-
-    for label, x in idf_dict.items():
-        print(label + ' --> ' + str(x))
     return idf_dict
 
 
@@ -186,11 +183,6 @@ def parse_sdrf(sdrf_file):
     assays = OrderedDict()
     raw_data = OrderedDict()
     processed_data = OrderedDict()
-
-    # Guessing experiment type (SEQ or MA) from SDRF header
-    is_microarray = False
-    if 'arraydesignref' in header_dict or 'labeledextractname' in header_dict:
-        is_microarray = True
 
     # Recording the node names, to skip duplicate rows
     sample_names = []
@@ -399,7 +391,7 @@ def parse_sdrf(sdrf_file):
         # Note this will deliberately overwrite if there are different values within one sample (see comment above)
         samples[sample_name]["factors"] = factors
 
-    return samples, extracts, le, assays, raw_data, processed_data, is_microarray
+    return samples, extracts, le, assays, raw_data, processed_data
 
 
 def parse_data_file_columns(data_nodes, header_dict, header, node_map, row, data_dict,

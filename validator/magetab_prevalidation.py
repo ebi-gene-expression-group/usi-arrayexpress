@@ -8,7 +8,20 @@ import re
 from converter.parsing import get_name, get_value
 
 
-def sdrf_prevalidation(sdrf_list, header, header_dict, is_microarray, logger):
+def idf_prevalidation():
+    """Check that all IDF fields and comments are from the allowed list and can be parsed properly.
+
+    In IDF the field name need to be spelled exactly like defined in the MAGE-TAB spec
+    (no variablilty with spaces and capitalisation) allowed for AE loading"""
+
+
+
+
+
+def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
+    """Perform basic checks on the SDRF, making sure that all expected nodes and protocols are present,
+    and that the basic assumptions about the relationships between samples and extracts are correct.
+    """
 
     # Strip whitespace
     header_names = [get_name(h) for h in header]
@@ -33,7 +46,7 @@ def sdrf_prevalidation(sdrf_list, header, header_dict, is_microarray, logger):
         extracts = [row[header_dict.get("extractname")[0]] for row in sdrf_list]
 
     # Labeled Extract Name
-    if is_microarray:
+    if submission_type == "microarray":
         if not present_exactly_once("labeledextractname", header_names):
             logger.error("Labeled Extract node was not found or more than once.")
         else:

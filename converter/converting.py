@@ -276,14 +276,15 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
     """
 
     study_info, protocols = parse_idf(idf_file_path)
-    samples, extracts, le, assays, raw_data, processed_data, is_microarray = parse_sdrf(sdrf_file_path)
+    samples, extracts, le, assays, raw_data, processed_data, submission_type = parse_sdrf(sdrf_file_path)
 
     # For MAGE-TAB files we don't have USI submission info might need to store these somewhere once we get this
     idf_file_name = os.path.basename(idf_file_path)
     sub_info = {"alias": re.sub("\.idf\.txt$", "", idf_file_name),
                 "accession": study_info.get("accession"),
                 "team": "my-super-test-team",
-                "metadata": idf_file_path}
+                "metadata": idf_file_path,
+                "submission_type": None}
 
     # Project
     project_object = Project.from_magetab(study_info)
@@ -306,7 +307,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
     # Assays
     assay_objects = []
 
-    if is_microarray:
+    if submission_type == "microarray":
         linked_extracts = []
         for le_name, le_attributes in le.items():
             for extract_name, extract_attributes in extracts.items():
