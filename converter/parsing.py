@@ -376,7 +376,6 @@ def parse_idf(idf_file):
     """This parses the raw IDF dictionary and puts the fields and values into a sub-category dictionary."""
 
     idf_dict = read_idf_file(idf_file)
-    print(idf_dict)
 
     study_info = {
         "title": "",
@@ -398,24 +397,18 @@ def parse_idf(idf_file):
 
     # Contacts
     parse_multi_column_fields(idf_dict, study_info["contacts"], "contact_terms")
-    print(study_info["contacts"])
 
     # Publications
     parse_multi_column_fields(idf_dict, study_info["publications"], "publication_terms")
-    print(study_info["publications"])
 
     # Factors
     parse_multi_column_fields(idf_dict, study_info["experimental_factor"], "factor_terms")
-    print(study_info["experimental_factor"])
 
     # Experimental Design
     parse_multi_column_fields(idf_dict, study_info["experimental_design"], "design_terms")
-    print(study_info["experimental_design"])
 
     # Protocols
     parse_multi_column_fields(idf_dict, protocols, "protocol_terms")
-    for p in protocols:
-        print(p.items())
 
     study_info["protocolRefs"] = [p.get("title") for p in protocols]
 

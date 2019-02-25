@@ -273,6 +273,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type=Non
 
     :param idf_file_path: string, path to IDF file
     :param sdrf_file_path: string, path to SDRF file
+    :param submission_type: string, microarray, sequencing or singlecell
     :return: Submission class object
     """
 
