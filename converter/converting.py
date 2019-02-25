@@ -11,7 +11,7 @@ from converter.datamodel import Attribute, Project, Study, Protocol, Sample, Mic
 from converter.parsing import parse_idf, parse_sdrf
 from utils.common_utils import create_logger
 from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict, \
-    get_sdrf_path, guess_submission_type_from_sdrf
+    get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf
 
 
 def generate_usi_project_object(project):
@@ -267,7 +267,7 @@ def mtab2usi_conversion(idf_file_path):
     datamodel2json_conversion(sub, current_dir, logger)
 
 
-def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
+def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type=None):
     """
     Parse IDF/SDRF files and transform metadata to common datamodel
 
@@ -278,6 +278,15 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
 
     study_info, protocols = parse_idf(idf_file_path)
     samples, extracts, le, assays, raw_data, processed_data = parse_sdrf(sdrf_file_path)
+
+    # Will figure out submission type if it is not given
+    if not submission_type:
+        submission_type = guess_submission_type_from_sdrf(sdrf_file_path)
+        if not submission_type:
+            submission_type = guess_submission_type_from_idf(idf_file_path)
+            if not submission_type:
+                submission_type = "sequencing"
+                print("Could not determine submission type for this experiment. Using \"sequencing\".")
 
     # For MAGE-TAB files we don't have USI submission info might need to store these somewhere once we get this
     idf_file_name = os.path.basename(idf_file_path)

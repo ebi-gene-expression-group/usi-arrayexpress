@@ -197,8 +197,9 @@ def run_study_checks(sub: datamodel.Submission, logger):
         codes.append("STUD-E03")
     else:
         allowed_types = ontology_term("experiment_type")
+        all_types = allowed_types["microarray"] + allowed_types["sequencing"]
         for et in study.experiment_type:
-            if et not in allowed_types:
+            if et not in all_types:
                 logger.error("Experiment type \"{}\" is not an allowed experiment type.".format(et))
                 codes.append("STUD-E04")
 
