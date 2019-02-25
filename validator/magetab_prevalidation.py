@@ -5,7 +5,7 @@ SDRF prevalidation parses the SDRF header and checks that certain nodes are pres
 """
 import re
 
-from converter.parsing import get_name, get_value
+from utils.converter_utils import get_name, get_value
 
 
 def idf_prevalidation():
@@ -13,9 +13,7 @@ def idf_prevalidation():
 
     In IDF the field name need to be spelled exactly like defined in the MAGE-TAB spec
     (no variablilty with spaces and capitalisation) allowed for AE loading"""
-
-
-
+    pass
 
 
 def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
@@ -98,7 +96,7 @@ def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
                 len(samples), len(extracts)))
 
     # There must not be more labeled extracts than samples
-    if is_microarray and samples and le:
+    if submission_type == "microarray" and samples and le:
         if len(samples) > len(le):
             logger.error("Found more samples ({}) than labeled extracts ({}), please check the relationship.".format(
                 len(samples), len(le)))

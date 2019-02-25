@@ -4,10 +4,9 @@ import os
 import re
 import pkg_resources
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 from utils.eutils import esearch
-from converter.parsing import read_sdrf_file, get_value
 
 USI_JSON_DIRECTORY = "usijson"
 SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
@@ -212,3 +211,73 @@ def guess_submission_type_from_sdrf(sdrf_path):
 
 def guess_submission_type_from_idf(idf_path):
     pass
+
+
+def get_name(header_string):
+    """Return the first part of an SDRF header in lower case and without spaces."""
+    no_spaces = header_string.replace(' ', '')
+    field_name = no_spaces.split('[')[0]
+    return field_name.lower()
+
+
+def get_value(header_string):
+    """Return the value within square brackets of an SDRF header."""
+    field_value = header_string.split('[')[-1]
+    return field_value.strip(']')
+
+
+def read_sdrf_file(sdrf_file):
+    """
+    Read SDRF file and return the table content as nested list,
+    the header row as list, and a dictionary of the fields and their indexes
+    :param sdrf_file: string, path to SDRF file
+    """
+
+    with codecs.open(sdrf_file, encoding='utf-8') as sf:
+        header = sf.readline().rstrip().split('\t')
+        sdrf_raw = sf.readlines()
+
+    sdrf_list = [x.rstrip('\n').split('\t') for x in sdrf_raw]
+    header_dict = defaultdict(list)
+    for i, field in enumerate(header):
+        short_name = get_name(field)
+        header_dict[short_name].append(i)
+
+    return sdrf_list, header, header_dict
+
+
+def read_idf_file(idf_file):
+    """This function reads in an IDF file and determines whether it is a normal or a merged file.
+    It then returns the data as a dictionary with the field names as keys and values as list."""
+    idf_dict = OrderedDict()
+    with codecs.open(idf_file, encoding='utf-8') as fi:
+        idf_raw = fi.readlines()
+
+        for row in idf_raw:
+            idf_row = row.rstrip('\n').split('\t')
+            # Skip empty lines or lines full of just empty spaces/tabs
+            if len(''.join(idf_row).strip()) == 0:
+                continue
+            if re.search(r"^\[SDRF\]", idf_row[0]):
+                # idf_file is a combined idf/sdrf file - stop when you get to the beginning of sdrf section
+                break
+            # In the case of a merged idf/sdrf file - skip the beginning of the idf section)
+            if not re.search(r"^\[IDF\]", idf_row[0]):
+                # Store label in separate variable
+                row_label = idf_row.pop(0)
+                # For comments get the value inside square brackets
+                if re.search('comment', row_label, flags=re.IGNORECASE):
+                    row_label = get_value(row_label)
+                # For normal Row labels remove whitespaces
+                else:
+                    row_label = get_name(row_label)
+                # Skip rows that have a label but no values
+                if not len(''.join(idf_row).strip()) == 0:
+                    # Some comments are duplicated
+                    if row_label in idf_dict:
+                        # in that case add to existing entry
+                        idf_dict[row_label].extend(idf_row)
+                    else:
+                        # Store values in idf_dict
+                        idf_dict[row_label] = idf_row
+    return idf_dict

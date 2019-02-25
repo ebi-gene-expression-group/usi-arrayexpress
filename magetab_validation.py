@@ -9,8 +9,8 @@ import os
 import logging
 
 from utils.common_utils import create_logger
-from utils.converter_utils import get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf
-from converter.parsing import read_sdrf_file
+from utils.converter_utils import get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf, \
+    read_sdrf_file
 from converter.converting import data_objects_from_magetab
 
 import validator.magetab_prevalidation as pre
@@ -52,7 +52,7 @@ def main():
     pre.sdrf_prevalidation(sdrf_data, header, header_dict, submission_type, logger)
 
     # Read in MAGE-TAB and convert to common data model
-    sub = data_objects_from_magetab(idf_file, sdrf_file_path)
+    sub = data_objects_from_magetab(idf_file, sdrf_file_path, submission_type)
 
     # Collect error codes
     error_codes = []

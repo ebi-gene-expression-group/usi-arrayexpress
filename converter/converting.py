@@ -10,7 +10,8 @@ from converter.datamodel import Attribute, Project, Study, Protocol, Sample, Mic
     AssayData, Analysis, Submission
 from converter.parsing import parse_idf, parse_sdrf
 from utils.common_utils import create_logger
-from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict, get_sdrf_path
+from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict, \
+    get_sdrf_path, guess_submission_type_from_sdrf
 
 
 def generate_usi_project_object(project):
@@ -266,7 +267,7 @@ def mtab2usi_conversion(idf_file_path):
     datamodel2json_conversion(sub, current_dir, logger)
 
 
-def data_objects_from_magetab(idf_file_path, sdrf_file_path):
+def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
     """
     Parse IDF/SDRF files and transform metadata to common datamodel
 
@@ -276,7 +277,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
     """
 
     study_info, protocols = parse_idf(idf_file_path)
-    samples, extracts, le, assays, raw_data, processed_data, submission_type = parse_sdrf(sdrf_file_path)
+    samples, extracts, le, assays, raw_data, processed_data = parse_sdrf(sdrf_file_path)
 
     # For MAGE-TAB files we don't have USI submission info might need to store these somewhere once we get this
     idf_file_name = os.path.basename(idf_file_path)
@@ -284,7 +285,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
                 "accession": study_info.get("accession"),
                 "team": "my-super-test-team",
                 "metadata": idf_file_path,
-                "submission_type": None}
+                "submission_type": submission_type}
 
     # Project
     project_object = Project.from_magetab(study_info)
