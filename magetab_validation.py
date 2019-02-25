@@ -10,7 +10,7 @@ import logging
 
 from utils.common_utils import create_logger
 from utils.converter_utils import get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf, \
-    read_sdrf_file
+    read_sdrf_file, read_idf_file
 from converter.converting import data_objects_from_magetab
 
 import validator.magetab_prevalidation as pre
@@ -43,7 +43,8 @@ def main():
     sdrf_file_path = get_sdrf_path(idf_file, logger)
 
     # Perform prevalidation checks on MAGE-TAB format
-
+    idf_dict = read_idf_file(idf_file)
+    pre.idf_prevalidation(idf_dict, logger)
     sdrf_data, header, header_dict = read_sdrf_file(sdrf_file_path)
     submission_type = guess_submission_type_from_sdrf(sdrf_file_path)
     if not submission_type:

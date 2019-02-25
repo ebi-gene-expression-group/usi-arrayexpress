@@ -5,15 +5,24 @@ SDRF prevalidation parses the SDRF header and checks that certain nodes are pres
 """
 import re
 
-from utils.converter_utils import get_name, get_value
+from utils.converter_utils import get_name, get_value, get_controlled_vocabulary
 
 
-def idf_prevalidation():
+def idf_prevalidation(idf_dict, logger):
     """Check that all IDF fields and comments are from the allowed list and can be parsed properly.
 
     In IDF the field name need to be spelled exactly like defined in the MAGE-TAB spec
     (no variablilty with spaces and capitalisation) allowed for AE loading"""
-    pass
+
+    # Check if all fields can be parsed
+    idf_fields = get_controlled_vocabulary("idf", "magetab")
+    # Remove spaces (we don't care about them in order to parse correctly)
+    known_fields = [get_name(field) for field in idf_fields]
+    # Add controlled comment fields (values in square brackets)
+    known_fields.extend(get_controlled_vocabulary("idf_comment_terms"))
+    for idf_key in idf_dict:
+        if idf_key not in known_fields:
+            logger.error("Cannot parse IDF field \"{}\".".format(idf_key))
 
 
 def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):

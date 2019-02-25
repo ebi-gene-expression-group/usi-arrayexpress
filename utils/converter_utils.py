@@ -46,17 +46,19 @@ def write_json_file(wd, json_object, object_type, sub_info):
 
 def ontology_term(category):
     """Read the json with expected EFO terms and return the dict for the given category."""
+    return get_controlled_vocabulary(category, "ontology")
+
+
+def get_controlled_vocabulary(category, resource="translations"):
+    """Read the json with controlled vocab and return the dict for the given category.
+    The resource parameter specifies which file to read."""
     resource_package = __name__
-    resource_path = "ontology_terms.json"
-    all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
-
-    return all_terms[category]
-
-
-def get_controlled_vocabulary(category):
-    """Read the json with controlled vocab and return the dict for the given category."""
-    resource_package = __name__
-    resource_path = "term_translations.json"
+    if resource == "ontology":
+        resource_path = "ontology_terms.json"
+    elif resource == "magetab":
+        resource_path = "magetab_fields.json"
+    else:
+        resource_path = "term_translations.json"
     all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
 
     return all_terms[category]
