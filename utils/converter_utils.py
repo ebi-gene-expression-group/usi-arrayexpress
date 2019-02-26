@@ -196,6 +196,7 @@ def guess_submission_type_from_sdrf(sdrf_path):
     """ Guess the basic experiment type (microarray or sequencing) from SDRF header"""
 
     sdrf_data, header, header_dict = read_sdrf_file(sdrf_path)
+    print(header_dict)
     if 'arraydesignref' in header_dict or 'labeledextractname' in header_dict:
         return "microarray"
     elif "comment" in header_dict:
@@ -203,12 +204,14 @@ def guess_submission_type_from_sdrf(sdrf_path):
             if get_value(header[comment_index]) == "library construction" \
                     or get_value(header[comment_index]) == "single cell isolation":
                 return "singlecell"
-    elif "technologytype" in header_dict:
+    if "technologytype" in header_dict:
         index = header_dict.get("technologytype")
-        if sdrf_data[0][index] == "array assay":
-            return "microarray"
-        elif sdrf_data[0][index] == "sequencing assay":
-            return "sequencing"
+        if len(index) > 0:
+            index = index[0]
+            if sdrf_data[0][index] == "array assay":
+                return "microarray"
+            elif sdrf_data[0][index] == "sequencing assay":
+                return "sequencing"
 
 
 def guess_submission_type_from_idf(idf_path):

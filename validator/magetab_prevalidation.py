@@ -24,6 +24,12 @@ def idf_prevalidation(idf_dict, logger):
         if idf_key not in known_fields:
             logger.error("Cannot parse IDF field \"{}\".".format(idf_key))
 
+    # Check fields that can only contain one value
+    max1 = ("mage-tabversion", "investigationtitle", "dateofexperiment", "publicreleasedate", "experimentdescription")
+    for field in max1:
+        if idf_dict.get(field) and len([x for x in idf_dict[field] if x]) > 1:
+            logger.error("IDF field \"{}\" contains more than one value.")
+
 
 def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
     """Perform basic checks on the SDRF, making sure that all expected nodes and protocols are present,
@@ -45,7 +51,7 @@ def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
         # For later check of sample to extract relationship
         samples = [row[header_dict.get("sourcename")[0]] for row in sdrf_list]
 
-        # Extract Name
+    # Extract Name
     if not present_exactly_once("extractname", header_names):
         logger.error("Extract Name node was not found or more than once.")
     else:
@@ -79,7 +85,7 @@ def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
         logger.error("The following characteristics categories is present more than once: {}".format(
             ", ".join(duplicated_categories)))
 
-    # Protocols must be between all major nodes
+    # Protocols should be between all major nodes
     ref_positions = header_dict.get("protocolref")
     # Add first node for each data file node type to node positions, where we want a protocol
     _add_first_occurance("arraydatafile", header_dict, node_positions)
@@ -87,15 +93,13 @@ def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
     _add_first_occurance("arraydatamatrixfile", header_dict, node_positions)
     _add_first_occurance("derivedarraydatafile", header_dict, node_positions)
     _add_first_occurance("derivedarraydatamatrixfile", header_dict, node_positions)
-    print(node_positions)
     # Go through nodes up until the one before last
     for i, node_pos in enumerate(node_positions[:-1]):
         # Get all protocol positions that fulfill the criteria of being between the current and the next node
         next_node_pos = node_positions[i+1]
         prots_in_range = [prot for prot in ref_positions if node_pos < prot < next_node_pos]
-        print(prots_in_range)
         if not prots_in_range:
-            logger.error("There is no Protocol REF connecting \"{}\" and \"{}\".".format(
+            logger.warn("There is no Protocol REF connecting \"{}\" and \"{}\".".format(
                 header[node_pos], header[next_node_pos]))
 
     # There must not be more samples than extracts

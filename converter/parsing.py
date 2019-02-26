@@ -415,6 +415,7 @@ def parse_idf(idf_file):
     # Comments
     # Here we allow >1 value but they are not related to the other comment values in the same column
     comment_terms = get_controlled_vocabulary("idf_comment_terms")
+    print(comment_terms)
     for idf_ct, usi_ct in comment_terms.items():
         if idf_ct in idf_dict:
             # Remove empty list entries, e.g. 'related experiment': ['E-MTAB-7236', '', '', '']
@@ -423,7 +424,7 @@ def parse_idf(idf_file):
             study_info["comments"][usi_ct] = comment_values
 
     # General Info
-    general_terms = get_controlled_vocabulary("investigation_terms")
+    general_terms = {get_name(t): val for t, val in get_controlled_vocabulary("investigation_terms").items()}
     for idf_ct, usi_ct in general_terms.items():
         if idf_ct in idf_dict and idf_dict[idf_ct]:
             # for these terms we only expect/allow 1 value (the first item in the list)
@@ -446,7 +447,7 @@ def parse_multi_column_fields(idf_dict, category_list, lookup_term):
     and saves the values as a list of individual dictionaries."""
 
     # Get the field names and translation from IDF to USI
-    controlled_terms = get_controlled_vocabulary(lookup_term)
+    controlled_terms = {get_name(t): val for t, val in get_controlled_vocabulary(lookup_term).items()}
     # Go through terms
     for idf_ct, usi_ct in controlled_terms.items():
         if idf_ct in idf_dict:

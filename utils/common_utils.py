@@ -56,7 +56,6 @@ def get_term_descendants(ontology, term_url, logger):
         try:
             for d in data["_embedded"]["terms"]:
                 efo_children.add(d["label"])
-            print(efo_children)
             return efo_children
         except KeyError:
             logger.error("Failed to receive valid response from {}.".format(api_url))

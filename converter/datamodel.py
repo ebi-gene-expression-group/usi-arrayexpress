@@ -294,15 +294,15 @@ class Project:
 
         contact_terms = get_controlled_vocabulary("contact_terms")
         contacts_raw = study_info.get("contacts", [])
-        contacts = [Contact(c.get(contact_terms["personfirstname"]),
-                            c.get(contact_terms["personlastname"]),
-                            c.get(contact_terms["personemail"]),
-                            c.get(contact_terms["personaffiliation"]),
-                            c.get(contact_terms["personaddress"]),
-                            c.get(contact_terms["personphone"]),
-                            c.get(contact_terms["personroles"]),
-                            c.get(contact_terms["personmidinitials"]),
-                            c.get(contact_terms["personfax"])
+        contacts = [Contact(c.get(contact_terms["Person First Name"]),
+                            c.get(contact_terms["Person Last Name"]),
+                            c.get(contact_terms["Person Email"]),
+                            c.get(contact_terms["Person Affiliation"]),
+                            c.get(contact_terms["Person Address"]),
+                            c.get(contact_terms["Person Phone"]),
+                            c.get(contact_terms["Person Roles"]),
+                            c.get(contact_terms["Person Mid Initials"]),
+                            c.get(contact_terms["Person Fax"])
                             ) for c in contacts_raw]
         # Transform roles to list
         for c in contacts:
@@ -312,11 +312,11 @@ class Project:
         # Get publication terms and create list of
         publications_raw = study_info.get("publications", [])
         pub_terms = get_controlled_vocabulary("publication_terms")
-        publications = [Publication(pub.get(pub_terms["publicationtitle"]),
-                                    pub.get(pub_terms["publicationauthorlist"]),
-                                    pub.get(pub_terms["pubmedid"]),
-                                    pub.get(pub_terms["publicationdoi"]),
-                                    pub.get(pub_terms["publicationstatus"])) for pub in publications_raw]
+        publications = [Publication(pub.get(pub_terms["Publication Title"]),
+                                    pub.get(pub_terms["Publication Author List"]),
+                                    pub.get(pub_terms["PubMed ID"]),
+                                    pub.get(pub_terms["Publication DOI"]),
+                                    pub.get(pub_terms["Publication Status"])) for pub in publications_raw]
 
         title = study_info.get("title")
         description = study_info.get("description")
@@ -518,7 +518,7 @@ class Contact:
         self.fax = fax
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.firstName}, {self.lastName}, {self.email}," \
+        return "{self.__class__.__name__}({self.firstName}, {self.lastName}, {self.email}, " \
                "{self.affiliation}, {self.address}, {self.phone}, {self.roles}, " \
                "{self.middleInitials}, {self.fax})".format(self=self)
 
