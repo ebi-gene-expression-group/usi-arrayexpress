@@ -3,6 +3,7 @@ import os.path
 import urllib
 import requests
 import json
+import sys
 
 from datetime import datetime
 
@@ -59,6 +60,12 @@ def get_term_descendants(ontology, term_url, logger):
             return efo_children
         except KeyError:
             logger.error("Failed to receive valid response from {}.".format(api_url))
+
+
+def file_exists(input_file):
+    if not os.path.exists(input_file):
+        print("Invalid input. File does not exist: {}".format(input_file))
+        sys.exit()
 
 
 if __name__ == '__main__':

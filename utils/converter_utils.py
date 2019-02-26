@@ -3,6 +3,7 @@ import json
 import os
 import re
 import pkg_resources
+import sys
 
 from collections import OrderedDict, defaultdict
 
@@ -98,8 +99,9 @@ organism_lookup = {}
 
 def get_taxon(organism):
     """Return the NCBI taxonomy ID for a given species name."""
-    if organism and organism not in organism_lookup:
 
+    if organism and organism not in organism_lookup:
+        print("Looking up species in NCBI taxonomy. Please wait...")
         db = 'taxonomy'
         a = esearch(db=db, term=organism)
         try:
@@ -174,7 +176,7 @@ def get_sdrf_path(idf_file_path, logger):
     """
 
     current_dir = os.path.dirname(idf_file_path)
-    sdrf_file_path = None
+    sdrf_file_path = ""
     # Figure out the name and location of sdrf files
     with codecs.open(idf_file_path, 'rU', encoding='utf-8') as f:
         # U flag makes it portable across in unix and windows (\n and \r\n are treated the same)
@@ -192,11 +194,9 @@ def get_sdrf_path(idf_file_path, logger):
     return sdrf_file_path
 
 
-def guess_submission_type_from_sdrf(sdrf_path):
-    """ Guess the basic experiment type (microarray or sequencing) from SDRF header"""
+def guess_submission_type_from_sdrf(sdrf_data, header, header_dict):
+    """ Guess the basic experiment type (microarray or sequencing) from SDRF"""
 
-    sdrf_data, header, header_dict = read_sdrf_file(sdrf_path)
-    print(header_dict)
     if 'arraydesignref' in header_dict or 'labeledextractname' in header_dict:
         return "microarray"
     elif "comment" in header_dict:
@@ -214,8 +214,33 @@ def guess_submission_type_from_sdrf(sdrf_path):
                 return "sequencing"
 
 
-def guess_submission_type_from_idf(idf_path):
-    pass
+def guess_submission_type_from_idf(idf_dict):
+    """Based on the experiment type, we can try to infer the basic experiment type
+    This returns the type of the first experiment type found. We cannot handle mixed type experiments.
+    """
+    print(idf_dict)
+    if "AEExperimentType" in idf_dict:
+        all_types = get_controlled_vocabulary("experiment_type", "ontology")
+        print(all_types)
+        for exptype in idf_dict["AEExperimentType"]:
+            if exptype in all_types["sequencing"]:
+                return "sequencing"
+            elif exptype in all_types["microarray"]:
+                return "microarray"
+            elif exptype in all_types["singlecell"]:
+                return "singlecell"
+
+
+def guess_submission_type(idf_file, sdrf_file, logger):
+    """Read IDF/SDRF to get submission type"""
+
+    idf_dict = read_idf_file(idf_file)
+    sdrf_data, header, header_dict = read_sdrf_file(sdrf_file)
+    submission_type = guess_submission_type_from_sdrf(sdrf_data, header, header_dict)
+    if not submission_type:
+        submission_type = guess_submission_type_from_idf(idf_dict)
+    logger.info("Found experiment type: {}".format(submission_type))
+    return submission_type, idf_dict,
 
 
 def get_name(header_string):

@@ -128,8 +128,10 @@
       "MRE-seq",
       "RIP-seq",
       "RNA-seq of coding RNA",
+      "RNA-seq of non coding RNA"
+      ],
+    "singlecell": [
       "RNA-seq of coding RNA from single cells",
-      "RNA-seq of non coding RNA",
       "RNA-seq of non coding RNA from single cells"
     ]
   },
