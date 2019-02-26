@@ -42,14 +42,16 @@ def main():
     # Get path to SDRF file
     sdrf_file_path = get_sdrf_path(idf_file, logger)
 
-    # Perform prevalidation checks on MAGE-TAB format
+    # Read IDF/SDRF and get submission type
     idf_dict = read_idf_file(idf_file)
-    pre.idf_prevalidation(idf_dict, logger)
     sdrf_data, header, header_dict = read_sdrf_file(sdrf_file_path)
-    submission_type = guess_submission_type_from_sdrf(sdrf_file_path)
+    submission_type = guess_submission_type_from_sdrf(sdrf_data, header, header_dict)
     if not submission_type:
-        # Place holder this doesn't exist yet
-        guess_submission_type_from_idf(idf_file)
+        submission_type = guess_submission_type_from_idf(idf_dict)
+    logger.info("Found experiment type: {}".format(submission_type))
+
+    # Perform prevalidation checks on MAGE-TAB format
+    pre.idf_prevalidation(idf_dict, logger)
     pre.sdrf_prevalidation(sdrf_data, header, header_dict, submission_type, logger)
 
     # Read in MAGE-TAB and convert to common data model

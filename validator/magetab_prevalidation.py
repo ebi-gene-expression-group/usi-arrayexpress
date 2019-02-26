@@ -28,7 +28,7 @@ def idf_prevalidation(idf_dict, logger):
     max1 = ("mage-tabversion", "investigationtitle", "dateofexperiment", "publicreleasedate", "experimentdescription")
     for field in max1:
         if idf_dict.get(field) and len([x for x in idf_dict[field] if x]) > 1:
-            logger.error("IDF field \"{}\" contains more than one value.")
+            logger.error("IDF field \"{}\" contains more than one value. This is not allowed".format(field))
 
 
 def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):

@@ -267,7 +267,7 @@ def mtab2usi_conversion(idf_file_path):
     datamodel2json_conversion(sub, current_dir, logger)
 
 
-def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type=None):
+def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="sequencing"):
     """
     Parse IDF/SDRF files and transform metadata to common datamodel
 
@@ -279,15 +279,6 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type=Non
 
     study_info, protocols = parse_idf(idf_file_path)
     samples, extracts, le, assays, raw_data, processed_data = parse_sdrf(sdrf_file_path)
-
-    # Will figure out submission type if it is not given
-    if not submission_type:
-        submission_type = guess_submission_type_from_sdrf(sdrf_file_path)
-        if not submission_type:
-            submission_type = guess_submission_type_from_idf(idf_file_path)
-            if not submission_type:
-                submission_type = "sequencing"
-                print("Could not determine submission type for this experiment. Using \"sequencing\".")
 
     # For MAGE-TAB files we don't have USI submission info might need to store these somewhere once we get this
     idf_file_name = os.path.basename(idf_file_path)
