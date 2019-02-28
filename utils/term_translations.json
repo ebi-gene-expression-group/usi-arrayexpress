@@ -63,7 +63,11 @@
     "EAAdditionalAttributes": "",
     "EAExperimentType": "",
     "EACurator": "",
-    "Submitted Name": ""
+    "Submitted Name": "",
+    "SRASubmissionDate": "",
+    "GEOReleaseDate": "",
+    "GEOLastUpdateDate": "",
+    "TemplateType": ""
   },
   "node_terms": {
     "Source Name": "",
