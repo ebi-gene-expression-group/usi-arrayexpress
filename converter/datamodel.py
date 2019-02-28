@@ -94,7 +94,7 @@ class Assay:
 
 
 class MicroarrayAssay(Assay):
-    def __init__(self, alias, accession, technology_type, protocolrefs, sampleref, label, arrayref):
+    def __init__(self, alias, accession, technology_type, protocolrefs, sampleref, label, array_design):
         """
         Assay attributes specific to microarray assays
 
@@ -103,7 +103,7 @@ class MicroarrayAssay(Assay):
         """
         Assay.__init__(self, alias, accession, technology_type, protocolrefs, sampleref)
         self.label = label
-        self.arrayref = arrayref
+        self.array_design = array_design
 
     @classmethod
     def from_magetab(cls, le_attributes, extract_attributes, assay_attributes):
@@ -127,9 +127,9 @@ class MicroarrayAssay(Assay):
         label = le_attributes.get("label")
 
         # Get Array design REF, we are only expecting one unique per extract
-        arrayref = [a.get("array_design") for a in assay_attributes]
+        array_design = [a.get("array_design") for a in assay_attributes]
 
-        return cls(alias, accession, technology_type[0], protocolrefs, sampleref, label, arrayref[0])
+        return cls(alias, accession, technology_type[0], protocolrefs, sampleref, label, array_design[0])
 
     @classmethod
     def from_json(self):
