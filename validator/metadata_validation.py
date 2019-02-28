@@ -304,7 +304,60 @@ def run_project_checks(sub: datamodel.Submission, logger):
     return codes
 
 
+def run_assay_checks(sub: datamodel.Submission, logger):
 
+    assays = sub.assay
+    exptype = sub.info["submission_type"]
+    codes = []
 
+    if not assays:
+        logger.error("Experiment has no assays. At least one expected.")
+        codes.append("ASSA-E01")
+        return codes
+
+    for a in assays:
+        additional_attributes = a.get_attributes()
+        # Assay must have name
+        if not a.alias:
+            logger.error("Assay \"{}\" does not have a name specified. Not checking it.".format(a))
+            codes.append("ASSA-E02")
+            continue
+        # Technology type
+        if not a.technology_type:
+            logger.error("Assay \"{}\" does not have technology type specified.".format(a))
+            codes.append("ASSA-E03")
+        elif exptype == "microarray" and a.technology_type != "array assay":
+            logger.error("Technology Type must be 'array assay' in a microarray submission. "
+                         "Found \"{}\".".format(a.technology_type))
+            codes.append("ASSA-E04")
+        elif exptype == "sequencing" and a.technology_type != "sequencing assay":
+            logger.error("Technology Type must be 'sequencing assay' in a sequencing submission. "
+                         "Found \"{}\".".format(a.technology_type))
+            codes.append("ASSA-E05")
+
+        # Microarray checks for label and array design
+        if exptype == "microarray":
+            # Label
+            if not a.label:
+                logger.error("Microarray assay \"{}\" does not have label attribute specified.".format(a))
+                codes.append("ASSA-E06")
+            # Array design
+            if not a.array_design:
+                logger.error("Microarray assay \"{}\" does not have array design specified.".format(a))
+                codes.append("ASSA-E07")
+            elif not is_accession(a.array_design, "ARRAYEXPRESS"):
+                logger.error("Array design \"{}\" is not a valid ArrayExpress accession number.".format(a.array_design))
+                codes.append("ASSA-E08")
+
+        # Sequencing checks
+        elif exptype == "sequencing":
+            if "label" in additional_attributes:
+                logger.error("Found sequencing assay \"{}\" with 'label' attribute.".format(a))
+                codes.append("ASSA-E09")
+            if "array_design" in additional_attributes:
+                logger.error("Found sequencing assay \"{}\" with 'array design' attribute.".format(a))
+                codes.append("ASSA-E10")
+
+    return codes
 
 
