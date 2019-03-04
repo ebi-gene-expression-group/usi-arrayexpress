@@ -35,10 +35,7 @@ def main():
 
     # Create logger
     current_dir, idf_file_name = os.path.split(idf_file)
-    logger = create_logger(current_dir, process_name, idf_file_name)
-    # Add handler to direct output to screen in addition to log file
-    stream_hdlr = logging.StreamHandler()
-    logger.addHandler(stream_hdlr)
+    logger = create_logger(current_dir, process_name, idf_file_name, logger_name="Validation")
 
     # Get path to SDRF file
     sdrf_file_path = get_sdrf_path(idf_file, logger)
@@ -51,9 +48,10 @@ def main():
         submission_type = guess_submission_type_from_idf(idf_dict)
     logger.info("Found experiment type: {}".format(submission_type))
 
+    mtab_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="MAGE-TAB")
     # Perform prevalidation checks on MAGE-TAB format
-    pre.idf_prevalidation(idf_dict, logger)
-    pre.sdrf_prevalidation(sdrf_data, header, header_dict, submission_type, logger)
+    pre.idf_prevalidation(idf_dict, mtab_logger)
+    pre.sdrf_prevalidation(sdrf_data, header, header_dict, submission_type, mtab_logger)
 
     # Read in MAGE-TAB and convert to common data model
     sub = data_objects_from_magetab(idf_file, sdrf_file_path, submission_type)
@@ -61,12 +59,14 @@ def main():
     # Collect error codes
     error_codes = []
 
+    metadata_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="Metadata")
+
     # Validate metadata in common data model
-    error_codes.extend(mv.run_project_checks(sub, logger))
-    error_codes.extend(mv.run_study_checks(sub, logger))
-    error_codes.extend(mv.run_protocol_checks(sub, logger))
-    error_codes.extend(mv.run_sample_checks(sub, logger))
-    error_codes.extend(mv.run_assay_checks(sub, logger))
+    error_codes.extend(mv.run_project_checks(sub, metadata_logger))
+    error_codes.extend(mv.run_study_checks(sub, metadata_logger))
+    error_codes.extend(mv.run_protocol_checks(sub, metadata_logger))
+    error_codes.extend(mv.run_sample_checks(sub, metadata_logger))
+    error_codes.extend(mv.run_assay_checks(sub, metadata_logger))
 
     if error_codes:
         logger.info("Validation finished with the following error codes: \n{}".format("\n".join(set(error_codes))))
