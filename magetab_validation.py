@@ -69,7 +69,7 @@ def main():
     error_codes.extend(mv.run_assay_checks(sub, logger))
 
     if error_codes:
-        logger.info("Validation finished with the following error codes: \n{}".format("\n".join(error_codes)))
+        logger.info("Validation finished with the following error codes: \n{}".format("\n".join(set(error_codes))))
     else:
         logger.info("Validation was successful!")
 

@@ -131,6 +131,27 @@ class TestMetaDataValidation(unittest.TestCase):
         self.assertIn("PROJ-E01", error_codes)
         self.assertIn("PROJ-E08", error_codes)
 
+    def test_assay_validation(self):
+        # All should be fine
+        error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
+        self.assertEqual(error_codes, [])
+
+        # Deleting alias from first assay should give ASSA-E02
+        self.sub.assay[0].alias = ""
+        # Deleting technology type should give ASSA-E03
+        self.sub.assay[1].technology_type = ""
+        # Changing technology type to unknown type should give ASSA-E04
+        self.sub.assay[2].technology_type = "whatever"
+        error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
+        self.assertIn("ASSA-E02", error_codes)
+        self.assertIn("ASSA-E03", error_codes)
+        self.assertIn("ASSA-E04", error_codes)
+
+        # Deleting all assays should give error ASSA-E01
+        self.sub.assay = []
+        error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
+        self.assertEqual(["ASSA-E01"], error_codes)
+
 
 if __name__ == '__main__':
     unittest.main()

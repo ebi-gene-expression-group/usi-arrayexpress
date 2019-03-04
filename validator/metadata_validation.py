@@ -197,7 +197,7 @@ def run_study_checks(sub: datamodel.Submission, logger):
         codes.append("STUD-E03")
     else:
         allowed_types = ontology_term("experiment_type")
-        all_types = allowed_types["microarray"] + allowed_types["sequencing"]
+        all_types = allowed_types["microarray"] + allowed_types["sequencing"] + allowed_types["singlecell"]
         for et in study.experiment_type:
             if et not in all_types:
                 logger.error("Experiment type \"{}\" is not an allowed experiment type.".format(et))
@@ -260,7 +260,7 @@ def run_project_checks(sub: datamodel.Submission, logger):
                 for r in c.roles:
                     role_value = r.lower().rstrip()
                     if role_value not in allowed_roles:
-                        logger.warn("Contact role \"{}\" is not an allowed term.".format(role_value))
+                        logger.warning("Contact role \"{}\" is not an allowed term.".format(role_value))
                         codes.append("PROJ-E05")
                     elif role_value == "submitter":
                         found_submitter = True
@@ -324,7 +324,7 @@ def run_assay_checks(sub: datamodel.Submission, logger):
             continue
         # Technology type
         if not a.technology_type:
-            logger.error("Assay \"{}\" does not have technology type specified.".format(a))
+            logger.error("Assay \"{}\" does not have technology type specified.".format(a.alias))
             codes.append("ASSA-E03")
         elif exptype == "microarray" and a.technology_type != "array assay":
             logger.error("Technology Type must be 'array assay' in a microarray submission. "
@@ -339,11 +339,11 @@ def run_assay_checks(sub: datamodel.Submission, logger):
         if exptype == "microarray":
             # Label
             if not a.label:
-                logger.error("Microarray assay \"{}\" does not have label attribute specified.".format(a))
+                logger.error("Microarray assay \"{}\" does not have label attribute specified.".format(a.alias))
                 codes.append("ASSA-E06")
             # Array design
             if not a.array_design:
-                logger.error("Microarray assay \"{}\" does not have array design specified.".format(a))
+                logger.error("Microarray assay \"{}\" does not have array design specified.".format(a.alias))
                 codes.append("ASSA-E07")
             elif not is_accession(a.array_design, "ARRAYEXPRESS"):
                 logger.error("Array design \"{}\" is not a valid ArrayExpress accession number.".format(a.array_design))
@@ -352,10 +352,10 @@ def run_assay_checks(sub: datamodel.Submission, logger):
         # Sequencing checks
         elif exptype == "sequencing":
             if "label" in additional_attributes:
-                logger.error("Found sequencing assay \"{}\" with 'label' attribute.".format(a))
+                logger.error("Found sequencing assay \"{}\" with 'label' attribute.".format(a.alias))
                 codes.append("ASSA-E09")
             if "array_design" in additional_attributes:
-                logger.error("Found sequencing assay \"{}\" with 'array design' attribute.".format(a))
+                logger.error("Found sequencing assay \"{}\" with 'array design' attribute.".format(a.alias))
                 codes.append("ASSA-E10")
 
     return codes
