@@ -117,7 +117,7 @@ def run_sample_checks(sub: datamodel.Submission, logger):
     # Check organism name is in taxonomy
     for o in organisms:
         taxon_id = converter_utils.get_taxon(o)
-        print(taxon_id)
+        logger.debug("Found taxon ID: ", taxon_id)
         if not isinstance(taxon_id, int):
             logger.error("Organism \"{}\" was not found in NCBI taxonomy.".format(o))
             codes.append("SAMP-E08")

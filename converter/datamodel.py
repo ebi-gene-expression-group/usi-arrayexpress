@@ -436,7 +436,6 @@ class AssayData:
             data_type = None
 
         comments = common_file_attributes.get("comments")
-        print(comments)
         accession = comments.get("ENA_RUN")
 
         protocolrefs = common_file_attributes.get("protocol_ref")

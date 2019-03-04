@@ -102,7 +102,6 @@ def parse_sdrf(sdrf_file):
 
     # A map of the start, end and protocol refs of each node
     node_map = get_node_positions(nodes, header)
-    print(node_map)
 
     samples = OrderedDict()
     extracts = OrderedDict()
@@ -415,7 +414,6 @@ def parse_idf(idf_file):
     # Comments
     # Here we allow >1 value but they are not related to the other comment values in the same column
     comment_terms = get_controlled_vocabulary("idf_comment_terms")
-    print(comment_terms)
     for idf_ct, usi_ct in comment_terms.items():
         if idf_ct in idf_dict:
             # Remove empty list entries, e.g. 'related experiment': ['E-MTAB-7236', '', '', '']
@@ -433,9 +431,6 @@ def parse_idf(idf_file):
     accession = study_info["comments"].get("accession", None)
     if accession:
         study_info["comments"]["accession"] = accession[0]
-
-    for s, v in study_info.items():
-        print(s, v)
 
     return study_info, protocols
 

@@ -48,7 +48,9 @@ def main():
         submission_type = guess_submission_type_from_idf(idf_dict)
     logger.info("Found experiment type: {}".format(submission_type))
 
+    # Logger for prevalidation (create new to show different styling)
     mtab_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="MAGE-TAB")
+
     # Perform prevalidation checks on MAGE-TAB format
     pre.idf_prevalidation(idf_dict, mtab_logger)
     pre.sdrf_prevalidation(sdrf_data, header, header_dict, submission_type, mtab_logger)
@@ -59,6 +61,7 @@ def main():
     # Collect error codes
     error_codes = []
 
+    # Logger for metadata validation output
     metadata_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="Metadata")
 
     # Validate metadata in common data model

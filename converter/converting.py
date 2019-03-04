@@ -363,7 +363,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="se
         ad_objects.append(assay_data)
 
     # Analysis (processed data)
-    print(processed_data)
+
     # Here loading the data into the datamodel is a bit simpler: create dataFile objects for each file
     # and then Analysis object with the additional attributes
     # We only want one Analysis object per file but the standard structure of the objects is a list
