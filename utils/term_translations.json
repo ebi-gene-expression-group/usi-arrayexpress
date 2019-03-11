@@ -1,55 +1,55 @@
 {
   "contact_terms": {
-    "personfirstname": "firstName",
-    "personmidinitials": "middleInitials",
-    "personlastname": "lastName",
-    "personemail": "email",
-    "personaddress": "address",
-    "personaffiliation": "affiliation",
-    "personphone": "phone",
-    "personfax": "fax",
-    "personroles": "roles"
+    "Person First Name": "firstName",
+    "Person Mid Initials": "middleInitials",
+    "Person Last Name": "lastName",
+    "Person Email": "email",
+    "Person Address": "address",
+    "Person Affiliation": "affiliation",
+    "Person Phone": "phone",
+    "Person Fax": "fax",
+    "Person Roles": "roles"
   },
   "investigation_terms": {
-    "investigationtitle": "title",
-    "experimentdescription": "description",
-    "dateofexperiment": "date_of_experiment",
-    "publicreleasedate": "releaseDate",
-    "sdrffile": "sdrf_filename"
+    "Investigation Title": "title",
+    "Experiment Description": "description",
+    "Date of Experiment": "date_of_experiment",
+    "Public Release Date": "releaseDate",
+    "SDRF File": "sdrf_filename"
   },
   "publication_terms": {
-    "pubmedid": "pubmedId",
-    "publicationdoi": "doi",
-    "publicationauthorlist": "authors",
-    "publicationtitle": "articleTitle",
-    "publicationstatus": "publicationStatus",
-    "publicationstatustermsourceref": "",
-    "publicationstatustermaccessionnumber": ""
+    "PubMed ID": "pubmedId",
+    "Publication DOI": "doi",
+    "Publication Author List": "authors",
+    "Publication Title": "articleTitle",
+    "Publication Status": "publicationStatus",
+    "Publication Status Term Source REF": "",
+    "Publication Status Term Accession Number": ""
   },
   "protocol_terms": {
-    "protocolname": "title",
-    "protocoldescription": "description",
-    "protocolparameters": "parameters",
-    "protocolhardware": "hardware",
-    "protocolsoftware": "software",
-    "protocoltype": "protocol_type",
-    "protocoltermsourceref": "term_source",
-    "protocoltermaccessionnumber": "term_accession"
+    "Protocol name": "title",
+    "Protocol description": "description",
+    "Protocol parameters": "parameters",
+    "Protocol hardware": "hardware",
+    "Protocol software": "software",
+    "Protocol type": "protocol_type",
+    "Protocol Term Source REF": "term_source",
+    "Protocol  Term Accession Number": "term_accession"
   },
   "factor_terms": {
-    "experimentalfactorname": "experimental_factor",
-    "experimentalfactortermsourceref": "term_source",
-    "experimentalfactortermaccessionnumber": "term_accession"
+    "Experimental Factor Name": "experimental_factor",
+    "Experimental Factor Term Source REF": "term_source",
+    "Experimental Factor Term Accession Number": "term_accession"
   },
     "design_terms": {
-    "experimentaldesign": "experimental_design",
-    "experimentaldesigntermsourceref": "term_source",
-    "experimentaldesigntermaccessionnumber": "term_accession"
+    "Experimental Design": "experimental_design",
+    "Experimental Design Term Source REF": "term_source",
+    "Experimental Design Term Accession Number": "term_accession"
   },
   "reference_terms": {
-    "Termsourcename": "",
-    "Termsourcefile": "",
-    "Termsourceversion": ""
+    "Term Source Name": "",
+    "Term Source File": "",
+    "Term Source Version": ""
   },
   "idf_comment_terms": {
     "ArrayExpressAccession": "accession",
@@ -62,87 +62,88 @@
     "EAExpectedClusters": "",
     "EAAdditionalAttributes": "",
     "EAExperimentType": "",
-    "EACurator": ""
+    "EACurator": "",
+    "Submitted Name": "",
+    "SRASubmissionDate": "",
+    "GEOReleaseDate": "",
+    "GEOLastUpdateDate": "",
+    "TemplateType": ""
   },
   "node_terms": {
-    "Sourcename": "",
-    "Extractname": "",
-    "Labeled Extractname": "",
-    "Assayname": "",
-    "Scanname": "",
-    "Arraydatafile": "",
-    "Arraydata Matrixfile": "",
-    "Derived Arraydatafile": "",
-    "Derived Arraydata Matrixfile": "",
-    "Protocolref": "protocolUses"
+    "Source Name": "",
+    "Extract Name": "",
+    "Labeled Extract Name": "",
+    "Assay Name": "",
+    "Scan Name": "",
+    "Array Data File": "raw",
+    "Array Data Matrix File": "raw matrix",
+    "Derived Array Data File": "processed",
+    "Derived Array Data Matrix File": "processed matrix",
+    "Protocol REF": "protocolUses"
   },
   "attribute_terms": {
-    "Sourcename": {
+    "Source Name": {
       "Characteristics": "attributes",
       "Provider": "",
-      "Materialtype": "",
-      "Description": "",
+      "Material Type": "material type",
+      "Description": "description",
       "Comment": ""
     },
-    "Extractname": {
-      "characteristics": "attributes",
-      "materialtype": "",
-      "description": "",
-      "comment": ""
-    },
-    "Labeled Extractname": {
-      "characteristics": "attributes",
-      "materialtype": "",
-      "description": "",
-      "label": "label",
-      "comment": ""
-    },
-    "Assayname": {
-      "technologytype": "technology_type",
-      "arraydesignref": "array_design",
-      "comment": ""
-    },
-    "Arraydatafile":{
-      "comment": ""
-    },
-    "Arraydata Matrixfile":{
+    "extract Name": {
+      "Characteristics": "attributes",
       "Comment": ""
     },
-    "Derived Arraydatafile":{
+    "Labeled Extract Name": {
+      "Characteristics": "attributes",
+      "Label": "label",
       "Comment": ""
     },
-    "Derived Arraydata Matrixfile":{
+    "assay Name": {
+      "Technology Type": "technology_type",
+      "Array Design REF": "array_design",
       "Comment": ""
     },
-    "Scanname":{
+    "Array Data File":{
       "Comment": ""
     },
-    "Protocolref": {
-      "Termsourceref": "",
+    "Arraydata Matrix File":{
+      "Comment": ""
+    },
+    "Derived Array Data File":{
+      "Comment": ""
+    },
+    "Derived Array Data Matrix File":{
+      "Comment": ""
+    },
+    "Scan Name":{
+      "Comment": ""
+    },
+    "Protocol REF": {
+      "Termsource REF": "",
       "Parameter Value": "",
       "Performer": "performer",
       "Comment": ""
     },
-    "Array Designref": {
-      "Termsourceref": "",
+    "Array Design REF": {
+      "Term Source REF": "",
       "Comment": ""
     },
     "characteristics": {
       "Unit": "units",
-      "Termsourceref": ""
+      "Terms Source REF": ""
     },
     "Factor Value": {
       "Unit": "units",
-      "Termsourceref": ""
+      "Term Source REF": ""
     },
     "Parameter Value": {
       "Unit": "units",
-      "Termsourceref": ""
+      "Term Source REF": ""
     },
     "Unit": {
-      "Termsourceref": ""
+      "Term Source REF": ""
     },
-    "Termsourceref": {
+    "Term Source REF": {
       "Term Accession Number": ""
     }
   },

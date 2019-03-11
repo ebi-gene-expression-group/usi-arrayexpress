@@ -1,7 +1,6 @@
 """Module to convert experiment metadata in MAGE-TAB (IDF/SDRF) format to USI submittable JSON format and
 helper functions for converting from common data model to USI JSON objects"""
 
-import codecs
 import os
 import re
 
@@ -11,7 +10,8 @@ from converter.datamodel import Attribute, Project, Study, Protocol, Sample, Mic
     AssayData, Analysis, Submission
 from converter.parsing import parse_idf, parse_sdrf
 from utils.common_utils import create_logger
-from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict
+from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict, \
+    get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf
 
 
 def generate_usi_project_object(project):
@@ -243,10 +243,6 @@ def generate_usi_ref_object(alias, sub_info, accession=None):
     return ref_object
 
 
-SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
-DATA_DIRECTORY = "unpacked"
-
-
 def mtab2usi_conversion(idf_file_path):
     """
     Run data transformation from a set of IDF/SDRF files to a set of USI JSON files
@@ -260,49 +256,37 @@ def mtab2usi_conversion(idf_file_path):
     """
     process_name = "mtab2usi_conversion"
 
-    current_dir = os.path.dirname(idf_file_path)
-    idf_file_name = os.path.basename(idf_file_path)
-    sdrf_file_path = None
-
     # Create logger
+    current_dir, idf_file_name = os.path.split(idf_file_path)
     logger = create_logger(current_dir, process_name, idf_file_name)
 
-    # Figure out the name and location of sdrf files
-    with codecs.open(idf_file_path, 'rU', encoding='utf-8') as f:
-        # U flag makes it portable across in unix and windows (\n and \r\n are treated the same)
-        for line in f:
-            if re.search(SDRF_FILE_NAME_REGEX, line):
-                sdrf_file_name = line.split("\t")[1].strip()
-                if os.path.exists(current_dir + DATA_DIRECTORY):
-                    sdrf_file_path = os.path.join(current_dir, DATA_DIRECTORY, sdrf_file_name)
-                else:
-                    sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
-
-    logger.debug("Found SDRF file: {}".format(sdrf_file_path))
+    sdrf_file_path = get_sdrf_path(idf_file_path, logger)
 
     sub = data_objects_from_magetab(idf_file_path, sdrf_file_path)
 
     datamodel2json_conversion(sub, current_dir, logger)
 
 
-def data_objects_from_magetab(idf_file_path, sdrf_file_path):
+def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="sequencing"):
     """
     Parse IDF/SDRF files and transform metadata to common datamodel
 
     :param idf_file_path: string, path to IDF file
     :param sdrf_file_path: string, path to SDRF file
+    :param submission_type: string, microarray, sequencing or singlecell
     :return: Submission class object
     """
 
     study_info, protocols = parse_idf(idf_file_path)
-    samples, extracts, le, assays, raw_data, processed_data, is_microarray = parse_sdrf(sdrf_file_path)
+    samples, extracts, le, assays, raw_data, processed_data = parse_sdrf(sdrf_file_path)
 
     # For MAGE-TAB files we don't have USI submission info might need to store these somewhere once we get this
     idf_file_name = os.path.basename(idf_file_path)
     sub_info = {"alias": re.sub("\.idf\.txt$", "", idf_file_name),
                 "accession": study_info.get("accession"),
                 "team": "my-super-test-team",
-                "metadata": idf_file_path}
+                "metadata": idf_file_path,
+                "submission_type": submission_type}
 
     # Project
     project_object = Project.from_magetab(study_info)
@@ -325,7 +309,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
     # Assays
     assay_objects = []
 
-    if is_microarray:
+    if submission_type == "microarray":
         linked_extracts = []
         for le_name, le_attributes in le.items():
             for extract_name, extract_attributes in extracts.items():
@@ -379,7 +363,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path):
         ad_objects.append(assay_data)
 
     # Analysis (processed data)
-    print(processed_data)
+
     # Here loading the data into the datamodel is a bit simpler: create dataFile objects for each file
     # and then Analysis object with the additional attributes
     # We only want one Analysis object per file but the standard structure of the objects is a list

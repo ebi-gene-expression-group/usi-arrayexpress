@@ -5,7 +5,8 @@ import logging
 from converter import datamodel
 from converter.converting import data_objects_from_magetab
 from validator import metadata_validation
-from utils.common_utils import create_logger
+from utils.converter_utils import guess_submission_type_from_sdrf, guess_submission_type_from_idf, \
+    read_sdrf_file, read_idf_file
 
 
 class TestMetaDataValidation(unittest.TestCase):
@@ -15,7 +16,12 @@ class TestMetaDataValidation(unittest.TestCase):
         wd = os.path.dirname(os.path.realpath(__file__))
         idf = os.path.join(wd, 'test_data', 'E-MTAB-4250.idf.txt')
         sdrf = os.path.join(wd, 'test_data', 'E-MTAB-4250.sdrf.txt')
-        self.sub = data_objects_from_magetab(idf, sdrf)
+        idf_dict = read_idf_file(idf)
+        sdrf_data, header, header_dict = read_sdrf_file(sdrf)
+        submission_type = guess_submission_type_from_sdrf(sdrf_data, header, header_dict)
+        if not submission_type:
+            submission_type = guess_submission_type_from_idf(idf_dict)
+        self.sub = data_objects_from_magetab(idf, sdrf, submission_type)
         # Add logger to hold error messages
         self.logger = logging.getLogger()
         self.logger.setLevel(10)
@@ -124,6 +130,27 @@ class TestMetaDataValidation(unittest.TestCase):
         error_codes = metadata_validation.run_project_checks(self.sub, self.logger)
         self.assertIn("PROJ-E01", error_codes)
         self.assertIn("PROJ-E08", error_codes)
+
+    def test_assay_validation(self):
+        # All should be fine
+        error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
+        self.assertEqual(error_codes, [])
+
+        # Deleting alias from first assay should give ASSA-E02
+        self.sub.assay[0].alias = ""
+        # Deleting technology type should give ASSA-E03
+        self.sub.assay[1].technology_type = ""
+        # Changing technology type to unknown type should give ASSA-E04
+        self.sub.assay[2].technology_type = "whatever"
+        error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
+        self.assertIn("ASSA-E02", error_codes)
+        self.assertIn("ASSA-E03", error_codes)
+        self.assertIn("ASSA-E04", error_codes)
+
+        # Deleting all assays should give error ASSA-E01
+        self.sub.assay = []
+        error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
+        self.assertEqual(["ASSA-E01"], error_codes)
 
 
 if __name__ == '__main__':

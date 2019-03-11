@@ -3,12 +3,15 @@ import json
 import os
 import re
 import pkg_resources
+import sys
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 from utils.eutils import esearch
 
 USI_JSON_DIRECTORY = "usijson"
+SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
+DATA_DIRECTORY = "unpacked"
 
 
 def read_json_file(filename):
@@ -44,17 +47,19 @@ def write_json_file(wd, json_object, object_type, sub_info):
 
 def ontology_term(category):
     """Read the json with expected EFO terms and return the dict for the given category."""
+    return get_controlled_vocabulary(category, "ontology")
+
+
+def get_controlled_vocabulary(category, resource="translations"):
+    """Read the json with controlled vocab and return the dict for the given category.
+    The resource parameter specifies which file to read."""
     resource_package = __name__
-    resource_path = "ontology_terms.json"
-    all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
-
-    return all_terms[category]
-
-
-def get_controlled_vocabulary(category):
-    """Read the json with controlled vocab and return the dict for the given category."""
-    resource_package = __name__
-    resource_path = "term_translations.json"
+    if resource == "ontology":
+        resource_path = "ontology_terms.json"
+    elif resource == "magetab":
+        resource_path = "magetab_fields.json"
+    else:
+        resource_path = "term_translations.json"
     all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
 
     return all_terms[category]
@@ -94,8 +99,9 @@ organism_lookup = {}
 
 def get_taxon(organism):
     """Return the NCBI taxonomy ID for a given species name."""
-    if organism and organism not in organism_lookup:
 
+    if organism and organism not in organism_lookup:
+        print("Looking up species in NCBI taxonomy. Please wait...")
         db = 'taxonomy'
         a = esearch(db=db, term=organism)
         try:
@@ -159,3 +165,149 @@ def attrib2dict(ob):
 
     return attrib_dict
 
+
+def get_sdrf_path(idf_file_path, logger):
+    """Read IDF and get the SDRF file name, look for the SDRF in the data directory (i.e. "unpacked")
+    or in the same directory as the IDF.
+
+    :param idf_file_path: full or relative path to IDF file
+    :param logger: log handler
+    :return: path to SDRF file
+    """
+
+    current_dir = os.path.dirname(idf_file_path)
+    sdrf_file_path = ""
+    # Figure out the name and location of sdrf files
+    with codecs.open(idf_file_path, 'rU', encoding='utf-8') as f:
+        # U flag makes it portable across in unix and windows (\n and \r\n are treated the same)
+        for line in f:
+            if re.search(SDRF_FILE_NAME_REGEX, line):
+                sdrf_file_name = line.split('\t')[1].strip()
+                if os.path.exists(current_dir + DATA_DIRECTORY):
+                    sdrf_file_path = os.path.join(current_dir, DATA_DIRECTORY, sdrf_file_name)
+                else:
+                    sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
+    logger.debug("Generated SDRF file path: {}".format(sdrf_file_path))
+    if not os.path.exists(sdrf_file_path):
+        logger.error("SDRF file {} does not exist".format(sdrf_file_path))
+
+    return sdrf_file_path
+
+
+def guess_submission_type_from_sdrf(sdrf_data, header, header_dict):
+    """ Guess the basic experiment type (microarray or sequencing) from SDRF"""
+
+    if 'arraydesignref' in header_dict or 'labeledextractname' in header_dict:
+        return "microarray"
+    elif "comment" in header_dict:
+        for comment_index in header_dict.get("comment"):
+            if get_value(header[comment_index]) == "library construction" \
+                    or get_value(header[comment_index]) == "single cell isolation":
+                return "singlecell"
+    if "technologytype" in header_dict:
+        index = header_dict.get("technologytype")
+        if len(index) > 0:
+            index = index[0]
+            if sdrf_data[0][index] == "array assay":
+                return "microarray"
+            elif sdrf_data[0][index] == "sequencing assay":
+                return "sequencing"
+
+
+def guess_submission_type_from_idf(idf_dict):
+    """Based on the experiment type, we can try to infer the basic experiment type
+    This returns the type of the first experiment type found. We cannot handle mixed type experiments.
+    """
+    print(idf_dict)
+    if "AEExperimentType" in idf_dict:
+        all_types = get_controlled_vocabulary("experiment_type", "ontology")
+        print(all_types)
+        for exptype in idf_dict["AEExperimentType"]:
+            if exptype in all_types["sequencing"]:
+                return "sequencing"
+            elif exptype in all_types["microarray"]:
+                return "microarray"
+            elif exptype in all_types["singlecell"]:
+                return "singlecell"
+
+
+def guess_submission_type(idf_file, sdrf_file, logger):
+    """Read IDF/SDRF to get submission type"""
+
+    idf_dict = read_idf_file(idf_file)
+    sdrf_data, header, header_dict = read_sdrf_file(sdrf_file)
+    submission_type = guess_submission_type_from_sdrf(sdrf_data, header, header_dict)
+    if not submission_type:
+        submission_type = guess_submission_type_from_idf(idf_dict)
+    logger.info("Found experiment type: {}".format(submission_type))
+    return submission_type, idf_dict,
+
+
+def get_name(header_string):
+    """Return the first part of an SDRF header in lower case and without spaces."""
+    no_spaces = header_string.replace(' ', '')
+    field_name = no_spaces.split('[')[0]
+    return field_name.lower()
+
+
+def get_value(header_string):
+    """Return the value within square brackets of an SDRF header."""
+    field_value = header_string.split('[')[-1]
+    return field_value.strip(']')
+
+
+def read_sdrf_file(sdrf_file):
+    """
+    Read SDRF file and return the table content as nested list,
+    the header row as list, and a dictionary of the fields and their indexes
+    :param sdrf_file: string, path to SDRF file
+    """
+
+    with codecs.open(sdrf_file, encoding='utf-8') as sf:
+        header = sf.readline().rstrip().split('\t')
+        sdrf_raw = sf.readlines()
+
+    sdrf_list = [x.rstrip('\n').split('\t') for x in sdrf_raw]
+    header_dict = defaultdict(list)
+    for i, field in enumerate(header):
+        short_name = get_name(field)
+        header_dict[short_name].append(i)
+
+    return sdrf_list, header, header_dict
+
+
+def read_idf_file(idf_file):
+    """This function reads in an IDF file and determines whether it is a normal or a merged file.
+    It then returns the data as a dictionary with the field names as keys and values as list."""
+    idf_dict = OrderedDict()
+    with codecs.open(idf_file, encoding='utf-8') as fi:
+        idf_raw = fi.readlines()
+
+        for row in idf_raw:
+            idf_row = row.rstrip('\n').split('\t')
+            # Skip empty lines or lines full of just empty spaces/tabs
+            if len(''.join(idf_row).strip()) == 0:
+                continue
+            if re.search(r"^\[SDRF\]", idf_row[0]):
+                # idf_file is a combined idf/sdrf file - stop when you get to the beginning of sdrf section
+                break
+            # In the case of a merged idf/sdrf file - skip the beginning of the idf section)
+            if not re.search(r"^\[IDF\]", idf_row[0]):
+                # Store label in separate variable
+                row_label = idf_row.pop(0)
+                # For comments get the value inside square brackets
+                if re.search('comment', row_label, flags=re.IGNORECASE):
+                    row_label = get_value(row_label)
+                # For normal Row labels remove whitespaces
+                else:
+                    row_label = get_name(row_label)
+                # Skip rows that have a label but no values
+                if not len(''.join(idf_row).strip()) == 0:
+                    # Some comments are duplicated
+                    if row_label in idf_dict:
+                        # in that case add to existing entry
+                        idf_dict[row_label].extend(idf_row)
+                    else:
+                        # Store values in idf_dict
+                        idf_dict[row_label] = idf_row
+    return idf_dict
