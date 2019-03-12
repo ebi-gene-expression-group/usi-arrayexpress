@@ -54,19 +54,37 @@ def get_term_descendants(ontology, term_url, logger):
     param = {'size': 200}
     api_url = "{}/{}/terms/{}/descendants".format(base_url, ontology, url_encoded)
 
-    logger.debug("Calling: " + api_url)
-    r = requests.get(api_url, params=param)
-    data = json.loads(r.text)
+    data = download_json(logger, api_url, param)
 
-    if r.status_code != 200:
-        logger.error("Failed to receive response from {}. Got error: {}.".format(api_url, r.status_code))
-    else:
+    if data:
         try:
             for d in data["_embedded"]["terms"]:
                 efo_children.add(d["label"])
             return efo_children
         except KeyError:
             logger.error("Failed to receive valid response from {}.".format(api_url))
+
+
+def get_ena_library_terms_via_usi(logger):
+    """Read ENA's controlled vocabulary using USI's API and
+    return dictionary of the field names with the allowed values."""
+
+    url = "https://submission-dev.ebi.ac.uk/api/dataTypes/sequencingExperiments"
+    data = download_json(logger, url)
+    if data:
+        return {field: description["items"]["properties"]["value"].get("enum", [])
+                for field, description in data["validationSchema"]["properties"]["attributes"]["properties"].items()}
+
+
+def download_json(logger, url, parameters=None):
+    """Basic function to retrieve URL and return JSON object."""
+
+    logger.debug("Calling: " + url)
+    r = requests.get(url, params=parameters)
+    if r.status_code != 200:
+        logger.error("Failed to receive response from {}. Got error: {}.".format(url, r.status_code))
+    else:
+        return json.loads(r.text)
 
 
 def file_exists(input_file):

@@ -2,7 +2,7 @@ import unittest
 import os
 
 from utils.converter_utils import get_taxon
-from utils.common_utils import get_term_descendants, create_logger
+from utils.common_utils import get_term_descendants, create_logger, get_ena_library_terms_via_usi
 
 
 class TestTaxonRetrieval(unittest.TestCase):
@@ -32,6 +32,18 @@ class TestOntologyTermRetrieval(unittest.TestCase):
         ontology = "EFO"
         terms = get_term_descendants(ontology, uri, self.logger)
         self.assertIn("colony forming unit", terms)
+
+
+class TestRetrievingENAlibraryTerms(unittest.TestCase):
+
+    def setUp(self):
+        wd = os.path.dirname(os.path.realpath(__file__))
+        # Add logger to hold error messages
+        self.logger = create_logger(wd, "testing", "validation", 10)
+
+    def test_library_layout_cv(self):
+        library_terms = get_ena_library_terms_via_usi(self.logger)
+        self.assertIn("SINGLE", library_terms["library_layout"])
 
 
 if __name__ == '__main__':
