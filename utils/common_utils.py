@@ -21,7 +21,7 @@ def create_logger(working_dir, process_name, object_name, log_level=20, logger_n
 
     # This handler is for writing to the log file
     hdlr = logging.FileHandler(log_file_path)
-    formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s : %(message)s')
+    formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
     hdlr.setFormatter(formatter)
     logger.addHandler(hdlr)
 

@@ -6,7 +6,6 @@ This script takes an IDF file as input and runs validation of the metadata in th
 
 import argparse
 import os
-import logging
 
 from utils.common_utils import create_logger, file_exists
 from utils.converter_utils import get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf, \
