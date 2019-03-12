@@ -3,7 +3,7 @@ import re
 from converter import datamodel
 from utils import converter_utils
 from utils.converter_utils import ontology_term, get_controlled_vocabulary, is_accession
-from utils.common_utils import get_term_descendants
+from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi
 
 
 REGEX_DATE_FORMAT = re.compile("([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))")
@@ -310,6 +310,10 @@ def run_assay_checks(sub: datamodel.Submission, logger):
     exptype = sub.info["submission_type"]
     codes = []
 
+    # Get controlled terms from ENA's assay schema
+    if exptype == "sequencing":
+        library_terms = get_ena_library_terms_via_usi(logger)
+
     if not assays:
         logger.error("Experiment has no assays. At least one expected.")
         codes.append("ASSA-E01")
@@ -351,13 +355,20 @@ def run_assay_checks(sub: datamodel.Submission, logger):
 
         # Sequencing checks
         elif exptype == "sequencing":
+            # Absense of MA fields
             if "label" in additional_attributes:
                 logger.error("Found sequencing assay \"{}\" with 'label' attribute.".format(a.alias))
                 codes.append("ASSA-E09")
             if "array_design" in additional_attributes:
                 logger.error("Found sequencing assay \"{}\" with 'array design' attribute.".format(a.alias))
                 codes.append("ASSA-E10")
+            # ENA library terms must match against controlled vocabulary
+            for term, cv in library_terms.items():
+                # Assuming here that the names of the fields are exactly the same as in the assay attributes
+                value = getattr(a, term)
+                if value not in cv:
+                    logger.error("Value \"{}\" for {} does not match against ENA's controlled vocabulary".format(value, term))
+                    codes.append("ASSA-E11")
 
     return codes
-
 
