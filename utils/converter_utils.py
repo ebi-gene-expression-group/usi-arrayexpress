@@ -101,6 +101,10 @@ def get_taxon(organism):
     """Return the NCBI taxonomy ID for a given species name."""
 
     if organism and organism not in organism_lookup:
+        # If we have more than one organism mixed in one sample - in the case assign the 'mixed
+        # sample' taxon_id (c.f. https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1427524)
+        if re.search(r" and | \+ ", organism):
+            return 1427524
         print("Looking up species in NCBI taxonomy. Please wait...")
         db = 'taxonomy'
         a = esearch(db=db, term=organism)
@@ -108,17 +112,8 @@ def get_taxon(organism):
             taxon_id = int(a['esearchresult']['idlist'][0])
             organism_lookup[organism] = taxon_id
             return taxon_id
-        except IndexError:
-            if re.search(r" and | \+ ", organism):
-                # It looks as if we have more than one organism mixed in one sample - in the case assign the 'mixed
-                # sample' taxon_id (c.f. https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1427524) - as
-                # per instructions on https://www.ebi.ac.uk/seqdb/confluence/display/GXA/Curation+Look-up
-                return 1427524
-            else:
-                print("Failed to retrieve organism data from ENA taxonomy service for: " + organism)
-        #except KeyError:
-        #    time.sleep(10)
-        #    return esearch(db, organism)
+        except:
+            print("Failed to retrieve organism data from ENA taxonomy service for: " + organism)
     else:
         return organism_lookup.get(organism)
 
