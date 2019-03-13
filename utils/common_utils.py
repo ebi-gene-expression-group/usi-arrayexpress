@@ -67,13 +67,27 @@ def get_term_descendants(ontology, term_url, logger):
 
 def get_ena_library_terms_via_usi(logger):
     """Read ENA's controlled vocabulary using USI's API and
-    return dictionary of the field names with the allowed values."""
+    return dictionary of the field names that have a set of allowed values (enum)."""
 
     url = "https://submission-dev.ebi.ac.uk/api/dataTypes/sequencingExperiments"
     data = download_json(logger, url)
     if data:
-        return {field: description["items"]["properties"]["value"].get("enum", [])
-                for field, description in data["validationSchema"]["properties"]["attributes"]["properties"].items()}
+        return {field: description["items"]["properties"]["value"]["enum"]
+                for field, description in data["validationSchema"]["properties"]["attributes"]["properties"].items()
+                if description["items"]["properties"]["value"].get("enum")}
+
+
+def get_ena_hardware_terms_via_usi(logger):
+    """Read ENA's controlled vocabulary using USI's API and
+    return list of the instrument models that are allowed (enum)."""
+
+    url = "https://submission-dev.ebi.ac.uk/api/dataTypes/sequencingExperiments"
+    data = download_json(logger, url)
+    instruments = []
+    if data:
+        for x in data["validationSchema"]["properties"]["attributes"]["oneOf"]:
+            instruments.extend(x["properties"]["instrument_model"]["items"]["properties"]["value"]["enum"])
+        return instruments
 
 
 def download_json(logger, url, parameters=None):
