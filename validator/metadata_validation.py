@@ -362,12 +362,32 @@ def run_assay_checks(sub: datamodel.Submission, logger):
             if "array_design" in additional_attributes:
                 logger.error("Found sequencing assay \"{}\" with 'array design' attribute.".format(a.alias))
                 codes.append("ASSA-E10")
+            # Mandatory ENA library info
+            if not a.library_layout:
+                logger.error("Sequencing assay \"{}\" has no library layout specified.".format(a.alias))
+                codes.append("ASSA-E12")
+            elif a.library_layout.lower() == "paired":
+                if not a.nominal_length:
+                    logger.error("Paired-end assay \"{}\" has no nominal length specified.".format(a.alias))
+                    codes.append("ASSA-E15")
+                if not a.nominal_sdev:
+                    logger.error("Paired-end assay \"{}\" has no nominal sdev specified.".format(a.alias))
+                    codes.append("ASSA-E16")
+            if not a.library_source:
+                logger.error("Sequencing assay \"{}\" has no library source specified.".format(a.alias))
+                codes.append("ASSA-E13")
+            if not a.library_strategy:
+                logger.error("Sequencing assay \"{}\" has no library strategy specified.".format(a.alias))
+                codes.append("ASSA-E14")
+            if not a.library_strand:
+                logger.warn("Sequencing assay \"{}\" has no library strand specified.".format(a.alias))
+                codes.append("ASSA-W01")
             # ENA library terms must match against controlled vocabulary
             for term, cv in library_terms.items():
                 # Assuming here that the names of the fields are exactly the same as in the assay attributes
                 value = getattr(a, term)
-                if value not in cv:
-                    logger.error("Value \"{}\" for {} does not match against ENA's controlled vocabulary".format(value, term))
+                if value and value not in cv:
+                    logger.error("Value \"{}\" for {} does not match against ENA's controlled vocabulary.".format(value, term))
                     codes.append("ASSA-E11")
 
     return codes
