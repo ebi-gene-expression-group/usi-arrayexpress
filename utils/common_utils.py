@@ -77,7 +77,7 @@ def get_ena_library_terms_via_usi(logger):
                 if description["items"]["properties"]["value"].get("enum")}
 
 
-def get_ena_hardware_terms_via_usi(logger):
+def get_ena_instrument_terms_via_usi(logger):
     """Read ENA's controlled vocabulary using USI's API and
     return list of the instrument models that are allowed (enum)."""
 

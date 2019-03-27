@@ -67,7 +67,8 @@
     "SRASubmissionDate": "",
     "GEOReleaseDate": "",
     "GEOLastUpdateDate": "",
-    "TemplateType": ""
+    "TemplateType": "",
+    "AEAnonymousReview": ""
   },
   "node_terms": {
     "Source Name": "",

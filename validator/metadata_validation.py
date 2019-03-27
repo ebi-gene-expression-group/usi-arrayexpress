@@ -2,8 +2,8 @@ import re
 
 from converter import datamodel
 from utils import converter_utils
-from utils.converter_utils import ontology_term, get_controlled_vocabulary, is_accession
-from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi
+from utils.converter_utils import ontology_term, is_accession
+from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi, get_ena_instrument_terms_via_usi
 
 
 REGEX_DATE_FORMAT = re.compile("([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))")
@@ -305,14 +305,18 @@ def run_project_checks(sub: datamodel.Submission, logger):
 
 
 def run_assay_checks(sub: datamodel.Submission, logger):
+    """Run checks on assay objects and factor values and return list of error codes."""
 
     assays = sub.assay
     exptype = sub.info["submission_type"]
     codes = []
+    is_sequencing = False
 
     # Get controlled terms from ENA's assay schema
     if exptype == "sequencing":
         library_terms = get_ena_library_terms_via_usi(logger)
+        instrument_models = get_ena_instrument_terms_via_usi(logger)
+        is_sequencing = True
 
     if not assays:
         logger.error("Experiment has no assays. At least one expected.")
@@ -340,7 +344,7 @@ def run_assay_checks(sub: datamodel.Submission, logger):
             codes.append("ASSA-E05")
 
         # Microarray checks for label and array design
-        if exptype == "microarray":
+        if not is_sequencing:
             # Label
             if not a.label:
                 logger.error("Microarray assay \"{}\" does not have label attribute specified.".format(a.alias))
@@ -354,8 +358,8 @@ def run_assay_checks(sub: datamodel.Submission, logger):
                 codes.append("ASSA-E08")
 
         # Sequencing checks
-        elif exptype == "sequencing":
-            # Absense of MA fields
+        elif is_sequencing:
+            # Absence of MA fields
             if "label" in additional_attributes:
                 logger.error("Found sequencing assay \"{}\" with 'label' attribute.".format(a.alias))
                 codes.append("ASSA-E09")
@@ -369,19 +373,29 @@ def run_assay_checks(sub: datamodel.Submission, logger):
             elif a.library_layout.lower() == "paired":
                 if not a.nominal_length:
                     logger.error("Paired-end assay \"{}\" has no nominal length specified.".format(a.alias))
-                    codes.append("ASSA-E15")
+                    codes.append("ASSA-E13")
                 if not a.nominal_sdev:
                     logger.error("Paired-end assay \"{}\" has no nominal sdev specified.".format(a.alias))
-                    codes.append("ASSA-E16")
+                    codes.append("ASSA-E14")
             if not a.library_source:
                 logger.error("Sequencing assay \"{}\" has no library source specified.".format(a.alias))
-                codes.append("ASSA-E13")
+                codes.append("ASSA-E15")
             if not a.library_strategy:
                 logger.error("Sequencing assay \"{}\" has no library strategy specified.".format(a.alias))
-                codes.append("ASSA-E14")
+                codes.append("ASSA-E16")
+            if not a.library_selection:
+                logger.error("Sequencing assay \"{}\" has no library source specified.".format(a.alias))
+                codes.append("ASSA-E17")
             if not a.library_strand:
                 logger.warn("Sequencing assay \"{}\" has no library strand specified.".format(a.alias))
                 codes.append("ASSA-W01")
+            if not a.instrument_model:
+                logger.error("Sequencing assay \"{}\" has no instrument model specified.".format(a.alias))
+                codes.append("ASSA-E18")
+            elif a.instrument_model not in instrument_models:
+                logger.error("Sequencing assay \"{}\" has instrument model \"{}\" which does "
+                             "not match against ENA's controlled vocabulary.".format(a.alias, a.instrument_model))
+                codes.append("ASSA-E19")
             # ENA library terms must match against controlled vocabulary
             for term, cv in library_terms.items():
                 # Assuming here that the names of the fields are exactly the same as in the assay attributes

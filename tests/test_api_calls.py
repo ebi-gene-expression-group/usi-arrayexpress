@@ -5,7 +5,7 @@ from utils.converter_utils import get_taxon
 from utils.common_utils import create_logger, \
     get_term_descendants, \
     get_ena_library_terms_via_usi, \
-    get_ena_hardware_terms_via_usi
+    get_ena_instrument_terms_via_usi
 
 
 class TestTaxonRetrieval(unittest.TestCase):
@@ -49,7 +49,7 @@ class TestRetrievingENAlibraryTerms(unittest.TestCase):
         self.assertIn("SINGLE", library_terms["library_layout"])
 
     def test_hardware_cv(self):
-        hardware_terms = get_ena_hardware_terms_via_usi(self.logger)
+        hardware_terms = get_ena_instrument_terms_via_usi(self.logger)
         self.assertIn("Illumina HiSeq 2500", hardware_terms)
 
 
