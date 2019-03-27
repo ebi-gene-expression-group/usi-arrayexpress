@@ -19,17 +19,19 @@ import validator.metadata_validation as mv
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('idf',
-                        help="name of MAGE-TAB IDF file")
+                        help="Path to the MAGE-TAB IDF file")
+    parser.add_argument('-d', "--data_dir", default="",
+                        help="Path to the directory with SDRF and data files")
 
     args = parser.parse_args()
 
-    return args.idf
+    return args.idf, args.data_dir
 
 
 def main():
     process_name = "magetab_validation"
 
-    idf_file = parse_args()
+    idf_file, data_dir = parse_args()
     file_exists(idf_file)
 
     # Create logger
@@ -37,7 +39,7 @@ def main():
     logger = create_logger(current_dir, process_name, idf_file_name, logger_name="Validation")
 
     # Get path to SDRF file
-    sdrf_file_path = get_sdrf_path(idf_file, logger)
+    sdrf_file_path = get_sdrf_path(idf_file, logger, data_dir)
 
     # Read IDF/SDRF and get submission type
     idf_dict = read_idf_file(idf_file)

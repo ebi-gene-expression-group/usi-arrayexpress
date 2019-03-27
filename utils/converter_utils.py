@@ -11,7 +11,7 @@ from utils.eutils import esearch
 
 USI_JSON_DIRECTORY = "usijson"
 SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
-DATA_DIRECTORY = "unpacked"
+DEFAULT_DATA_DIRECTORY = "unpacked"
 
 
 def read_json_file(filename):
@@ -161,12 +161,13 @@ def attrib2dict(ob):
     return attrib_dict
 
 
-def get_sdrf_path(idf_file_path, logger):
+def get_sdrf_path(idf_file_path, logger, data_dir=DEFAULT_DATA_DIRECTORY):
     """Read IDF and get the SDRF file name, look for the SDRF in the data directory (i.e. "unpacked")
     or in the same directory as the IDF.
 
     :param idf_file_path: full or relative path to IDF file
     :param logger: log handler
+    :param data_dir: path to folder with SDRF
     :return: path to SDRF file
     """
 
@@ -178,8 +179,8 @@ def get_sdrf_path(idf_file_path, logger):
         for line in f:
             if re.search(SDRF_FILE_NAME_REGEX, line):
                 sdrf_file_name = line.split('\t')[1].strip()
-                if os.path.exists(current_dir + DATA_DIRECTORY):
-                    sdrf_file_path = os.path.join(current_dir, DATA_DIRECTORY, sdrf_file_name)
+                if os.path.exists(current_dir + data_dir):
+                    sdrf_file_path = os.path.join(current_dir, data_dir, sdrf_file_name)
                 else:
                     sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
     logger.debug("Generated SDRF file path: {}".format(sdrf_file_path))
