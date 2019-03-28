@@ -8,6 +8,7 @@ from utils.common_utils import get_term_descendants, get_ena_library_terms_via_u
 
 REGEX_DATE_FORMAT = re.compile("([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))")
 REGEX_DOI_FORMAT = re.compile("^10\.\d{4,9}\/\S+$")
+REGEX_FILE_NAME = re.compile(r"^[A-Za-z0-9._-]+$")
 
 
 def run_protocol_checks(sub: datamodel.Submission, logger):
@@ -451,7 +452,7 @@ def _data_object_checks(data_objects, logger, codes):
 def _file_object_checks(file_objects, logger, codes):
     for f in file_objects:
         if f.name:
-            if not re.match(r"^[A-Za-z0-9._-]+$", f.name):
+            if not REGEX_FILE_NAME.match(f.name):
                 logger.error("File name \"{}\" does not match allowed pattern.".format(f.name))
                 codes.append("DATA-E06")
         else:
