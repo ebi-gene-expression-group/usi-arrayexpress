@@ -72,6 +72,7 @@ def main():
     error_codes.extend(mv.run_protocol_checks(sub, metadata_logger))
     error_codes.extend(mv.run_sample_checks(sub, metadata_logger))
     error_codes.extend(mv.run_assay_checks(sub, metadata_logger))
+    error_codes.extend(mv.run_file_checks(sub, metadata_logger))
 
     if error_codes:
         logger.info("Validation finished with the following error codes: \n{}".format("\n".join(set(error_codes))))

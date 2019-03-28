@@ -406,3 +406,55 @@ def run_assay_checks(sub: datamodel.Submission, logger):
 
     return codes
 
+
+def run_file_checks(sub: datamodel.Submission, logger):
+    """Run file checks on assay_data and analysis objects and return list of error codes."""
+
+    codes = []
+
+    if not sub.assay_data and not sub.analysis:
+        logger.error("Experiment does not have any data files associated with it.")
+        codes.append("DATA-E01")
+        return codes
+
+    # Run assay_data checks
+    if not sub.assay_data:
+        logger.error("Experiment does not have raw data files.")
+        codes.append("DATA-E02")
+    else:
+        _data_object_checks(sub.assay_data, logger, codes)
+
+    # Run analysis (processed data) checks
+    if not sub.analysis:
+        logger.warning("Experiment does not have processed data.")
+        codes.append("DATA-W01")
+    else:
+        _data_object_checks(sub.analysis, logger, codes)
+
+    return codes
+
+
+def _data_object_checks(data_objects, logger, codes):
+
+    for ad in data_objects:
+        if not ad.alias:
+            logger.error("Found data object \"{}\" without name specified. Not checking it.".format(ad))
+            codes.append("DATA-E03")
+            continue
+        if not ad.files:
+            logger.error("Found data object \"{}\" with no data files.".format(ad.alias))
+            codes.append("DATA-E04")
+        else:
+            _file_object_checks(ad.files, logger, codes)
+
+
+def _file_object_checks(file_objects, logger, codes):
+    for f in file_objects:
+        if f.name:
+            if not re.match(r"^[A-Za-z0-9._-]+$", f.name):
+                logger.error("File name \"{}\" does not match allowed pattern.".format(f.name))
+                codes.append("DATA-E06")
+        else:
+            logger.error("Found data file object \"{}\" without name specified.".format(f))
+            codes.append("DATA-E05")
+
