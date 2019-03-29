@@ -312,8 +312,11 @@ def read_idf_file(idf_file):
 
 
 def dict_to_vertcial_table(dict, filename, sep='\t'):
+    """Take a dictionary (can be ordered) and print the contents in a vertical table:
+     The keys are in the first column, with the values in the rest of the row."""
+
     with codecs.open(filename, 'w', encoding='utf-8') as out:
-        writer = csv.writer(out, delimiter=sep)
+        writer = csv.writer(out, delimiter=sep, lineterminator='\n')
         for key, value in dict.items():
             if isinstance(value, list):
                 print(key, value)
