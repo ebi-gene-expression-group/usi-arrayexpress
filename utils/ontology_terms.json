@@ -151,5 +151,11 @@
     "accession": "UO_0000000",
     "uri": "http://purl.obolibrary.org/obo/UO_0000000",
     "ontology": "EFO"
+  },
+  "publication_status": {
+    "accession": "EFO_0001742",
+    "uri": "http://www.ebi.ac.uk/efo/EFO_0001742",
+    "ontology": "EFO",
+    "label": "publication status"
   }
 }

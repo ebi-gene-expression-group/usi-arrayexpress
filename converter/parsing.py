@@ -430,7 +430,7 @@ def parse_idf(idf_file):
 
     accession = study_info["comments"].get("accession", None)
     if accession:
-        study_info["comments"]["accession"] = accession[0]
+        study_info["accession"] = accession[0]
 
     return study_info, protocols
 
