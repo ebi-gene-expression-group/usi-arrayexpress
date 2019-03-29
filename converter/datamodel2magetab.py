@@ -47,7 +47,7 @@ def generate_idf(sub):
         ("Comment[ArrayExpressAccession]", sub.info.get("accession"))
     ])
 
-    if sub.info.submission_type == "sequencing" or sub.info.submission_type == "singlecell":
+    if sub.info.get("submission_type") == "sequencing" or sub.info.submission_type == "singlecell":
         pass
         # TODO: Add comments for ENA accessions Comment[SecondaryAccession] and Comment[SequenceDataURI]
 
