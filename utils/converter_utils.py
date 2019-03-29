@@ -161,7 +161,7 @@ def attrib2dict(ob):
     return attrib_dict
 
 
-def get_sdrf_path(idf_file_path, logger, data_dir=DEFAULT_DATA_DIRECTORY):
+def get_sdrf_path(idf_file_path, logger, data_dir):
     """Read IDF and get the SDRF file name, look for the SDRF in the data directory (i.e. "unpacked")
     or in the same directory as the IDF.
 
@@ -173,13 +173,15 @@ def get_sdrf_path(idf_file_path, logger, data_dir=DEFAULT_DATA_DIRECTORY):
 
     current_dir = os.path.dirname(idf_file_path)
     sdrf_file_path = ""
+    if not data_dir:
+        data_dir = DEFAULT_DATA_DIRECTORY
     # Figure out the name and location of sdrf files
     with codecs.open(idf_file_path, 'rU', encoding='utf-8') as f:
         # U flag makes it portable across in unix and windows (\n and \r\n are treated the same)
         for line in f:
             if re.search(SDRF_FILE_NAME_REGEX, line):
                 sdrf_file_name = line.split('\t')[1].strip()
-                if os.path.exists(current_dir + data_dir):
+                if os.path.exists(os.path.join(current_dir, data_dir)):
                     sdrf_file_path = os.path.join(current_dir, data_dir, sdrf_file_name)
                 else:
                     sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
