@@ -25,6 +25,11 @@ sub_type, idf_dict = guess_submission_type(idf_file, sdrf_file_path, logger)
 # Read in MAGE-TAB and convert to common data model
 sub = data_objects_from_magetab(idf_file, sdrf_file_path, sub_type)
 
-idf = datamodel2magetab.generate_idf(sub)
+#idf = datamodel2magetab.generate_idf(sub)
 
-utils.converter_utils.dict_to_vertcial_table(idf, idf_file + "_new.txt")
+#utils.converter_utils.dict_to_vertcial_table(idf, idf_file + "_new.txt")
+
+raw_out = datamodel2magetab.generate_sdrf(sub)
+
+utils.converter_utils.tuple_list_to_table(raw_out, sdrf_file_path + "_new.txt")
+

@@ -1,6 +1,9 @@
 """Module to convert metadata in the submission data model to MAGE-TAB files."""
 
 from collections import OrderedDict
+from utils import converter_utils
+import codecs
+import csv
 
 
 def generate_idf(sub):
@@ -52,6 +55,64 @@ def generate_idf(sub):
         # TODO: Add comments for ENA accessions Comment[SecondaryAccession] and Comment[SequenceDataURI]
 
     return idf
+
+
+def generate_sdrf(sub):
+    """Transform metadata in data model to an SDRF table."""
+
+    header = []
+    rows = []
+
+    if sub.info.get("submission_type") == "microarray":
+
+        for sample in sub.sample:
+
+            sample_values = [
+                ("Source Name", sample.alias),
+                ("Description", sample.description),
+                ("Material Type", sample.material_type)
+            ]
+            print(sample_values)
+            # Get all assay objects that belong to this sample
+            assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
+
+            for assay in assays:
+
+                assay_values = [
+                    ("Extract Name", sample.alias),
+                    ("Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                                      if sub.get_protocol(pref).protocol_type.value == "nucleic acid labeling protocol"]),
+                    ("Labelled Extract Name", assay.alias),
+                    ("Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                                      if sub.get_protocol(pref).protocol_type.value == "nucleic acid hybridization to array protocol"])
+                ]
+                print(assay_values)
+
+                # Get all assay data objects that belong to this assay
+                data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]
+
+                for ad in data:
+                    data_values = [
+                        ("Assay Name", ad.alias),
+                        ("Technology Type", assay.technology_type),
+                        ("Array Design REF", assay.array_design),
+                        ("Term Source REF", "Array Express"),
+                        ("Protocol REF", [sub.get_protocol(pref).alias for pref in ad.protocolrefs
+                                      if sub.get_protocol(pref).protocol_type.value == "array scanning and feature extraction protocol"]),
+                    ]
+
+                    # Get all data files
+                    for f in ad.files:
+                        if ad.data_type == "raw":
+                            data_values.append(("Array Data File", f.name))
+                        elif ad.data_type == "raw matrix":
+                            data_values.append(("Array Data Matrix File", f.name))
+
+                    print(sample_values + assay_values + data_values)
+
+                    rows.append(sample_values + assay_values + data_values)
+
+    return rows
 
 
 
