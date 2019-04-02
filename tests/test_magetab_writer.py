@@ -6,6 +6,15 @@ from converter.converting import data_objects_from_magetab
 from converter import datamodel2magetab
 from sys import argv
 import os
+import pandas
+
+
+def column_name_to_magetab(header):
+    """Transform unique column header back to MAGE-TAB style.
+    Column headers are expected to be separated by "~~~". """
+    header_list = header.split("~~~")
+    return header_list[-1]
+
 
 process_name = "magetab_writer"
 idf_file = argv[1]
@@ -31,5 +40,13 @@ sub = data_objects_from_magetab(idf_file, sdrf_file_path, sub_type)
 
 raw_out = datamodel2magetab.generate_sdrf(sub)
 
-utils.converter_utils.tuple_list_to_table(raw_out, sdrf_file_path + "_new.txt")
+
+#utils.converter_utils.tuple_list_to_table(raw_out, sdrf_file_path + "_new.txt")
+
+raw_out.rename(column_name_to_magetab, axis="columns", inplace=True)
+
+raw_out.to_csv(sdrf_file_path + "_new.txt", sep='\t', encoding='utf-8', index=False)
+
+
+
 

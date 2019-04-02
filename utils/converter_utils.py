@@ -346,7 +346,7 @@ def write_table(header, rows, filename, sep='\t'):
 
 def split_tuple_list(tuple_list):
     """Take a list of lists with tuples of two items, e.g.
-    [[(header1, value1), (header2, value1)], [(header1, value3), (header2, value4)]]
+    [[(header1, value1), (header2, value2)], [(header1, value3), (header2, value4)]]
     and split into a list of the headers and the values as list of lists, e.g.
     [header1, header2] + [[value1, value2], [value3, value4]]"""
     header = []

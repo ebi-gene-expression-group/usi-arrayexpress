@@ -4,6 +4,9 @@ from collections import OrderedDict
 from utils import converter_utils
 import codecs
 import csv
+import pandas as pd
+import itertools
+
 
 
 def generate_idf(sub):
@@ -62,6 +65,7 @@ def generate_sdrf(sub):
 
     header = []
     rows = []
+    all_sample_categories = []
 
     if sub.info.get("submission_type") == "microarray":
 
@@ -69,10 +73,14 @@ def generate_sdrf(sub):
 
             sample_values = [
                 ("Source Name", sample.alias),
+                #("Characteristics", sample.attributes),
                 ("Description", sample.description),
                 ("Material Type", sample.material_type)
             ]
-            print(sample_values)
+            # Expand sample attributes to characteristics columns (they can be different between different samples)
+            for category, sample_attrib in sample.attributes.items():
+                sample_values.extend(flatten_sample_attribute(category, sample_attrib, make_unique=True))
+
             # Get all assay objects that belong to this sample
             assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
 
@@ -80,13 +88,12 @@ def generate_sdrf(sub):
 
                 assay_values = [
                     ("Extract Name", sample.alias),
-                    ("Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                    ("labeling~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
                                       if sub.get_protocol(pref).protocol_type.value == "nucleic acid labeling protocol"]),
                     ("Labelled Extract Name", assay.alias),
-                    ("Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                    ("hyb~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
                                       if sub.get_protocol(pref).protocol_type.value == "nucleic acid hybridization to array protocol"])
                 ]
-                print(assay_values)
 
                 # Get all assay data objects that belong to this assay
                 data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]
@@ -96,8 +103,8 @@ def generate_sdrf(sub):
                         ("Assay Name", ad.alias),
                         ("Technology Type", assay.technology_type),
                         ("Array Design REF", assay.array_design),
-                        ("Term Source REF", "Array Express"),
-                        ("Protocol REF", [sub.get_protocol(pref).alias for pref in ad.protocolrefs
+                        ("design~Term Source REF", "Array Express"),
+                        ("scanning~Protocol REF", [sub.get_protocol(pref).alias for pref in ad.protocolrefs
                                       if sub.get_protocol(pref).protocol_type.value == "array scanning and feature extraction protocol"]),
                     ]
 
@@ -108,11 +115,123 @@ def generate_sdrf(sub):
                         elif ad.data_type == "raw matrix":
                             data_values.append(("Array Data Matrix File", f.name))
 
-                    print(sample_values + assay_values + data_values)
+                    # Add all lists together and transform to dictionary so that we can use pandas to write to table
+                    rows.append((OrderedDict(sample_values), OrderedDict(assay_values), OrderedDict(data_values)))
 
-                    rows.append(sample_values + assay_values + data_values)
 
-    return rows
 
+    # TODO: Expand protocol refs as they can be variable length
+
+
+    # Get all keys (categories) from the dictionaries/rows (in row-list position 1, tuple position 1)
+
+    print(rows)
+    sample_dicts = [row[0] for row in rows]
+    data_frames = []
+    for i in range(len(rows[0])):
+
+        data_frames.append(pd.DataFrame.from_records([row[i] for row in rows ]))
+
+    print(pd.concat(data_frames, axis=1))
+
+    return pd.concat(data_frames, axis=1)
+
+    #return rows
+
+
+def flatten_unit(category, unit_object, make_unique=False, sep="~~~"):
+    flat_list = []
+    if unit_object.value and unit_object.unit_type:
+        if make_unique:
+            unit_header = category + sep + "Unit[{}]".format(unit_object.unit_type)
+        else:
+            unit_header = "Unit[{}]".format(unit_object.unit_type)
+        flat_list.append((unit_header, unit_object.value))
+        if unit_object.term_source:
+            if make_unique:
+                flat_list.append((category + "-unit" + sep + "Term Source REF", unit_object.term_source))
+            else:
+                flat_list.append(("Term Source REF", unit_object.term_source))
+            if unit_object.term_accession:
+                if make_unique:
+                    flat_list.append((category + "-unit" + sep + "Term Accession Number", unit_object.term_accession))
+                else:
+                    flat_list.append(("Term Accession Number", unit_object.term_accession))
+    return flat_list
+
+
+def flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~~~"):
+    flat_list = []
+    if attrib_object.value:
+        header = "Characteristics[{}]".format(category)
+        flat_list.append((header, attrib_object.value))
+        if attrib_object.term_source:
+            if make_unique:
+                flat_list.append((category + sep + "Term Source REF", attrib_object.term_source))
+            else:
+                flat_list.append(("Term Source REF", attrib_object.term_source))
+            if attrib_object.term_accession:
+                if make_unique:
+                    flat_list.append((category + sep + "Term Accession Number", attrib_object.term_accession))
+                else:
+                    flat_list.append(("Term Accession Number", attrib_object.term_accession))
+        if attrib_object.unit:
+            flat_list.extend(flatten_unit(category, attrib_object.unit, make_unique=make_unique))
+    return flat_list
+
+
+def sample_attribute_to_dict(category, attrib_object):
+    attrib_dict = OrderedDict()
+    if attrib_object.value:
+        header = "Characteristics[{}]".format(category)
+        attrib_dict[header] = attrib_object.value
+        if attrib_object.term_source:
+            attrib_dict["Term Source REF"] = attrib_object.term_source
+            if attrib_object.term_accession:
+                attrib_dict["Term Accession Number"] = attrib_object.term_accession
+        if attrib_object.unit:
+            attrib_dict["unit"] = unit_to_dict(category, attrib_object.unit)
+    return attrib_dict
+
+
+def unit_to_dict(category, unit_object):
+    unit_dict = OrderedDict()
+    if unit_object.value and unit_object.unit_type:
+        unit_header = "Unit[{}]".format(unit_object.unit_type)
+        unit_dict[unit_header] = unit_object.value
+        if unit_object.term_source:
+            unit_dict["Term Source REF"] = unit_object.term_source
+            if unit_object.term_accession:
+                unit_dict["Term Accession Number"] = unit_object.term_accession
+    return unit_dict
+
+
+def flatten_nested_zip(nested_zip, flat_list):
+    """Take a list of nested tuples and return a single list with all non-empty values."""
+    if isinstance(nested_zip, tuple):
+        for item in nested_zip:
+            if isinstance(item, tuple):
+                return flatten_nested_zip(item, flat_list)
+            # Removes None values
+            elif item:
+                flat_list.append(item)
+    else:
+        flat_list.append(nested_zip)
+    return flat_list
+
+
+def unique_keys_in_order(rows):
+    """Take a list of ordered dictionaries and return a list of all keys without duplicates and in original order."""
+    # Zip all keys into a nested tuple
+    zipped_keys = []
+    for d in rows:
+        zipped_keys = list(itertools.zip_longest(list(d), zipped_keys))
+    # Turn nested tuples into a flat list
+    all_keys = []
+    for x in zipped_keys:
+        all_keys.extend(flatten_nested_zip(x, []))
+    # Remove duplicates
+    unique_keys = list(OrderedDict.fromkeys(all_keys))
+    return unique_keys
 
 
