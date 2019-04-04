@@ -63,35 +63,47 @@ def generate_idf(sub):
 def generate_sdrf(sub):
     """Transform metadata in data model to an SDRF table."""
 
-    header = []
     rows = []
-    all_sample_categories = []
 
     if sub.info.get("submission_type") == "microarray":
 
         for sample in sub.sample:
-
             sample_values = [
-                ("Source Name", sample.alias),
-                #("Characteristics", sample.attributes),
-                ("Description", sample.description),
-                ("Material Type", sample.material_type)
+                ("Source Name", sample.alias)
             ]
             # Expand sample attributes to characteristics columns (they can be different between different samples)
             for category, sample_attrib in sample.attributes.items():
                 sample_values.extend(flatten_sample_attribute(category, sample_attrib, make_unique=True))
+
+            if sample.description:
+                sample_values.append(("Description", sample.description))
+            if sample.material_type:
+                sample_values.append(("Material Type", sample.material_type))
 
             # Get all assay objects that belong to this sample
             assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
 
             for assay in assays:
 
+                source_to_extract_protocols = [
+                    ("growth~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                                               if sub.get_protocol(pref).protocol_type.value == "growth protocol"]),
+                    ("treatment~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                                                  if sub.get_protocol(pref).protocol_type.value == "treatment protocol"]),
+                    ("dissection~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                                                   if sub.get_protocol(pref).protocol_type.value == "dissection protocol"]),
+                    ("collection~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                                                   if sub.get_protocol(pref).protocol_type.value == "sample collection protocol"]),
+                    ("conversion~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                                                   if sub.get_protocol(pref).protocol_type.value == "conversion protocol"])
+                ]
+
                 assay_values = [
                     ("Extract Name", sample.alias),
-                    ("labeling~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                    ("labeling~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
                                       if sub.get_protocol(pref).protocol_type.value == "nucleic acid labeling protocol"]),
                     ("Labelled Extract Name", assay.alias),
-                    ("hyb~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
+                    ("hyb~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
                                       if sub.get_protocol(pref).protocol_type.value == "nucleic acid hybridization to array protocol"])
                 ]
 
@@ -123,18 +135,15 @@ def generate_sdrf(sub):
     # TODO: Expand protocol refs as they can be variable length
 
 
-    # Get all keys (categories) from the dictionaries/rows (in row-list position 1, tuple position 1)
-
     print(rows)
-    sample_dicts = [row[0] for row in rows]
+
     data_frames = []
     for i in range(len(rows[0])):
+        data_frames.append(pd.DataFrame.from_records([row[i] for row in rows]))
 
-        data_frames.append(pd.DataFrame.from_records([row[i] for row in rows ]))
+    raw_sdrf = pd.concat(data_frames, axis=1)
 
-    print(pd.concat(data_frames, axis=1))
-
-    return pd.concat(data_frames, axis=1)
+    return raw_sdrf
 
     #return rows
 
@@ -160,7 +169,7 @@ def flatten_unit(category, unit_object, make_unique=False, sep="~~~"):
     return flat_list
 
 
-def flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~~~"):
+def  flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~~~"):
     flat_list = []
     if attrib_object.value:
         header = "Characteristics[{}]".format(category)
@@ -180,58 +189,9 @@ def flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~~
     return flat_list
 
 
-def sample_attribute_to_dict(category, attrib_object):
-    attrib_dict = OrderedDict()
-    if attrib_object.value:
-        header = "Characteristics[{}]".format(category)
-        attrib_dict[header] = attrib_object.value
-        if attrib_object.term_source:
-            attrib_dict["Term Source REF"] = attrib_object.term_source
-            if attrib_object.term_accession:
-                attrib_dict["Term Accession Number"] = attrib_object.term_accession
-        if attrib_object.unit:
-            attrib_dict["unit"] = unit_to_dict(category, attrib_object.unit)
-    return attrib_dict
-
-
-def unit_to_dict(category, unit_object):
-    unit_dict = OrderedDict()
-    if unit_object.value and unit_object.unit_type:
-        unit_header = "Unit[{}]".format(unit_object.unit_type)
-        unit_dict[unit_header] = unit_object.value
-        if unit_object.term_source:
-            unit_dict["Term Source REF"] = unit_object.term_source
-            if unit_object.term_accession:
-                unit_dict["Term Accession Number"] = unit_object.term_accession
-    return unit_dict
-
-
-def flatten_nested_zip(nested_zip, flat_list):
-    """Take a list of nested tuples and return a single list with all non-empty values."""
-    if isinstance(nested_zip, tuple):
-        for item in nested_zip:
-            if isinstance(item, tuple):
-                return flatten_nested_zip(item, flat_list)
-            # Removes None values
-            elif item:
-                flat_list.append(item)
-    else:
-        flat_list.append(nested_zip)
-    return flat_list
-
-
-def unique_keys_in_order(rows):
-    """Take a list of ordered dictionaries and return a list of all keys without duplicates and in original order."""
-    # Zip all keys into a nested tuple
-    zipped_keys = []
-    for d in rows:
-        zipped_keys = list(itertools.zip_longest(list(d), zipped_keys))
-    # Turn nested tuples into a flat list
-    all_keys = []
-    for x in zipped_keys:
-        all_keys.extend(flatten_nested_zip(x, []))
-    # Remove duplicates
-    unique_keys = list(OrderedDict.fromkeys(all_keys))
-    return unique_keys
+def get_microarray_protcols():
+    """Fetch all protocol types for microarray studies and return a dictionary sorted by position in the SDRF.
+    {1: [sample collection, growth, treatment], 2: [labeling], 3: [hybridization] ...}"""
+    pass
 
 
