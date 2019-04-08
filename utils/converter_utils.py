@@ -1,13 +1,14 @@
 import codecs
 import json
+import logging
 import os
-import re
 import pkg_resources
-import sys
+import re
 
 from collections import OrderedDict, defaultdict
 
 from utils.eutils import esearch
+
 
 USI_JSON_DIRECTORY = "usijson"
 SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
@@ -97,7 +98,7 @@ def is_accession(accession, archive=None):
 organism_lookup = {}
 
 
-def get_taxon(organism):
+def get_taxon(organism, logger=logging.getLogger()):
     """Return the NCBI taxonomy ID for a given species name."""
 
     if organism and organism not in organism_lookup:
@@ -105,15 +106,15 @@ def get_taxon(organism):
         # sample' taxon_id (c.f. https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1427524)
         if re.search(r" and | \+ ", organism):
             return 1427524
-        print("Looking up species in NCBI taxonomy. Please wait...")
+        logger.info("Looking up species in NCBI taxonomy. Please wait...")
         db = 'taxonomy'
         a = esearch(db=db, term=organism)
         try:
             taxon_id = int(a['esearchresult']['idlist'][0])
             organism_lookup[organism] = taxon_id
             return taxon_id
-        except:
-            print("Failed to retrieve organism data from ENA taxonomy service for: " + organism)
+        except Exception as e:
+            logger.error("Failed to retrieve organism data from ENA taxonomy service for {} due to {}".format(organism, str(e)))
     else:
         return organism_lookup.get(organism)
 
