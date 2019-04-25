@@ -182,8 +182,9 @@ def get_sdrf_path(idf_file_path, logger, data_dir):
         for line in f:
             if re.search(SDRF_FILE_NAME_REGEX, line):
                 sdrf_file_name = line.split('\t')[1].strip()
-                if os.path.exists(os.path.join(current_dir, data_dir)):
-                    sdrf_file_path = os.path.join(current_dir, data_dir, sdrf_file_name)
+                data_path = os.path.join(current_dir, data_dir)
+                if os.path.exists(data_path):
+                    sdrf_file_path = os.path.join(data_path, sdrf_file_name)
                 else:
                     sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
     logger.debug("Generated SDRF file path: {}".format(sdrf_file_path))
