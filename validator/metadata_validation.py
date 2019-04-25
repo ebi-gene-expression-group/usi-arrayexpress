@@ -2,12 +2,13 @@ import re
 
 from converter import datamodel
 from utils import converter_utils
-from utils.converter_utils import ontology_term, get_controlled_vocabulary, is_accession
-from utils.common_utils import get_term_descendants
+from utils.converter_utils import ontology_term, is_accession
+from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi, get_ena_instrument_terms_via_usi
 
 
 REGEX_DATE_FORMAT = re.compile("([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))")
 REGEX_DOI_FORMAT = re.compile("^10\.\d{4,9}\/\S+$")
+REGEX_FILE_NAME = re.compile(r"^[A-Za-z0-9._-]+$")
 
 
 def run_protocol_checks(sub: datamodel.Submission, logger):
@@ -117,7 +118,7 @@ def run_sample_checks(sub: datamodel.Submission, logger):
     # Check organism name is in taxonomy
     for o in organisms:
         taxon_id = converter_utils.get_taxon(o)
-        logger.debug("Found taxon ID: ", taxon_id)
+        logger.debug("Found taxon ID: {}".format(taxon_id))
         if not isinstance(taxon_id, int):
             logger.error("Organism \"{}\" was not found in NCBI taxonomy.".format(o))
             codes.append("SAMP-E08")
@@ -305,10 +306,18 @@ def run_project_checks(sub: datamodel.Submission, logger):
 
 
 def run_assay_checks(sub: datamodel.Submission, logger):
+    """Run checks on assay objects and factor values and return list of error codes."""
 
     assays = sub.assay
     exptype = sub.info["submission_type"]
     codes = []
+    is_sequencing = False
+
+    # Get controlled terms from ENA's assay schema
+    if exptype == "sequencing":
+        library_terms = get_ena_library_terms_via_usi(logger)
+        instrument_models = get_ena_instrument_terms_via_usi(logger)
+        is_sequencing = True
 
     if not assays:
         logger.error("Experiment has no assays. At least one expected.")
@@ -336,7 +345,7 @@ def run_assay_checks(sub: datamodel.Submission, logger):
             codes.append("ASSA-E05")
 
         # Microarray checks for label and array design
-        if exptype == "microarray":
+        if not is_sequencing:
             # Label
             if not a.label:
                 logger.error("Microarray assay \"{}\" does not have label attribute specified.".format(a.alias))
@@ -350,14 +359,103 @@ def run_assay_checks(sub: datamodel.Submission, logger):
                 codes.append("ASSA-E08")
 
         # Sequencing checks
-        elif exptype == "sequencing":
+        elif is_sequencing:
+            # Absence of MA fields
             if "label" in additional_attributes:
                 logger.error("Found sequencing assay \"{}\" with 'label' attribute.".format(a.alias))
                 codes.append("ASSA-E09")
             if "array_design" in additional_attributes:
                 logger.error("Found sequencing assay \"{}\" with 'array design' attribute.".format(a.alias))
                 codes.append("ASSA-E10")
+            # Mandatory ENA library info
+            if not a.library_layout:
+                logger.error("Sequencing assay \"{}\" has no library layout specified.".format(a.alias))
+                codes.append("ASSA-E12")
+            elif a.library_layout.lower() == "paired":
+                if not a.nominal_length:
+                    logger.error("Paired-end assay \"{}\" has no nominal length specified.".format(a.alias))
+                    codes.append("ASSA-E13")
+                if not a.nominal_sdev:
+                    logger.error("Paired-end assay \"{}\" has no nominal sdev specified.".format(a.alias))
+                    codes.append("ASSA-E14")
+            if not a.library_source:
+                logger.error("Sequencing assay \"{}\" has no library source specified.".format(a.alias))
+                codes.append("ASSA-E15")
+            if not a.library_strategy:
+                logger.error("Sequencing assay \"{}\" has no library strategy specified.".format(a.alias))
+                codes.append("ASSA-E16")
+            if not a.library_selection:
+                logger.error("Sequencing assay \"{}\" has no library source specified.".format(a.alias))
+                codes.append("ASSA-E17")
+            if not a.library_strand:
+                logger.warn("Sequencing assay \"{}\" has no library strand specified.".format(a.alias))
+                codes.append("ASSA-W01")
+            if not a.instrument_model:
+                logger.error("Sequencing assay \"{}\" has no instrument model specified.".format(a.alias))
+                codes.append("ASSA-E18")
+            elif a.instrument_model not in instrument_models:
+                logger.error("Sequencing assay \"{}\" has instrument model \"{}\" which does "
+                             "not match against ENA's controlled vocabulary.".format(a.alias, a.instrument_model))
+                codes.append("ASSA-E19")
+            # ENA library terms must match against controlled vocabulary
+            for term, cv in library_terms.items():
+                # Assuming here that the names of the fields are exactly the same as in the assay attributes
+                value = getattr(a, term)
+                if value and value not in cv:
+                    logger.error("Value \"{}\" for {} does not match against ENA's controlled vocabulary.".format(value, term))
+                    codes.append("ASSA-E11")
 
     return codes
 
+
+def run_file_checks(sub: datamodel.Submission, logger):
+    """Run file checks on assay_data and analysis objects and return list of error codes."""
+
+    codes = []
+
+    if not sub.assay_data and not sub.analysis:
+        logger.error("Experiment does not have any data files associated with it.")
+        codes.append("DATA-E01")
+        return codes
+
+    # Run assay_data checks
+    if not sub.assay_data:
+        logger.error("Experiment does not have raw data files.")
+        codes.append("DATA-E02")
+    else:
+        _data_object_checks(sub.assay_data, logger, codes)
+
+    # Run analysis (processed data) checks
+    if not sub.analysis:
+        logger.warning("Experiment does not have processed data.")
+        codes.append("DATA-W01")
+    else:
+        _data_object_checks(sub.analysis, logger, codes)
+
+    return codes
+
+
+def _data_object_checks(data_objects, logger, codes):
+
+    for ad in data_objects:
+        if not ad.alias:
+            logger.error("Found data object \"{}\" without name specified. Not checking it.".format(ad))
+            codes.append("DATA-E03")
+            continue
+        if not ad.files:
+            logger.error("Found data object \"{}\" with no data files.".format(ad.alias))
+            codes.append("DATA-E04")
+        else:
+            _file_object_checks(ad.files, logger, codes)
+
+
+def _file_object_checks(file_objects, logger, codes):
+    for f in file_objects:
+        if f.name:
+            if not REGEX_FILE_NAME.match(f.name):
+                logger.error("File name \"{}\" does not match allowed pattern.".format(f.name))
+                codes.append("DATA-E06")
+        else:
+            logger.error("Found data file object \"{}\" without name specified.".format(f))
+            codes.append("DATA-E05")
 

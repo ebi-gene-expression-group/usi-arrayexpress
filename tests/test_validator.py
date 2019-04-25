@@ -142,10 +142,21 @@ class TestMetaDataValidation(unittest.TestCase):
         self.sub.assay[1].technology_type = ""
         # Changing technology type to unknown type should give ASSA-E04
         self.sub.assay[2].technology_type = "whatever"
+        # Changing array design to non AE accession should give ASSA-E08
+        self.sub.assay[1].array_design = "this is not in AE"
         error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
         self.assertIn("ASSA-E02", error_codes)
         self.assertIn("ASSA-E03", error_codes)
         self.assertIn("ASSA-E04", error_codes)
+        self.assertIn("ASSA-E08", error_codes)
+
+        # Deleting label should give ASSA-E06
+        self.sub.assay[1].label = ""
+        # Deleting array design should give ASSA-E07
+        self.sub.assay[1].array_design = ""
+        error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
+        self.assertIn("ASSA-E06", error_codes)
+        self.assertIn("ASSA-E07", error_codes)
 
         # Deleting all assays should give error ASSA-E01
         self.sub.assay = []

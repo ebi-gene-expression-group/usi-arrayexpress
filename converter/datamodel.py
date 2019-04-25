@@ -190,7 +190,7 @@ class SeqAssay(Assay):
 
         # Get platform and instrument from sequencing protocol
         for p in protocols:
-            if p.get("title") in protocolrefs and p.get("protocol type") == "nucleic acid sequencing protocol":
+            if p.get("title") in protocolrefs and p.get("protocol_type") == "nucleic acid sequencing protocol":
                 hardware = p.get("hardware")
                 lib_attribs["instrument_model"] = hardware
                 # TODO: need to look up the platform type from ENA's controlled vocab
