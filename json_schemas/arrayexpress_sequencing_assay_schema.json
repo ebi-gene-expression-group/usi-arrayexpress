@@ -1,0 +1,169 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ArrayExpress Sequencing Assay Schema",
+    "description": "The schema describing the attributes of a sequencing assay submitted to ArrayExpress",
+    "version": "1.0.0",
+    "author": "arrayexpress",
+    "type": "object",
+    "required": [
+            "alias",
+            "studyRef",
+            "protocolUses",
+            "sampleUses"
+        ],
+    "additionalProperties": false,
+    "properties": {
+        "alias": {
+            "description": "A unique identifier for the sequencing assay.",
+            "type": "string",
+            "minLength": 1
+        },
+        "description": {
+            "description": "More extensive free-form description.",
+            "type": "string"
+        },
+        "attributes": {
+            "description": "Attributes for describing a sequencing assay. CAN WE REFERENCE ENA's SCHEMA HERE? WHAT ELSE IS MANDATORY FOR ENA?",
+            "type": "object",
+            "required": [
+                "library_layout",
+                "library_source",
+                "library_strategy",
+                "library_selection",
+                "platform_type",
+                "instrument_model",
+                "technology_type"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "library_layout": {
+                    "description": "The layout of the sequencing library, SINGLE or PAIRED."
+                },
+                "library_source": {
+                    "description": "The source material of the sequencing library, e.g. TRANSCRIPTOMIC."
+                },
+                "library_strategy": {
+                    "description": "The type of sequencing approach, e.g. RNA-Seq."
+                },
+                "library_selection": {
+                    "description": "The selection strategy of the faction of nucleic acid that was sequenced."
+                },
+                "nominal_length": {},
+                "nominal_sdev": {},
+                "platform_type":{},
+                "instrument_model": {},
+                "technology_type": {
+                    "description": "The type of technology used, sequencing or microarray assay.",
+                    "type": "string",
+                    "enum": [
+                        "sequencing assay"
+                    ]
+                }
+            },
+            "patternProperties": {
+                "^.*$": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "properties": {
+                            "value": {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "units": {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "terms": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "url": {
+                                            "type": "string",
+                                            "format": "uri"
+                                        }
+                                    },
+                                    "required": [
+                                        "url"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "value"
+                        ]
+                    }
+                }
+            }
+        },
+        "studyRef": {
+            "description": "Reference to study.",
+            "$ref": "#/definitions/submittableRef"
+        },
+        "protocolUses": {
+            "type": "array",
+            "minLength": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "protocolRef": { "$ref": "#/definitions/submittableRef" },
+                    "attributes": { "$ref": "#/definitions/attributes" }
+                }
+            }
+        },
+        "sampleUses": {
+            "type": "array",
+            "minLength": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "sampleRef": { "$ref": "#/definitions/submittableRef" },
+                    "attributes": { "$ref": "#/definitions/attributes" }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "attributes": {
+            "description": "Attributes for describing a sequencing assay.",
+            "type": "object",
+            "properties": {},
+            "patternProperties": {
+                "^.*$": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "properties": {
+                            "value": { "type": "string", "minLength": 1 },
+                            "units": { "type": "string", "minLength": 1 },
+                            "terms": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "url": {"type": "string", "format": "uri" }
+                                    },
+                                    "required": ["url"]
+                                }
+                            }
+                        },
+                        "required": [ "value" ]
+                    }
+                }
+            }
+        },
+        "submittableRef": {
+			"type": "object",
+			"properties": {
+				"alias": { "type": "string", "minLength": 1 },
+				"accession": { "type": "string", "minLength": 1 },
+				"team": { "type": "string", "minLength": 1 }
+			},
+			"anyOf": [
+				{ "required": [ "alias", "team" ] },
+				{ "required": [ "accession" ] }
+			]
+        }
+    }
+}

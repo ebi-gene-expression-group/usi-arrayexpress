@@ -1,0 +1,158 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ArrayExpress Microarray Assay Schema",
+    "description": "The schema describing the attributes of a microarray assay submitted to ArrayExpress. A microarray assay is roughly equivalent to a labeled extract in MAGE-TAB, which is used in a hybridisation reaction.",
+    "version": "1.0.0",
+    "author": "arrayexpress",
+    "type": "object",
+    "required": [
+            "alias",
+            "studyRef",
+            "protocolUses",
+            "sampleUses"
+        ],
+    "additionalProperties": false,
+    "properties": {
+        "alias": {
+            "description": "A unique identifier for the microarray assay.",
+            "type": "string",
+            "minLength": 1
+        },
+        "description": {
+            "description": "More extensive free-form description.",
+            "type": "string"
+        },
+        "attributes": {
+            "description": "Attributes for describing a microarray assay.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "label",
+                "array_design",
+                "technology_type"
+            ],
+            "properties": {
+                "label": {
+                    "description": "The chemicals (e.g. Cy3 fluorescent dye) conjugated to nucleic acid to label them before microarray hybridisation. Experiments with Affymetrix or Illumina arrays usually use the label 'biotin'. Two-colour microarrays usually use Cy3 and Cy5.",
+                    "type": "string"
+                },
+                "array_design": {
+                    "description": "The ArrayExpress accession of the array design that was used for the hybridisation",
+                    "type": "string",
+                    "pattern": "^A-[A-Z]{4}-[0-9]+$"
+                },
+                "technology_type": {
+                    "description": "The type of technology used, sequencing or microarray assay.",
+                    "type": "string",
+                    "enum": [
+                        "array assay"
+                    ]
+                }
+            },
+            "patternProperties": {
+                "^.*$": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "properties": {
+                            "value": {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "units": {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "terms": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "url": {
+                                            "type": "string",
+                                            "format": "uri"
+                                        }
+                                    },
+                                    "required": [
+                                        "url"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "value"
+                        ]
+                    }
+                }
+            }
+        },
+        "studyRef": {
+            "description": "Reference to study.",
+            "$ref": "#/definitions/submittableRef"
+        },
+        "protocolUses": {
+            "type": "array",
+            "minLength": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "protocolRef": { "$ref": "#/definitions/submittableRef" },
+                    "attributes": { "$ref": "#/definitions/attributes" }
+                }
+            }
+        },
+        "sampleUses": {
+            "type": "array",
+            "minLength": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "sampleRef": { "$ref": "#/definitions/submittableRef" },
+                    "attributes": { "$ref": "#/definitions/attributes" }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "attributes": {
+            "description": "Attributes for describing a sequencing assay.",
+            "type": "object",
+            "properties": {},
+            "patternProperties": {
+                "^.*$": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "properties": {
+                            "value": { "type": "string", "minLength": 1 },
+                            "units": { "type": "string", "minLength": 1 },
+                            "terms": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "url": {"type": "string", "format": "uri" }
+                                    },
+                                    "required": ["url"]
+                                }
+                            }
+                        },
+                        "required": [ "value" ]
+                    }
+                }
+            }
+        },
+        "submittableRef": {
+			"type": "object",
+			"properties": {
+				"alias": { "type": "string", "minLength": 1 },
+				"accession": { "type": "string", "minLength": 1 },
+				"team": { "type": "string", "minLength": 1 }
+			},
+			"anyOf": [
+				{ "required": [ "alias", "team" ] },
+				{ "required": [ "accession" ] }
+			]
+        }
+    }
+}
