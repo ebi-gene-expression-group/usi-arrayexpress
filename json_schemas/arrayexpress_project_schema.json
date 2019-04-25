@@ -10,15 +10,29 @@
     "releaseDate",
     "contacts"
   ],
+  "additionalProperties": false,
   "properties": {
     "alias": {
       "description": "A unique identifier of the project",
       "type": "string",
       "minLength": 1
     },
+    "title": {
+      "description": "Title of the project.",
+        "type":	"string",
+        "minLength": 25,
+        "maxLength": 4000
+    },
+    "description": {
+      "description": "More extensive free-form description.",
+        "type":	"string",
+        "minLength": 50,
+        "maxLength": 4000
+    },
     "releaseDate": {
-      "description": "The date at which the project shall be made public",
+      "description": "The date at which the project shall be made public. Must be in DD-MM-YYYY format.",
       "type":  "string",
+      "format": "date",
       "pattern": "([12][0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]))"
     },
     "publications": {
@@ -31,6 +45,10 @@
             "description": "The title of the publication",
             "type": "string"
           },
+          "authors": {
+            "description": "A list of the manuscript authors",
+            "type": "string"
+          },
           "status": {
             "description": "The state in the publication process",
             "type": "string",
@@ -38,16 +56,13 @@
           },
           "pubmedId": {
             "description": "The accession number of the publication in the NCBI PubMed database",
-            "type": "integer"
-          },
-          "authors": {
-            "description": "A list of the manuscript authors",
-            "type": "string"
+            "type": "string",
+            "pattern":"^\\d+$"
           },
           "doi": {
             "description": "The digital object identifier of the publication (without 'http://')",
             "type": "string",
-            "pattern": "^10.[0-9]{4,9}/[-._;()/:A-Z0-9]+$"
+            "pattern": "^10\\.\\d{4,9}\\/\\S+$"
           }
         }
       }
@@ -67,6 +82,9 @@
         "lastName": {
           "type": "string"
         },
+        "middleInitials": {
+          "type": "string"
+        },
         "email": {
           "type": "string",
           "format": "email"
@@ -78,6 +96,12 @@
           "type": "string"
         },
         "phone": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "fax": {
           "type": [
             "string",
             "integer"
@@ -106,6 +130,71 @@
               "software manufacturer",
               "submitter"
             ]
+          }
+        }
+      },
+      "contains": {
+        "description": "The contact information of the submitter",
+        "type": "object",
+        "required": [
+            "roles",
+            "firstName",
+            "lastName",
+            "email",
+            "affiliation"
+        ],
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "affiliation": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phone": {
+            "type": [
+              "string",
+              "integer"
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "contains": {
+              "type": "string",
+              "enum": ["submitter"]
+            },
+            "items": {
+              "type": "string",
+              "enum": [
+                "array manufacturer",
+                  "biomaterial provider",
+                  "biosequence provider",
+                  "consortium member",
+                  "consultant",
+                  "curator",
+                  "data analyst",
+                  "data coder",
+                  "experiment performer",
+                  "funder",
+                  "hardware manufacturer",
+                  "institution",
+                  "investigator",
+                  "material supplier role",
+                  "peer review quality control role",
+                  "software manufacturer",
+                  "submitter"
+              ]
+            }
           }
         }
       }
