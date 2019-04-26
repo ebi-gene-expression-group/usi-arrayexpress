@@ -1,12 +1,15 @@
 """Module to convert metadata in the submission data model to MAGE-TAB files."""
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from utils import converter_utils
 import codecs
 import csv
 import pandas as pd
 import itertools
+import unittest
 
+
+from utils.converter_utils import get_controlled_vocabulary
 
 
 def generate_idf(sub):
@@ -65,8 +68,15 @@ def generate_sdrf(sub):
 
     rows = []
 
-    if sub.info.get("submission_type") == "microarray":
+    submission_type = sub.info.get("submission_type")
 
+    protocol_positions = get_protocol_positions(submission_type)
+
+    if submission_type == "microarray":
+
+        # For each node (sample, extract, assay etc.) start a list of tuples with category value pairs,
+        # because each node block can have different attributes for each sample. Therefore all data points
+        # are collected separately per node block and then merged at the end into one SDRF table.
         for sample in sub.sample:
             sample_values = [
                 ("Source Name", sample.alias)
@@ -169,7 +179,8 @@ def flatten_unit(category, unit_object, make_unique=False, sep="~~~"):
     return flat_list
 
 
-def  flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~~~"):
+def flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~~~"):
+    print(attrib_object)
     flat_list = []
     if attrib_object.value:
         header = "Characteristics[{}]".format(category)
@@ -189,9 +200,18 @@ def  flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~
     return flat_list
 
 
-def get_microarray_protcols():
-    """Fetch all protocol types for microarray studies and return a dictionary sorted by position in the SDRF.
+def get_protocol_positions(techtype):
+    """Fetch all protocol types for microarray/sequencing studies and return a dictionary sorted by position in the SDRF.
     {1: [sample collection, growth, treatment], 2: [labeling], 3: [hybridization] ...}"""
-    pass
+    # Use the same protocols for singlecell as for sequencing
+    if techtype == "singlecell":
+        techtype = "sequencing"
+    protocol_info = get_controlled_vocabulary("protocol_types", resource="ontology")
+    protocol_positions = defaultdict(list)
+    for p_type, p_info in protocol_info.items():
+        if p_info["exp_type"] == "all" or p_info["exp_type"] == techtype:
+            protocol_positions[p_info["position"]].append(p_type)
+    return protocol_positions
+
 
 

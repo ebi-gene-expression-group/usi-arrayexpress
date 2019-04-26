@@ -24,14 +24,6 @@
       "mandatory": "one of",
       "position": 1
     },
-    "conversion protocol": {
-      "accession": "EFO_0005520",
-      "uri": "http://www.ebi.ac.uk/efo/EFO_0005520",
-      "ontology": "EFO",
-      "exp_type": "all",
-      "mandatory": "no",
-      "position": 1
-    },
     "dissection protocol": {
       "accession": "EFO_0005519",
       "uri": "http://www.ebi.ac.uk/efo/EFO_0005519",
@@ -48,61 +40,69 @@
       "mandatory": "ma",
       "position": 1
     },
-    "normalization data transformation protocol": {
-      "accession": "EFO_0003816",
-      "uri": "http://www.ebi.ac.uk/efo/EFO_0003816",
+    "conversion protocol": {
+      "accession": "EFO_0005520",
+      "uri": "http://www.ebi.ac.uk/efo/EFO_0005520",
       "ontology": "EFO",
       "exp_type": "all",
       "mandatory": "no",
-      "position": 5
+      "position": 1
+    },
+    "nucleic acid library construction protocol": {
+      "accession": "EFO_0004184",
+      "uri": "http://www.ebi.ac.uk/efo/EFO_0004184",
+      "ontology": "EFO",
+      "exp_type": "sequencing",
+      "mandatory": "sequencing",
+      "position": 1
     },
     "nucleic acid labeling protocol": {
       "accession": "EFO_0003813",
       "uri": "http://www.ebi.ac.uk/efo/EFO_0003813",
       "ontology": "EFO",
-      "exp_type": "ma",
-      "mandatory": "ma",
+      "exp_type": "microarray",
+      "mandatory": "microarray",
       "position": 2
     },
     "nucleic acid hybridization to array protocol": {
       "accession": "EFO_0003815",
       "uri": "http://www.ebi.ac.uk/efo/EFO_0003815",
       "ontology": "EFO",
-      "exp_type": "ma",
-      "mandatory": "ma",
+      "exp_type": "microarray",
+      "mandatory": "microarray",
       "position": 3
-    },
-    "array scanning and feature extraction protocol": {
-      "accession": "EFO_0003814",
-      "uri": "http://www.ebi.ac.uk/efo/EFO_0003814",
-      "ontology": "EFO",
-      "exp_type": "ma",
-      "mandatory": "ma",
-      "position": 4
-    },
-    "nucleic acid library construction protocol": {
-      "accession": "EFO_0004184",
-      "uri": "http://www.ebi.ac.uk/efo/EFO_0004184",
-      "ontology": "EFO",
-      "exp_type": "seq",
-      "mandatory": "seq",
-      "position": 1
     },
     "nucleic acid sequencing protocol": {
       "accession": "EFO_0004170",
       "uri": "http://www.ebi.ac.uk/efo/EFO_0004170",
       "ontology": "EFO",
-      "exp_type": "seq",
-      "mandatory": "seq",
-      "position": 2
+      "exp_type": "sequencing",
+      "mandatory": "sequencing",
+      "position": 4
+    },
+    "array scanning and feature extraction protocol": {
+      "accession": "EFO_0003814",
+      "uri": "http://www.ebi.ac.uk/efo/EFO_0003814",
+      "ontology": "EFO",
+      "exp_type": "microarray",
+      "mandatory": "microarray",
+      "position": 5
     },
     "high throughput sequence alignment protocol": {
       "accession": "EFO_0004917",
       "uri": "http://www.ebi.ac.uk/efo/EFO_0004917",
       "ontology": "EFO",
-      "exp_type": "seq",
+      "exp_type": "sequencing",
       "mandatory": "no",
-      "position": 3
+      "position": 6
+    },
+    "normalization data transformation protocol": {
+      "accession": "EFO_0003816",
+      "uri": "http://www.ebi.ac.uk/efo/EFO_0003816",
+      "ontology": "EFO",
+      "exp_type": "all",
+      "mandatory": "no",
+      "position": 6
     }
   },
   "experiment_type": {
