@@ -50,7 +50,7 @@ class TestTransformingProtocolRefs(unittest.TestCase):
                                        Attribute("normalization data transformation protocol", None, None), None, None, None)
                               ]
 
-    def test_protocol_refs(self):
+    def test_microarray_protocol_refs(self):
         for i in range(5):
             protocol_refs = sort_protocol_refs_to_dict(self.protocol_positions, self.all_protocols)
             print(protocol_refs)

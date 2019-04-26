@@ -66,12 +66,9 @@ def generate_idf(sub):
 def generate_sdrf(sub):
     """Transform metadata in data model to an SDRF table."""
 
-    rows = []
-
-
     submission_type = sub.info.get("submission_type")
-
     protocol_positions = get_protocol_positions(submission_type)
+    rows = []
 
     if submission_type == "microarray":
 
@@ -93,7 +90,6 @@ def generate_sdrf(sub):
 
             # Get all assay objects that belong to this sample
             assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
-
             all_protocols = []
 
             for assay in assays:
@@ -129,11 +125,11 @@ def generate_sdrf(sub):
                     protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
 
                     # Add all lists together and transform to dictionary so that we can use pandas to write to table
-                    rows.append((OrderedDict(sample_values), protocol_refs[1],
+                    rows.append([OrderedDict(sample_values), protocol_refs[1],
                                  OrderedDict(extract_values), protocol_refs[2],
                                  OrderedDict(le_values), protocol_refs[3],
                                  OrderedDict(assay_values), protocol_refs[5],
-                                 OrderedDict(data_values)))
+                                 OrderedDict(data_values)])
 
 
     # TODO: Assay Name handling for matrix files
@@ -174,7 +170,6 @@ def flatten_unit(category, unit_object, make_unique=False, sep="~~~"):
 
 
 def flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~~~"):
-    print(attrib_object)
     flat_list = []
     if attrib_object.value:
         header = "Characteristics[{}]".format(category)
@@ -210,7 +205,7 @@ def get_protocol_positions(techtype):
 
 def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
     """
-
+    Convert protocol references to a dictionary style to be transformed to columns
     :param protocol_positions: dictionary with the position as key and list of protocol types as value
     :param all_protocols: list of protocol objects
 
