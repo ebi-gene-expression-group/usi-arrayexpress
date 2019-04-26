@@ -105,8 +105,14 @@ def generate_sdrf(sub):
                 data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]
 
                 for ad in data:
+                    # For matrix files the Assay Name is inferred from the assay object (i.e. labeled extract name)
+                    if ad.data_type == "raw matrix":
+                        assay_name = assay.alias
+                    else:
+                        assay_name = ad.alias
+
                     assay_values = [
-                        ("Assay Name", ad.alias),
+                        ("Assay Name", assay_name),
                         ("Technology Type", assay.technology_type),
                         ("Array Design REF", assay.array_design),
                         ("array-design~~~Term Source REF", "Array Express")]
@@ -131,12 +137,6 @@ def generate_sdrf(sub):
                                  OrderedDict(assay_values), protocol_refs[5],
                                  OrderedDict(data_values)])
 
-
-    # TODO: Assay Name handling for matrix files
-
-
-    #print(rows)
-
     data_frames = []
     for i in range(len(rows[0])):
         data_frames.append(pd.DataFrame.from_records([row[i] for row in rows]))
@@ -144,8 +144,6 @@ def generate_sdrf(sub):
     raw_sdrf = pd.concat(data_frames, axis=1)
 
     return raw_sdrf
-
-    #return rows
 
 
 def flatten_unit(category, unit_object, make_unique=False, sep="~~~"):
