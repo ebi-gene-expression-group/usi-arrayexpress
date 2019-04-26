@@ -227,6 +227,10 @@ class Protocol:
         self.software = software
         self.parameters = parameters
 
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.description}, " \
+               "{self.protocol_type}, {self.hardware}, {self.software}, {self.parameters})".format(self=self)
+
     def get_ae_attributes(self):
         """Return a list of all AE attributes that have values."""
         all_attributes = self.__dict__.keys()

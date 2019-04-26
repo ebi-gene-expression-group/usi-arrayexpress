@@ -68,6 +68,7 @@ def generate_sdrf(sub):
 
     rows = []
 
+
     submission_type = sub.info.get("submission_type")
 
     protocol_positions = get_protocol_positions(submission_type)
@@ -93,59 +94,52 @@ def generate_sdrf(sub):
             # Get all assay objects that belong to this sample
             assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
 
+            all_protocols = []
+
             for assay in assays:
+                all_protocols.extend([sub.get_protocol(pref) for pref in assay.protocolrefs])
 
-                source_to_extract_protocols = [
-                    ("growth~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
-                                               if sub.get_protocol(pref).protocol_type.value == "growth protocol"]),
-                    ("treatment~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
-                                                  if sub.get_protocol(pref).protocol_type.value == "treatment protocol"]),
-                    ("dissection~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
-                                                   if sub.get_protocol(pref).protocol_type.value == "dissection protocol"]),
-                    ("collection~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
-                                                   if sub.get_protocol(pref).protocol_type.value == "sample collection protocol"]),
-                    ("conversion~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
-                                                   if sub.get_protocol(pref).protocol_type.value == "conversion protocol"])
-                ]
+                extract_values = [("Extract Name", sample.alias)]
 
-                assay_values = [
-                    ("Extract Name", sample.alias),
-                    ("labeling~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
-                                      if sub.get_protocol(pref).protocol_type.value == "nucleic acid labeling protocol"]),
+                le_values = [
                     ("Labelled Extract Name", assay.alias),
-                    ("hyb~~~Protocol REF", [sub.get_protocol(pref).alias for pref in assay.protocolrefs
-                                      if sub.get_protocol(pref).protocol_type.value == "nucleic acid hybridization to array protocol"])
-                ]
+                    ("Label", assay.label)]
 
                 # Get all assay data objects that belong to this assay
                 data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]
 
                 for ad in data:
-                    data_values = [
+                    assay_values = [
                         ("Assay Name", ad.alias),
                         ("Technology Type", assay.technology_type),
                         ("Array Design REF", assay.array_design),
-                        ("design~Term Source REF", "Array Express"),
-                        ("scanning~Protocol REF", [sub.get_protocol(pref).alias for pref in ad.protocolrefs
-                                      if sub.get_protocol(pref).protocol_type.value == "array scanning and feature extraction protocol"]),
-                    ]
+                        ("array-design~~~Term Source REF", "Array Express")]
+
+                    all_protocols.extend([sub.get_protocol(pref) for pref in ad.protocolrefs])
 
                     # Get all data files
+                    data_values = []
                     for f in ad.files:
                         if ad.data_type == "raw":
                             data_values.append(("Array Data File", f.name))
                         elif ad.data_type == "raw matrix":
                             data_values.append(("Array Data Matrix File", f.name))
 
+                    # Reformat protocol REFs for edges between nodes
+                    protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
+
                     # Add all lists together and transform to dictionary so that we can use pandas to write to table
-                    rows.append((OrderedDict(sample_values), OrderedDict(assay_values), OrderedDict(data_values)))
+                    rows.append((OrderedDict(sample_values), protocol_refs[1],
+                                 OrderedDict(extract_values), protocol_refs[2],
+                                 OrderedDict(le_values), protocol_refs[3],
+                                 OrderedDict(assay_values), protocol_refs[5],
+                                 OrderedDict(data_values)))
 
 
+    # TODO: Assay Name handling for matrix files
 
-    # TODO: Expand protocol refs as they can be variable length
 
-
-    print(rows)
+    #print(rows)
 
     data_frames = []
     for i in range(len(rows[0])):
@@ -213,5 +207,30 @@ def get_protocol_positions(techtype):
             protocol_positions[p_info["position"]].append(p_type)
     return protocol_positions
 
+
+def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
+    """
+
+    :param protocol_positions: dictionary with the position as key and list of protocol types as value
+    :param all_protocols: list of protocol objects
+
+    :return: nested dictionary
+    {1: {11~~~Protocol REF: Protocol 1}, {12~~~Protocol REF: Protocol 2}
+     2: {21~~~Protocol REF: Protocol 3},
+     3: {31~~~Protocol REF: Protocol 4}}
+    """
+    protocol_dict = defaultdict(dict)
+
+    for pos, p_types in protocol_positions.items():
+        prefs_for_position = [p.alias for p in all_protocols if p.protocol_type.value in p_types]
+        # Number of entries in the dict corresponds to the number of columns that will be created and
+        # should be equal of the number of protocol refs for the same position
+        column_number = 1
+        for p in prefs_for_position:
+            # Making the secondary key unique
+            protocol_dict[pos][str(pos)+str(column_number)+sep+"Protocol REF"] = p
+            column_number += 1
+
+    return protocol_dict
 
 
