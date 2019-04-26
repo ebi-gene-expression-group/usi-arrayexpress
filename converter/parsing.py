@@ -216,7 +216,7 @@ def parse_sdrf(sdrf_file):
                 # Keep reference to sample in that row
                 extract_attributes["sample_ref"] = sample_name
 
-                extract_attributes["protocol_ref"] = [row[i] for i in node_range[2]]
+                extract_attributes["protocol_ref"] = [row[i] for i in node_range[2] if row[i]]
                 extracts[extract_name] = extract_attributes
 
         # Labeled Extract
@@ -243,7 +243,7 @@ def parse_sdrf(sdrf_file):
                 # Keep reference to sample in that row
                 le_attributes["extract_ref"].append(extract_name)
 
-                le_attributes["protocol_ref"] = [row[i] for i in node_range[2]]
+                le_attributes["protocol_ref"] = [row[i] for i in node_range[2] if row[i]]
                 le[le_name] = le_attributes
 
         # Assay
@@ -269,7 +269,7 @@ def parse_sdrf(sdrf_file):
                     elif get_name(header[i]) == "arraydesignref":
                         assay_attributes["array_design"] = row[i]
                 assay_attributes["comments"] = get_comment_values(row, header, node_range[0], node_range[1])
-                assay_attributes["protocol_ref"] = [row[i] for i in node_range[2]]
+                assay_attributes["protocol_ref"] = [row[i] for i in node_range[2] if row[i]]
                 assays[assay_name] = assay_attributes
 
                 if le_name:
@@ -354,7 +354,7 @@ def parse_data_file_columns(data_nodes, header_dict, header, node_map, row, data
                     data_dict[file_name]["assay_ref"].append(assay_name)
                     data_dict[file_name]["extract_ref"].append(extract_name)
                     data_dict[file_name]["sample_ref"].append(sample_name)
-                    data_dict[file_name]["protocol_ref"].extend([row[i] for i in node_range[2]])
+                    data_dict[file_name]["protocol_ref"].extend([row[i] for i in node_range[2] if row[i]])
                     if le_name:
                         data_dict[file_name]["le_ref"].append(le_name)
 
