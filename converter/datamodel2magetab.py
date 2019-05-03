@@ -237,3 +237,28 @@ def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
     return protocol_dict
 
 
+def column_name_to_magetab(header, sep="~~~"):
+    """Transform unique column header back to MAGE-TAB style.
+    Column headers are expected to be separated by sep. """
+    header_list = header.split(sep)
+    return header_list[-1]
+
+
+def write_sdrf_file(pandas_table, new_file_name, logger):
+    """Write out SDRF tab-delimited text file from merged pandas table
+
+    :param pandas_table: pandas data frame containing unique column headers for each SDRF column
+    :param new_file_name: file path to write SDRF
+    :param logger: log for errors
+    :return: None
+
+    """
+    logger.debug("Renaming unique column headers back to MAGE-TAB format.")
+    pandas_table.rename(column_name_to_magetab, axis="columns", inplace=True)
+
+    logger.debug("Writing new SDRF {}.".format(new_file_name))
+    try:
+        pandas_table.to_csv(new_file_name, sep='\t', encoding='utf-8', index=False)
+    except Exception as e:
+        logger.error("Failed to write SDRF: {}".format(str(e)))
+

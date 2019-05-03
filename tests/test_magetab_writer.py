@@ -38,14 +38,15 @@ sub = data_objects_from_magetab(idf_file, sdrf_file_path, sub_type)
 
 #utils.converter_utils.dict_to_vertcial_table(idf, idf_file + "_new.txt")
 
+
+# Output is a pandas dataframe
 raw_out = datamodel2magetab.generate_sdrf(sub)
 
 
 #utils.converter_utils.tuple_list_to_table(raw_out, sdrf_file_path + "_new.txt")
 
-raw_out.rename(column_name_to_magetab, axis="columns", inplace=True)
-
-raw_out.to_csv(sdrf_file_path + "_new.txt", sep='\t', encoding='utf-8', index=False)
+# Rename the columns to the new header list, created by applying a function to "de-uniquify" the header fields
+datamodel2magetab.write_sdrf_file(raw_out, sdrf_file_path + "_new.txt", logger)
 
 
 
