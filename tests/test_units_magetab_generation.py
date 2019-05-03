@@ -1,6 +1,6 @@
 import unittest
-from converter.datamodel2magetab import get_protocol_positions, sort_protocol_refs_to_dict
-from converter.datamodel import Protocol, Attribute
+from converter.datamodel2magetab import get_protocol_positions, sort_protocol_refs_to_dict, flatten_sample_attribute
+from converter.datamodel import Protocol, Attribute, Unit
 
 
 class TestReadingProtocolPositions(unittest.TestCase):
@@ -64,3 +64,43 @@ class TestTransformingProtocolRefs(unittest.TestCase):
                                      3: {'31~~~Protocol REF': 'Protocol 8'},
                                      5: {'51~~~Protocol REF': 'Protocol 9'},
                                      6: {'61~~~Protocol REF': 'Protocol 10'}})
+
+
+class TestFlatteningAttributesToList(unittest.TestCase):
+
+    def setUp(self):
+        self.test_age_category = "age"
+        self.test_age_attribute = Attribute("24", Unit("year", "time unit", None, None), None, None)
+        self.test_dose_category = "dose"
+        self.test_dose_attribute = Attribute("50", Unit("micromolar", "concentration unit", "EFO_000123", "EFO"), None,
+                                             None)
+        self.test_organism_category = "organism"
+        self.test_organism_attribute = Attribute("Homo sapiens", None, "NCBITaxon_9606", "NCBITAXON")
+        self.test_sex_category = "sex"
+        self.test_sex_attribute = Attribute("female", None, None, None)
+
+    def test_flatten_attribute_with_unit(self):
+        result = flatten_sample_attribute(self.test_age_category, self.test_age_attribute, "Characteristics")
+        assert(result == [("Characteristics[age]", "24"),
+                          ("age~~~Unit[time unit]", "year")])
+
+    def test_flatten_factor(self):
+        result = flatten_sample_attribute(self.test_dose_category, self.test_dose_attribute, "Factor Value")
+        assert(result == [("Factor Value[dose]", "50"),
+                          ("dose~~~Unit[concentration unit]", "micromolar"),
+                          ("dose-unit~~~Term Source REF", "EFO"),
+                          ("dose-unit~~~Term Accession Number", "EFO_000123")])
+
+    def test_flatten_attribute_with_terms(self):
+        result = flatten_sample_attribute(self.test_organism_category, self.test_organism_attribute, "Characteristics")
+        assert(result == [("Characteristics[organism]", "Homo sapiens"),
+                          ("organism~~~Term Source REF", "NCBITAXON"),
+                          ("organism~~~Term Accession Number", "NCBITaxon_9606")])
+
+    def test_flatten_simple_attribute(self):
+        result = flatten_sample_attribute(self.test_sex_category, self.test_sex_attribute, "Characteristics")
+        assert(result == [("Characteristics[sex]", "female")])
+
+    def test_empty_object(self):
+        result = flatten_sample_attribute("", Attribute(None, None, None, None), "Characteristics")
+        assert(result == [])

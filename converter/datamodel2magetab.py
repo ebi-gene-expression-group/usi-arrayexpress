@@ -129,7 +129,6 @@ def generate_sdrf(sub):
 
                     # Factor values
                     factors = sub.study.experimental_factor
-
                     factor_values = []
                     # Look up factor in sample attributes and turn into ordered dict with unit/term columns
                     for f in factors:
