@@ -81,7 +81,7 @@ def generate_sdrf(sub):
             ]
             # Expand sample attributes to characteristics columns (they can be different between different samples)
             for category, sample_attrib in sample.attributes.items():
-                sample_values.extend(flatten_sample_attribute(category, sample_attrib, make_unique=True))
+                sample_values.extend(flatten_sample_attribute(category, sample_attrib, "Characteristics"))
 
             if sample.description:
                 sample_values.append(("Description", sample.description))
@@ -127,6 +127,14 @@ def generate_sdrf(sub):
                         elif ad.data_type == "raw matrix":
                             data_values.append(("Array Data Matrix File", f.name))
 
+                    # Factor values
+                    factors = sub.study.experimental_factor
+
+                    factor_values = []
+                    # Look up factor in sample attributes and turn into ordered dict with unit/term columns
+                    for f in factors:
+                        factor_values.extend(flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value"))
+
                     # Reformat protocol REFs for edges between nodes
                     protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
 
@@ -135,7 +143,9 @@ def generate_sdrf(sub):
                                  OrderedDict(extract_values), protocol_refs[2],
                                  OrderedDict(le_values), protocol_refs[3],
                                  OrderedDict(assay_values), protocol_refs[5],
-                                 OrderedDict(data_values)])
+                                 OrderedDict(data_values),
+                                 OrderedDict(factor_values)
+                                 ])
 
     data_frames = []
     for i in range(len(rows[0])):
@@ -146,7 +156,7 @@ def generate_sdrf(sub):
     return raw_sdrf
 
 
-def flatten_unit(category, unit_object, make_unique=False, sep="~~~"):
+def flatten_unit(category, unit_object, make_unique=True, sep="~~~"):
     flat_list = []
     if unit_object.value and unit_object.unit_type:
         if make_unique:
@@ -167,10 +177,10 @@ def flatten_unit(category, unit_object, make_unique=False, sep="~~~"):
     return flat_list
 
 
-def flatten_sample_attribute(category, attrib_object, make_unique=False, sep="~~~"):
+def flatten_sample_attribute(category, attrib_object, column_header, make_unique=True, sep="~~~"):
     flat_list = []
     if attrib_object.value:
-        header = "Characteristics[{}]".format(category)
+        header = "{}[{}]".format(column_header, category)
         flat_list.append((header, attrib_object.value))
         if attrib_object.term_source:
             if make_unique:
@@ -206,6 +216,7 @@ def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
     Convert protocol references to a dictionary style to be transformed to columns
     :param protocol_positions: dictionary with the position as key and list of protocol types as value
     :param all_protocols: list of protocol objects
+    :param sep: separator used to make dict keys (later column names unique)
 
     :return: nested dictionary
     {1: {11~~~Protocol REF: Protocol 1}, {12~~~Protocol REF: Protocol 2}
