@@ -1,13 +1,8 @@
 """Module to convert metadata in the submission data model to MAGE-TAB files."""
 
-from collections import OrderedDict, defaultdict
-from utils import converter_utils
-import codecs
-import csv
 import pandas as pd
-import itertools
-import unittest
 
+from collections import OrderedDict, defaultdict
 
 from utils.converter_utils import get_controlled_vocabulary
 
@@ -164,8 +159,8 @@ def generate_sdrf(sub):
                                  OrderedDict(factor_values)
                                  ])
 
-    # This goes through the collection of ordered dictionaries and transforms them into pandas data frames
-    # while merging the nodes/attributes for different samples, e.g. all extract attributes from different samples
+    # This goes through the collection of ordered dictionaries and transforms them into pandas data frames,
+    # while merging the nodes/attributes for different samples, e.g. all extract attributes from all samples together
     data_frames = []
     for i in range(len(rows[0])):
         data_frames.append(pd.DataFrame.from_records([row[i] for row in rows]))
@@ -178,6 +173,16 @@ def generate_sdrf(sub):
 
 
 def flatten_unit(category, unit_object, make_unique=True, sep="~~~"):
+    """
+    Transform a unit object with type and references to ontology terms into a list of key/value tuples
+    with defined order (as in the SDRF).
+
+    :param category: string, the type of attribute the unit belongs to, e.g. "age"
+    :param unit_object: Unit object, the object holiding the unit's attributes
+    :param make_unique: boolean, append name of category to make the key unique
+    :param sep: string, separator between category name and SDRF header in unique header values
+    :return: list of tuples
+    """
     flat_list = []
     if unit_object.value and unit_object.unit_type:
         if make_unique:
@@ -199,6 +204,18 @@ def flatten_unit(category, unit_object, make_unique=True, sep="~~~"):
 
 
 def flatten_sample_attribute(category, attrib_object, column_header, make_unique=True, sep="~~~"):
+    """
+    Transform the attribute and unit objects with references to ontology terms
+    into a list of key/value tuples with defined order (as in the SDRF).
+    Works for Characteristics and Factor value types (this can be specified with "column header".
+
+    :param category: string, the type of sample attribute
+    :param attrib_object: Attribute object, the object holding the category's attributes
+    :param column_header: string, Field name, either "Characteristics" or "Factor Value"
+    :param make_unique: boolean, append name of category to make the key unique
+    :param sep: string, separator between category name and SDRF header in unique header values
+    :return: list of tuples
+    """
     flat_list = []
     if attrib_object.value:
         header = "{}[{}]".format(column_header, category)
