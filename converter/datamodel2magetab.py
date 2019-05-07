@@ -164,12 +164,16 @@ def generate_sdrf(sub):
                                  OrderedDict(factor_values)
                                  ])
 
+    # This goes through the collection of ordered dictionaries and transforms them into pandas data frames
+    # while merging the nodes/attributes for different samples, e.g. all extract attributes from different samples
     data_frames = []
     for i in range(len(rows[0])):
         data_frames.append(pd.DataFrame.from_records([row[i] for row in rows]))
 
+    # Pandas concat merges the dictionaries for the different SDRF parts (nodes) together into one big table
     raw_sdrf = pd.concat(data_frames, axis=1)
 
+    # Raw output still has "uniquified" column headers
     return raw_sdrf
 
 
@@ -235,7 +239,7 @@ def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
     :param all_protocols: list of protocol objects
     :param sep: separator used to make dict keys (later column names unique)
 
-    :return: nested dictionary
+    :return: nested dictionary, with dict default value
     {1: {11~~~Protocol REF: Protocol 1}, {12~~~Protocol REF: Protocol 2}
      2: {21~~~Protocol REF: Protocol 3},
      3: {31~~~Protocol REF: Protocol 4}}
