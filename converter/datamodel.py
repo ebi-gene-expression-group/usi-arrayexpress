@@ -449,6 +449,13 @@ class AssayData:
 
 class Analysis:
     def __init__(self, alias, files, data_type, assaydatarefs, protocolrefs):
+        """
+        :param alias: string, unique name in the experiment (auto-generated from processed file name in SDRF)
+        :param files: list, DataFile class objects
+        :param data_type: string, processed or processed matrix
+        :param assaydatarefs: list, assay data name/accessions
+        :param protocolrefs: list, protocol name/accessions used to generate data file
+        """
         self.alias = alias
         self.files = files
         self.data_type = data_type
