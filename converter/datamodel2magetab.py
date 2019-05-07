@@ -127,6 +127,23 @@ def generate_sdrf(sub):
                         elif ad.data_type == "raw matrix":
                             data_values.append(("Array Data Matrix File", f.name))
 
+                    # Processed data
+                    # Get all analysis objects that belong to this assay data object
+                    processed_data = [px for px in sub.analysis if assay.alias in px.assaydatarefs]
+
+                    # Collect file names and turn into tuple list
+                    processed_data_values = []
+                    for px in processed_data:
+                        for f in px.files:
+                            if px.data_type == "processed":
+                                processed_data_values.append(("Derived Array Data File", f.name))
+                            elif px.data_type == "processed matrix":
+                                processed_data_values.append(("Derived Array Data Matrix File", f.name))
+                            if f.ftp_location:
+                                processed_data_values.append(("Comment[Derived ArrayExpress FTP file]", f.ftp_location))
+                        # Also add protocol references for how the processed data was generated from assay data
+                        all_protocols.extend([sub.get_protocol(pref) for pref in px.protocolrefs])
+
                     # Factor values
                     factors = sub.study.experimental_factor
                     factor_values = []
@@ -142,7 +159,8 @@ def generate_sdrf(sub):
                                  OrderedDict(extract_values), protocol_refs[2],
                                  OrderedDict(le_values), protocol_refs[3],
                                  OrderedDict(assay_values), protocol_refs[5],
-                                 OrderedDict(data_values),
+                                 OrderedDict(data_values), protocol_refs[6],
+                                 OrderedDict(processed_data_values),
                                  OrderedDict(factor_values)
                                  ])
 
