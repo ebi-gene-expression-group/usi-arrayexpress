@@ -1,10 +1,8 @@
 import codecs
-import csv
 import json
 import os
 import re
 import pkg_resources
-import sys
 
 from collections import OrderedDict, defaultdict
 
@@ -180,7 +178,6 @@ def get_sdrf_path(idf_file_path, logger, data_dir=DEFAULT_DATA_DIRECTORY):
         for line in f:
             if re.search(SDRF_FILE_NAME_REGEX, line):
                 sdrf_file_name = line.split('\t')[1].strip()
-                print(sdrf_file_name)
                 if os.path.exists(current_dir + data_dir):
                     sdrf_file_path = os.path.join(current_dir, data_dir, sdrf_file_name)
                 else:
@@ -309,5 +306,3 @@ def read_idf_file(idf_file):
                         # Store values in idf_dict
                         idf_dict[row_label] = idf_row
     return idf_dict
-
-
