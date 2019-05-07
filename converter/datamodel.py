@@ -1,6 +1,7 @@
 
 import os
 import re
+from collections import OrderedDict
 
 from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, get_taxon
 
@@ -43,7 +44,7 @@ class Sample:
         raw_attributes = characteristics.copy()
         raw_attributes.update(factors)
 
-        attributes = {}
+        attributes = OrderedDict()
         for c_name, c_attrib in raw_attributes.items():
             new_unit = None
             if "unit" in c_attrib:
