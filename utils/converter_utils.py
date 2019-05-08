@@ -1,4 +1,5 @@
 import codecs
+import csv
 import json
 import os
 import re
@@ -306,3 +307,17 @@ def read_idf_file(idf_file):
                         # Store values in idf_dict
                         idf_dict[row_label] = idf_row
     return idf_dict
+
+
+def dict_to_vertcial_table(input_dict, filename, sep='\t'):
+    """Take a dictionary (can be ordered) and print the contents in a vertical table:
+     The keys are in the first column, with the values in the rest of the row."""
+
+    with codecs.open(filename, 'w', encoding='utf-8') as out:
+        writer = csv.writer(out, delimiter=sep, lineterminator='\n')
+        for key, value in input_dict.items():
+            if isinstance(value, list):
+                print(key, value)
+                writer.writerow([key] + value)
+            else:
+                writer.writerow([key, value])

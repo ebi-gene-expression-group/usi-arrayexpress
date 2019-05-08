@@ -8,6 +8,8 @@ from utils.converter_utils import get_controlled_vocabulary
 
 
 def generate_idf(sub):
+    """Transform study/project/protocol metadata in data model to an IDF vertical table."""
+
     idf = OrderedDict([
         ("MAGE-TAB Version", "1.1"),
         ("Investigation Title", sub.study.title),
@@ -47,7 +49,7 @@ def generate_idf(sub):
         ("SDRF File", sub.info.get("accession") + ".sdrf.txt"),
         ("Term Source Name", ["EFO", "ArrayExpress"]),
         ("Term Source File", ["https://www.ebi.ac.uk/efo/", "https://www.ebi.ac.uk/arrayexpress/"]),
-        ("Comment[AEExperimentType", [exptype for exptype in sub.study.experiment_type]),
+        ("Comment[AEExperimentType]", [exptype for exptype in sub.study.experiment_type]),
         ("Comment[ArrayExpressAccession]", sub.info.get("accession"))
     ])
 
@@ -59,7 +61,7 @@ def generate_idf(sub):
 
 
 def generate_sdrf(sub):
-    """Transform metadata in data model to an SDRF table."""
+    """Transform sample and file metadata in data model to an SDRF table."""
 
     submission_type = sub.info.get("submission_type")
     protocol_positions = get_protocol_positions(submission_type)
@@ -69,7 +71,14 @@ def generate_sdrf(sub):
     # because each node block can have different attributes for each sample. Therefore all data points
     # are collected separately per node block and then merged at the end into one SDRF table.
     for sample in sub.sample:
-        sample_values = build_sample_node(sample)
+        sample_values = [("Source Name", sample.alias)]
+        # Expand sample attributes to characteristics columns (they can be different between different samples)
+        for category, sample_attrib in sample.attributes.items():
+            sample_values.extend(flatten_sample_attribute(category, sample_attrib, "Characteristics"))
+        if sample.description:
+            sample_values.append(("Description", sample.description))
+        if sample.material_type:
+            sample_values.append(("Material Type", sample.material_type))
 
         # Get all assay objects that belong to this sample
         assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
@@ -111,10 +120,28 @@ def generate_sdrf(sub):
                 all_protocols.extend([sub.get_protocol(pref) for pref in ad.protocolrefs])
 
                 # Processed data
-                processed_data_values = build_processed_data_node(all_protocols, assay, sub)
+                # Get all analysis objects that belong to this assay data object
+                processed_data = [px for px in sub.analysis if assay.alias in px.assaydatarefs]
+                # Collect file names and turn into tuple list
+                processed_data_values = []
+                for px in processed_data:
+                    for f in px.files:
+                        if px.data_type == "processed":
+                            processed_data_values.append(("Derived Array Data File", f.name))
+                        elif px.data_type == "processed matrix":
+                            processed_data_values.append(("Derived Array Data Matrix File", f.name))
+                        if f.ftp_location:
+                            processed_data_values.append(("Comment[Derived ArrayExpress FTP file]", f.ftp_location))
+                    # Also add protocol references for how the processed data was generated from assay data
+                    all_protocols.extend([sub.get_protocol(pref) for pref in px.protocolrefs])
 
                 # Factor values
-                factor_values = build_factor_node(sample, sub)
+                factors = sub.study.experimental_factor
+                factor_values = []
+                # Look up factor in sample attributes and turn into ordered dict with unit/term columns
+                for f in factors:
+                    factor_values.extend(
+                        flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value"))
 
                 # Reformat protocol REFs for edges between nodes
                 protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
@@ -157,45 +184,6 @@ def generate_sdrf(sub):
 
     # Raw output still has "uniquified" column headers
     return raw_sdrf
-
-
-def build_factor_node(sample, sub):
-    factors = sub.study.experimental_factor
-    factor_values = []
-    # Look up factor in sample attributes and turn into ordered dict with unit/term columns
-    for f in factors:
-        factor_values.extend(flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value"))
-    return factor_values
-
-
-def build_sample_node(sample):
-    sample_values = [("Source Name", sample.alias)]
-    # Expand sample attributes to characteristics columns (they can be different between different samples)
-    for category, sample_attrib in sample.attributes.items():
-        sample_values.extend(flatten_sample_attribute(category, sample_attrib, "Characteristics"))
-    if sample.description:
-        sample_values.append(("Description", sample.description))
-    if sample.material_type:
-        sample_values.append(("Material Type", sample.material_type))
-    return sample_values
-
-
-def build_processed_data_node(all_protocols, assay, sub):
-    # Get all analysis objects that belong to this assay data object
-    processed_data = [px for px in sub.analysis if assay.alias in px.assaydatarefs]
-    # Collect file names and turn into tuple list
-    processed_data_values = []
-    for px in processed_data:
-        for f in px.files:
-            if px.data_type == "processed":
-                processed_data_values.append(("Derived Array Data File", f.name))
-            elif px.data_type == "processed matrix":
-                processed_data_values.append(("Derived Array Data Matrix File", f.name))
-            if f.ftp_location:
-                processed_data_values.append(("Comment[Derived ArrayExpress FTP file]", f.ftp_location))
-        # Also add protocol references for how the processed data was generated from assay data
-        all_protocols.extend([sub.get_protocol(pref) for pref in px.protocolrefs])
-    return processed_data_values
 
 
 def flatten_unit(category, unit_object, make_unique=True, sep="~~~"):
