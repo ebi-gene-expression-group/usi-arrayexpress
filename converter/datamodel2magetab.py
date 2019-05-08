@@ -107,14 +107,6 @@ def generate_sdrf(sub):
 
                 all_protocols.extend([sub.get_protocol(pref) for pref in ad.protocolrefs])
 
-                # Get all data files
-                data_values = []
-                for f in ad.files:
-                    if ad.data_type == "raw":
-                        data_values.append(("Array Data File", f.name))
-                    elif ad.data_type == "raw matrix":
-                        data_values.append(("Array Data Matrix File", f.name))
-
                 # Processed data
                 processed_data_values = build_processed_data_node(all_protocols, assay, sub)
 
@@ -124,22 +116,32 @@ def generate_sdrf(sub):
                 # Reformat protocol REFs for edges between nodes
                 protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
 
-                # Add all lists together and transform to dictionary so that we can use pandas to write to table
-                if submission_type == "microarray":
-                    rows.append([OrderedDict(sample_values), protocol_refs[1],
-                                 OrderedDict(extract_values), protocol_refs[2],
-                                 OrderedDict(le_values), protocol_refs[3],
-                                 OrderedDict(assay_values), protocol_refs[5],
-                                 OrderedDict(data_values), protocol_refs[6],
-                                 OrderedDict(processed_data_values),
-                                 OrderedDict(factor_values)])
-                else:
-                    rows.append([OrderedDict(sample_values), protocol_refs[1],
-                                 OrderedDict(extract_values), protocol_refs[4],
-                                 OrderedDict(assay_values), protocol_refs[5],
-                                 OrderedDict(data_values), protocol_refs[6],
-                                 OrderedDict(processed_data_values),
-                                 OrderedDict(factor_values)])
+                # Get all data files
+                data_values = []
+                for f in ad.files:
+                    if ad.data_type == "raw":
+                        data_values.append(("Array Data File", f.name))
+                    elif ad.data_type == "raw matrix":
+                        data_values.append(("Array Data Matrix File", f.name))
+
+                    # Add all lists together to form the complete row of the SDRF. We do this
+                    # at the level of raw data files, which means each raw data file gets a row.
+                    # All lists are transformed to dictionaries so that we can use pandas to write a table.
+                    if submission_type == "microarray":
+                        rows.append([OrderedDict(sample_values), protocol_refs[1],
+                                     OrderedDict(extract_values), protocol_refs[2],
+                                     OrderedDict(le_values), protocol_refs[3],
+                                     OrderedDict(assay_values), protocol_refs[5],
+                                     OrderedDict(data_values), protocol_refs[6],
+                                     OrderedDict(processed_data_values),
+                                     OrderedDict(factor_values)])
+                    else:  # submission type is sequencing or singlecell
+                        rows.append([OrderedDict(sample_values), protocol_refs[1],
+                                     OrderedDict(extract_values), protocol_refs[4],
+                                     OrderedDict(assay_values), protocol_refs[5],
+                                     OrderedDict(data_values), protocol_refs[6],
+                                     OrderedDict(processed_data_values),
+                                     OrderedDict(factor_values)])
 
     # This goes through the collection of ordered dictionaries and transforms them into pandas data frames,
     # while merging the nodes/attributes for different samples, e.g. all extract attributes from all samples together
