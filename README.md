@@ -17,6 +17,11 @@ This will read in the IDF file and the SDRF file that is specified in the IDF. I
  The output JSON files are created in a sub-folder, in the location of the IDF file. The JSON structure is based on the [USI JSON schemas](https://github.com/EMBL-EBI-SUBS/validation-schemas) modified to accommodate ArrayExpress specific metadata fields. 
  
  
+ ### MAGE-TAB writer
+ 
+ The datamodel2magetab converter module can take data stored in the common data model and write it out as MAGE-TAB files. Study, project and protocols metadata get combined in the IDF table, while sample, assay and file metadata are combined in the SDRF table. The test script `run_magetab_writer.py` takes MAGE-TAB files as input, converts the data to the data model and outputs new IDF/SDRF files. 
+ 
+ 
  ## JSON schemas
  
  Prototypes for the JSON schemas describing the metadata required for ArrayExpress submissions. 
@@ -28,4 +33,4 @@ This will read in the IDF file and the SDRF file that is specified in the IDF. I
  The types of checks are roughly based on the checks in the [MAGE-TAB checker](https://github.com/arrayexpress/magetabcheck) used by [Annotare](https://github.com/arrayexpress/annotare2), with a few additions so far. <br>
  A pre-validation module is used to check IDF and SDRF files before reading them into the datamodel. These checks include validation of MAGE-TAB fields.<br>
  The validation can be run on a given set of MAGE-TAB files using the magetab_validation.py script, e.g. `python magetab_validation.py tests/test_data/E-MTAB-4250.idf.txt`
- 
+  
