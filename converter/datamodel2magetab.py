@@ -84,9 +84,12 @@ def generate_sdrf(sub):
                 le_values = [
                     ("Labelled Extract Name", assay.alias),
                     ("Label", assay.label)]
-            else:
+
             # submission type is sequencing or singlecell, get assay attributes and convert them to comments
-                pass
+            else:
+                assay_attributes = assay.get_attributes()
+                for aa in assay_attributes:
+                    extract_values.append(("Comment[{}]".format(aa.upper()), getattr(assay, aa)))
 
             # Get all assay data objects that belong to this assay
             data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]

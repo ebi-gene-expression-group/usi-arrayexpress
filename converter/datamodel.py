@@ -86,11 +86,8 @@ class Assay:
         """Return a list of all additional attributes that have values"""
         all_attributes = self.__dict__.keys()
         all_values = self.__dict__
-        fixed_attributes = ("alias", "accession", "protocolrefs", "sampleref")
-        other_attributes = list()
-        for a in all_attributes:
-            if a not in fixed_attributes and all_values[a]:
-                other_attributes.append(a)
+        fixed_attributes = ("alias", "accession", "technology_type", "protocolrefs", "sampleref")
+        other_attributes = [a for a in all_attributes if a not in fixed_attributes and all_values[a]]
         return other_attributes
 
 
