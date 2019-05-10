@@ -1,13 +1,15 @@
 import codecs
 import csv
 import json
+import logging
 import os
-import re
 import pkg_resources
+import re
 
 from collections import OrderedDict, defaultdict
 
 from utils.eutils import esearch
+
 
 USI_JSON_DIRECTORY = "usijson"
 SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
@@ -97,7 +99,7 @@ def is_accession(accession, archive=None):
 organism_lookup = {}
 
 
-def get_taxon(organism):
+def get_taxon(organism, logger=logging.getLogger()):
     """Return the NCBI taxonomy ID for a given species name."""
 
     if organism and organism not in organism_lookup:
@@ -105,15 +107,15 @@ def get_taxon(organism):
         # sample' taxon_id (c.f. https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1427524)
         if re.search(r" and | \+ ", organism):
             return 1427524
-        print("Looking up species in NCBI taxonomy. Please wait...")
+        logger.info("Looking up species in NCBI taxonomy. Please wait...")
         db = 'taxonomy'
         a = esearch(db=db, term=organism)
         try:
             taxon_id = int(a['esearchresult']['idlist'][0])
             organism_lookup[organism] = taxon_id
             return taxon_id
-        except:
-            print("Failed to retrieve organism data from ENA taxonomy service for: " + organism)
+        except Exception as e:
+            logger.error("Failed to retrieve organism data from ENA taxonomy service for {} due to {}".format(organism, str(e)))
     else:
         return organism_lookup.get(organism)
 
@@ -161,7 +163,7 @@ def attrib2dict(ob):
     return attrib_dict
 
 
-def get_sdrf_path(idf_file_path, logger, data_dir=DEFAULT_DATA_DIRECTORY):
+def get_sdrf_path(idf_file_path, logger, data_dir):
     """Read IDF and get the SDRF file name, look for the SDRF in the data directory (i.e. "unpacked")
     or in the same directory as the IDF.
 
@@ -173,14 +175,17 @@ def get_sdrf_path(idf_file_path, logger, data_dir=DEFAULT_DATA_DIRECTORY):
 
     current_dir = os.path.dirname(idf_file_path)
     sdrf_file_path = ""
+    if not data_dir:
+        data_dir = DEFAULT_DATA_DIRECTORY
     # Figure out the name and location of sdrf files
     with codecs.open(idf_file_path, 'rU', encoding='utf-8') as f:
         # U flag makes it portable across in unix and windows (\n and \r\n are treated the same)
         for line in f:
             if re.search(SDRF_FILE_NAME_REGEX, line):
                 sdrf_file_name = line.split('\t')[1].strip()
-                if os.path.exists(current_dir + data_dir):
-                    sdrf_file_path = os.path.join(current_dir, data_dir, sdrf_file_name)
+                data_path = os.path.join(current_dir, data_dir)
+                if os.path.exists(data_path):
+                    sdrf_file_path = os.path.join(data_path, sdrf_file_name)
                 else:
                     sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
     logger.debug("Generated SDRF file path: {}".format(sdrf_file_path))
