@@ -53,7 +53,7 @@ def generate_idf(sub):
         ("Comment[ArrayExpressAccession]", sub.info.get("accession"))
     ])
 
-    if sub.info.get("submission_type") == "sequencing" or sub.info.submission_type == "singlecell":
+    if sub.info.get("submission_type") == "sequencing" or sub.info.get("submission_type") == "singlecell":
         pass
         # TODO: Add comments for ENA accessions Comment[SecondaryAccession] and Comment[SequenceDataURI]
 
@@ -309,7 +309,7 @@ def write_sdrf_file(pandas_table, new_file_name, logger):
     logger.debug("Renaming unique column headers back to MAGE-TAB format.")
     pandas_table.rename(column_name_to_magetab, axis="columns", inplace=True)
 
-    logger.debug("Writing new SDRF {}.".format(new_file_name))
+    logger.debug("Writing new SDRF {}".format(new_file_name))
     try:
         pandas_table.to_csv(new_file_name, sep='\t', encoding='utf-8', index=False)
     except Exception as e:

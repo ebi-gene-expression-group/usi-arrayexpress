@@ -309,15 +309,18 @@ def read_idf_file(idf_file):
     return idf_dict
 
 
-def dict_to_vertcial_table(input_dict, filename, sep='\t'):
+def dict_to_vertcial_table(input_dict, filename, logger, sep='\t'):
     """Take a dictionary (can be ordered) and print the contents in a vertical table:
      The keys are in the first column, with the values in the rest of the row."""
 
-    with codecs.open(filename, 'w', encoding='utf-8') as out:
-        writer = csv.writer(out, delimiter=sep, lineterminator='\n')
-        for key, value in input_dict.items():
-            if isinstance(value, list):
-                print(key, value)
-                writer.writerow([key] + value)
-            else:
-                writer.writerow([key, value])
+    logger.debug("Writing new file: {}".format(filename))
+    try:
+        with codecs.open(filename, 'w', encoding='utf-8') as out:
+            writer = csv.writer(out, delimiter=sep, lineterminator='\n')
+            for key, value in input_dict.items():
+                if isinstance(value, list):
+                    writer.writerow([key] + value)
+                else:
+                    writer.writerow([key, value])
+    except Exception as e:
+        logger.error("Failed to write csv file: {}".format(str(e)))
