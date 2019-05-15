@@ -26,18 +26,21 @@ def parse_args():
                         help="Option to output detailed logging (debug level).")
     args = parser.parse_args()
 
-    return args.idf, args.data_dir, args.verbose
+    return args
 
 
 def main():
     process_name = "magetab_validation"
 
-    idf_file, data_dir, detail = parse_args()
+    args = parse_args()
+    idf_file, data_dir, logging_level = args.idf, args.data_dir, args.verbose
+
+    # Exit if IDF file doesn't exist
     file_exists(idf_file)
 
     # Create logger
     current_dir, idf_file_name = os.path.split(idf_file)
-    logger = create_logger(current_dir, process_name, idf_file_name, logger_name="Validation", log_level=detail)
+    logger = create_logger(current_dir, process_name, idf_file_name, logger_name="Validation", log_level=logging_level)
 
     # Get path to SDRF file
     sdrf_file_path = get_sdrf_path(idf_file, logger, data_dir)
@@ -51,7 +54,7 @@ def main():
     logger.info("Found experiment type: {}".format(submission_type))
 
     # Logger for prevalidation (create new to show different styling)
-    mtab_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="MAGE-TAB", log_level=detail)
+    mtab_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="MAGE-TAB", log_level=logging_level)
 
     # Perform prevalidation checks on MAGE-TAB format
     pre.idf_prevalidation(idf_dict, mtab_logger)
@@ -64,7 +67,7 @@ def main():
     error_codes = []
 
     # Logger for metadata validation output
-    metadata_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="Metadata", log_level=detail)
+    metadata_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="Metadata", log_level=logging_level)
 
     # Validate metadata in common data model
     error_codes.extend(mv.run_project_checks(sub, metadata_logger))

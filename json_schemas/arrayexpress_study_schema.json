@@ -12,6 +12,7 @@
       "description",
       "protocolRefs"
     ],
+    "additionalProperties": false,
     "properties": {
         "alias": {
             "description": "A unique identifier of the study",
@@ -20,7 +21,9 @@
         },
         "title": {
             "description": "Title of the study",
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
         },
         "description": {
             "description": "More extensive free-form description. Should describe the biological relevance and intent of the experiment, and include an experimental workflow.",
@@ -29,7 +32,7 @@
         },
         "studyType": {
             "type": "string",
-            "enum": [ "Sequencing", "FunctionalGenomics", "Metabolomics", "Proteomics" ]
+            "enum": ["FunctionalGenomics"]
         },
         "projectRef": {
             "description": "Reference to project",
@@ -44,22 +47,25 @@
             "description": "Attributes for describing a study",
             "type": "object",
             "required": [
-              "comment[aeexperimenttype]",
-              "experimental factor"
+              "experiment_type",
+              "experimental_factor"
             ],
+            "additionalProperties": false,
             "properties": {
-              "comment[aeexperimenttype]": {
-                "Description": "ArrayExpress experiment type, must be from EFO",
+              "experiment_type": {
+                "description": "ArrayExpress experiment type, must be from EFO"
               },
-              "experimental design": {
-                "Description": "The scientific design of the study, must be from EFO"
+              "experimental_design": {
+                "description": "The scientific design of the study, must be from EFO"
               },
-              "experimental factor": {
-                "Description": "The attributes in the study that describe the experimental groups",
+              "experimental_factor": {
+                "description": "The attributes in the study that describe the experimental groups"
               },
-              "date of experiment": {
-                "Description": "The date the experiment was performed",
-                "maxItems": 1
+              "date_of_experiment": {
+                "description": "The date the experiment was performed. Must be in DD-MM-YYYY format.",
+                "type": "string",
+                "format": "date",
+                "pattern": "([12][0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]))"
               }
             },
             "patternProperties": {
