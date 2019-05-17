@@ -2,8 +2,6 @@ sudo: required
 language: python
 python: 3.6
 
-env:
-  - dbConnection='postgresql://scxa:postgresPass@postgres/scxa-test'
 
 install:
   - pip install -f requirements.txt
