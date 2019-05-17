@@ -8,7 +8,7 @@ This repository contains modules for transformation of experimental metadata bet
 Python 3.6 interpreter<br>
 Package requirements:git 
 * requests 2.20.1
-* jsonschema 2.6.0
+* jsonschema 2
 
 Add usi-arrayexpress directory to PYTHONPATH environment variable
 
