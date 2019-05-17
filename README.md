@@ -7,7 +7,6 @@ This repository contains modules for transformation of experimental metadata bet
 
 Python 3.6 interpreter<br>
 Package requirements:git 
-* requests 2.20.1
 * jsonschema 2.6.0
 * pandas 0.24.2
 
