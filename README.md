@@ -32,3 +32,6 @@ This will read in the IDF file and the SDRF file that is specified in the IDF. I
  A pre-validation module is used to check IDF and SDRF files before reading them into the datamodel. These checks include validation of MAGE-TAB fields.<br>
  The validation can be run on a given set of MAGE-TAB files using the magetab_validation.py script, e.g. `python magetab_validation.py tests/test_data/E-MTAB-4250.idf.txt`
  
+ 
+ 
+ 
