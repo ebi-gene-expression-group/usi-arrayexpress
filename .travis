@@ -1,0 +1,14 @@
+sudo: required
+language: python
+python: 3.6
+
+env:
+  - dbConnection='postgresql://scxa:postgresPass@postgres/scxa-test'
+
+install:
+  - pip install -f requirements.txt
+
+script:
+  - python tests/run_magetab_writer.py tests/test_data/E-TEST-1.idf.txt
+    # Check that IDFs are identical
+  - diff tests/test_data/E-TEST-1.idf.txt tests/test_data/E-TEST-1.idf.txt_new.txt

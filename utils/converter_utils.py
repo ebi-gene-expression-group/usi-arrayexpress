@@ -163,7 +163,7 @@ def attrib2dict(ob):
     return attrib_dict
 
 
-def get_sdrf_path(idf_file_path, logger, data_dir):
+def get_sdrf_path(idf_file_path, logger, data_dir=None):
     """Read IDF and get the SDRF file name, look for the SDRF in the data directory (i.e. "unpacked")
     or in the same directory as the IDF.
 
@@ -240,7 +240,7 @@ def guess_submission_type(idf_file, sdrf_file, logger):
     submission_type = guess_submission_type_from_sdrf(sdrf_data, header, header_dict)
     if not submission_type:
         submission_type = guess_submission_type_from_idf(idf_dict)
-    logger.info("Found experiment type: {}".format(submission_type))
+    logger.debug("Found experiment type: {}".format(submission_type))
     return submission_type, idf_dict,
 
 
