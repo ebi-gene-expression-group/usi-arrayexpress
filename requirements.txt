@@ -1,0 +1,3 @@
+requests==2.20.1
+jsonschema==2.6.0
+pandas==0.24.2

@@ -1,0 +1,40 @@
+MAGE-TAB Version	1.1
+Investigation Title	A test case for a one-colour microarray experiment with a matrix data file
+Experiment Description	This is just a test experiment
+Experimental Design	case control design
+Experimental Design Term Source REF	EFO
+Experimental Design Term Accession Number	EFO_0001427
+Experimental Factor Name	genotype
+Experimental Factor Type	genotype
+Experimental Factor Term Source REF	EFO
+Experimental Factor Term Accession Number	EFO_0000513
+Person Last Name	R
+Person First Name	Searcher
+Person Mid Initials	E
+Person Email	fake@test.com
+Person Phone	
+Person Fax	
+Person Address	Wellcome Genome Campus
+Person Affiliation	EMBL-EBI
+Person Roles	submitter
+Date of Experiment	2019-05-17
+Public Release Date	2079-12-25
+PubMed ID	12345678
+Publication DOI	
+Publication Author List	A. Tester, D. Eveloper, R.E. Searcher
+Publication Title	A glorious discovery
+Publication Status	in preparation
+Publication Status Term Source REF	EFO
+Publication Status Term Accession Number
+Protocol Name	P-TEST-1	P-TEST-2	P-TEST-3	P-TEST-4	P-TEST-5
+Protocol Type	sample collection protocol	nucleic acid extraction protocol	nucleic acid labeling protocol	nucleic acid hybridization to array protocol	normalization data transformation protocol
+Protocol Term Source REF	EFO	EFO	EFO	EFO	EFO
+Protocol Term Accession Number	EFO_0005518	EFO_0002944	EFO_0003813	EFO_0003815	EFO_0003816
+Protocol Description	collecting	extracting	labelling	hybridising	normalising
+Protocol Hardware					
+Protocol Software					
+SDRF File	E-TEST-1.sdrf.txt
+Term Source Name	EFO	ArrayExpress
+Term Source File	https://www.ebi.ac.uk/efo/	https://www.ebi.ac.uk/arrayexpress/
+Comment[AEExperimentType]	transcription profiling by array
+Comment[ArrayExpressAccession]	E-TEST-1

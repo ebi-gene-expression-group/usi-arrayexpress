@@ -1,4 +1,5 @@
 import codecs
+import csv
 import json
 import logging
 import os
@@ -162,7 +163,7 @@ def attrib2dict(ob):
     return attrib_dict
 
 
-def get_sdrf_path(idf_file_path, logger, data_dir):
+def get_sdrf_path(idf_file_path, logger, data_dir=None):
     """Read IDF and get the SDRF file name, look for the SDRF in the data directory (i.e. "unpacked")
     or in the same directory as the IDF.
 
@@ -239,7 +240,7 @@ def guess_submission_type(idf_file, sdrf_file, logger):
     submission_type = guess_submission_type_from_sdrf(sdrf_data, header, header_dict)
     if not submission_type:
         submission_type = guess_submission_type_from_idf(idf_dict)
-    logger.info("Found experiment type: {}".format(submission_type))
+    logger.debug("Found experiment type: {}".format(submission_type))
     return submission_type, idf_dict,
 
 
@@ -311,3 +312,20 @@ def read_idf_file(idf_file):
                         # Store values in idf_dict
                         idf_dict[row_label] = idf_row
     return idf_dict
+
+
+def dict_to_vertcial_table(input_dict, filename, logger, sep='\t'):
+    """Take a dictionary (can be ordered) and print the contents in a vertical table:
+     The keys are in the first column, with the values in the rest of the row."""
+
+    logger.debug("Writing new file: {}".format(filename))
+    try:
+        with codecs.open(filename, 'w', encoding='utf-8') as out:
+            writer = csv.writer(out, delimiter=sep, lineterminator='\n')
+            for key, value in input_dict.items():
+                if isinstance(value, list):
+                    writer.writerow([key] + value)
+                else:
+                    writer.writerow([key, value])
+    except Exception as e:
+        logger.error("Failed to write csv file: {}".format(str(e)))

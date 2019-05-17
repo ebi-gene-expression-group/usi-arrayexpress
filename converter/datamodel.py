@@ -1,6 +1,7 @@
 
 import os
 import re
+from collections import OrderedDict
 
 from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, get_taxon
 
@@ -43,7 +44,7 @@ class Sample:
         raw_attributes = characteristics.copy()
         raw_attributes.update(factors)
 
-        attributes = {}
+        attributes = OrderedDict()
         for c_name, c_attrib in raw_attributes.items():
             new_unit = None
             if "unit" in c_attrib:
@@ -85,11 +86,8 @@ class Assay:
         """Return a list of all additional attributes that have values"""
         all_attributes = self.__dict__.keys()
         all_values = self.__dict__
-        fixed_attributes = ("alias", "accession", "protocolrefs", "sampleref")
-        other_attributes = list()
-        for a in all_attributes:
-            if a not in fixed_attributes and all_values[a]:
-                other_attributes.append(a)
+        fixed_attributes = ("alias", "accession", "technology_type", "protocolrefs", "sampleref")
+        other_attributes = [a for a in all_attributes if a not in fixed_attributes and all_values[a]]
         return other_attributes
 
 
@@ -226,6 +224,10 @@ class Protocol:
         self.hardware = hardware
         self.software = software
         self.parameters = parameters
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.description}, " \
+               "{self.protocol_type}, {self.hardware}, {self.software}, {self.parameters})".format(self=self)
 
     def get_ae_attributes(self):
         """Return a list of all AE attributes that have values."""
@@ -445,6 +447,13 @@ class AssayData:
 
 class Analysis:
     def __init__(self, alias, files, data_type, assaydatarefs, protocolrefs):
+        """
+        :param alias: string, unique name in the experiment (auto-generated from processed file name in SDRF)
+        :param files: list, DataFile class objects
+        :param data_type: string, processed or processed matrix
+        :param assaydatarefs: list, assay data name/accessions
+        :param protocolrefs: list, protocol name/accessions used to generate data file
+        """
         self.alias = alias
         self.files = files
         self.data_type = data_type
@@ -575,5 +584,27 @@ class Submission:
         self.assay = assay
         self.assay_data = assay_data
         self.analysis = analysis
+
+        # Create indexes so we can return given objects based on alias
+        self.sample_lookup = {s.alias: s for s in self.sample}
+        self.assay_lookup = {a.alias: a for a in self.assay}
+        self.protocol_lookup = {p.alias: p for p in self.protocol}
+        self.data_lookup = {ad.alias: ad for ad in self.assay_data}
+
+    def get_sample(self, sample_alias):
+        """Return the sample object for a given sample alias."""
+        return self.sample_lookup.get(sample_alias)
+
+    def get_assay(self, assay_alias):
+        """Return the assay object for a given assay alias."""
+        return self.assay_lookup.get(assay_alias)
+
+    def get_protocol(self, protocol_alias):
+        """Return the protocol object for a given protocol alias."""
+        return self.protocol_lookup.get(protocol_alias)
+
+    def get_assay_data(self, ad_alias):
+        """Return the assay data object for a given assay data alias."""
+        return self.data_lookup.get(ad_alias)
 
 
