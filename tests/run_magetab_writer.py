@@ -59,11 +59,13 @@ def main():
         new_sdrf_file = sdrf_file_path + "_new.txt"
 
     # Generate IDF dictionary
+    logger.debug("Generating IDF file")
     idf = generate_idf(sub)
     # Write out a new IDF file
     utils.converter_utils.dict_to_vertcial_table(idf, new_idf_file, logger)
 
     # Generate SDRF: Output is a pandas dataframe
+    logger.debug("Generating SDRF file")
     raw_out = generate_sdrf(sub)
 
     # Rename the columns to the new header list, created by applying a function
