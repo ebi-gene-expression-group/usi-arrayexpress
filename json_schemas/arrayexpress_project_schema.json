@@ -20,13 +20,11 @@
     "title": {
       "description": "Title of the project.",
         "type":	"string",
-        "minLength": 25,
         "maxLength": 4000
     },
     "description": {
       "description": "More extensive free-form description.",
         "type":	"string",
-        "minLength": 50,
         "maxLength": 4000
     },
     "releaseDate": {
