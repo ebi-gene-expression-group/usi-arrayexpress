@@ -58,42 +58,6 @@
             "processed matrix"
           ]
         }
-      },
-      "patternProperties": {
-        "^.*$": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "properties": {
-              "value": {
-                "type": "string",
-                "minLength": 1
-              },
-              "units": {
-                "type": "string",
-                "minLength": 1
-              },
-              "terms": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "url": {
-                      "type": "string",
-                      "format": "uri"
-                    }
-                  },
-                  "required": [
-                    "url"
-                  ]
-                }
-              }
-            },
-            "required": [
-              "value"
-            ]
-          }
-        }
       }
     },
     "assayDataRefs": {
@@ -101,6 +65,17 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/submittableRef"
+      }
+    },
+    "protocolUses": {
+      "type": "array",
+      "minLength": 1,
+      "items": {
+          "type": "object",
+          "properties": {
+              "protocolRef": { "$ref": "#/definitions/submittableRef" },
+              "attributes": { "$ref": "#/definitions/attributes" }
+        }
       }
     }
   },
