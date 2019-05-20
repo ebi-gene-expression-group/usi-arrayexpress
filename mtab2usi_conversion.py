@@ -9,7 +9,8 @@ import os
 
 from utils.common_utils import create_logger, file_exists
 from utils.converter_utils import get_sdrf_path
-from converter.converting import data_objects_from_magetab, datamodel2json_conversion
+from converter.dm2json import datamodel2json_conversion
+from converter.magetab2dm import data_objects_from_magetab
 
 
 def parse_args():

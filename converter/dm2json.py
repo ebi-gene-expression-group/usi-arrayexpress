@@ -1,17 +1,9 @@
-"""Module to convert experiment metadata in MAGE-TAB (IDF/SDRF) format to USI submittable JSON format and
-helper functions for converting from common data model to USI JSON objects"""
-
-import os
-import re
+"""Module with functions for converting from common data model to USI JSON objects"""
 
 from collections import OrderedDict, defaultdict
 
-from converter.datamodel import Attribute, Project, Study, Protocol, Sample, MicroarrayAssay, SeqAssay, DataFile, \
-    AssayData, Analysis, Submission
-from converter.parsing import parse_idf, parse_sdrf
-from utils.common_utils import create_logger
-from utils.converter_utils import is_accession, get_efo_url, strip_extension, write_json_file, attrib2dict, \
-    get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf
+from converter.datamodel import Attribute
+from utils.converter_utils import is_accession, get_efo_url, write_json_file, attrib2dict
 
 
 def generate_usi_project_object(project):
@@ -241,146 +233,6 @@ def generate_usi_ref_object(alias, sub_info, accession=None):
         ref_object['team'] = sub_info.get('team')
 
     return ref_object
-
-
-def mtab2usi_conversion(idf_file_path):
-    """
-    Run data transformation from a set of IDF/SDRF files to a set of USI JSON files
-
-    This function ties together the two parts of
-    - reading in MAGE-TAB data into common data model via the function "data_objects_from_magetab"
-    - writing JSON files from data in common data model via the function "datamodel2json_conversion"
-
-    :param idf_file_path: string, file path to IDF file
-    :return: None
-    """
-    process_name = "mtab2usi_conversion"
-
-    # Create logger
-    current_dir, idf_file_name = os.path.split(idf_file_path)
-    logger = create_logger(current_dir, process_name, idf_file_name)
-
-    sdrf_file_path = get_sdrf_path(idf_file_path, logger)
-
-    sub = data_objects_from_magetab(idf_file_path, sdrf_file_path)
-
-    datamodel2json_conversion(sub, current_dir, logger)
-
-
-def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="sequencing"):
-    """
-    Parse IDF/SDRF files and transform metadata to common datamodel
-
-    :param idf_file_path: string, path to IDF file
-    :param sdrf_file_path: string, path to SDRF file
-    :param submission_type: string, microarray, sequencing or singlecell
-    :return: Submission class object
-    """
-
-    study_info, protocols = parse_idf(idf_file_path)
-    samples, extracts, le, assays, raw_data, processed_data = parse_sdrf(sdrf_file_path)
-
-    # For MAGE-TAB files we don't have USI submission info might need to store these somewhere once we get this
-    idf_file_name = os.path.basename(idf_file_path)
-    sub_info = {"alias": re.sub("\.idf\.txt$", "", idf_file_name),
-                "accession": study_info.get("accession"),
-                "team": "my-super-test-team",
-                "metadata": idf_file_path,
-                "submission_type": submission_type}
-
-    # Project
-    project_object = Project.from_magetab(study_info)
-
-    # Study
-    study_object = Study.from_magetab(study_info)
-
-    # Protocols
-    protocol_objects = []
-    for p in protocols:
-        protocol = Protocol.from_magetab(p)
-        protocol_objects.append(protocol)
-
-    # Samples
-    sample_objects = []
-    for sample in samples.values():
-        new_sample = Sample.from_magetab(sample)
-        sample_objects.append(new_sample)
-
-    # Assays
-    assay_objects = []
-
-    if submission_type == "microarray":
-        linked_extracts = []
-        for le_name, le_attributes in le.items():
-            for extract_name, extract_attributes in extracts.items():
-                if extract_name in le_attributes["extract_ref"]:
-                    # Assuming there is only one extract per le
-                    linked_extracts = extract_attributes
-                    break
-
-            # Get all assays referencing this extract
-            linked_assays = []
-            for assay_name, assay_attributes in assays.items():
-                if le_name in assay_attributes["extract_ref"]:
-                    linked_assays.append(assay_attributes)
-
-            new_assay = MicroarrayAssay.from_magetab(le_attributes, linked_extracts, linked_assays)
-            assay_objects.append(new_assay)
-    # Sequencing assays
-    else:
-        for extract_name, extract_attributes in extracts.items():
-            # Get all assays referencing this extract
-            linked_assays = []
-            for assay_name, assay_attributes in assays.items():
-                if extract_name in assay_attributes["extract_ref"]:
-                    linked_assays.append(assay_attributes)
-
-            new_assay = SeqAssay.from_magetab(extract_attributes, linked_assays, protocols)
-            assay_objects.append(new_assay)
-
-    # Assay data
-    # We need to group all files that belong to the same run/hybridisation into 1 assay_data object
-    # E.g. the two paired-end files of a sequencing run
-    ad_objects = []
-    file_groups = OrderedDict()
-    for f_name, f_attrib in raw_data.items():
-        # For matrix files, we want one object per file not per assay ref
-        if len(f_attrib.get("assay_ref")) > 1:
-            file_groups[strip_extension(f_name)] = [f_attrib]
-        # In the other cases we can infer the assay data group from the assay ref of the file
-        elif len(f_attrib.get("assay_ref")) == 1:
-            a_ref = f_attrib.get("assay_ref")[0]
-            # Get the other files with the same assay ref
-            file_groups[a_ref] = [f_attrib for f_attrib in raw_data.values()
-                                  if a_ref in f_attrib.get("assay_ref")]
-
-    # We use the assay ref (Assay Name) as the alias for the assay_data object
-    for name, group in file_groups.items():
-        # Create dataFile object for each individual file within the group
-        file_objects = [DataFile.from_magetab(f_attrib) for f_attrib in group]
-        # The assay_data has a common alias and holds the file objects + common attributes of the group)
-        assay_data = AssayData.from_magetab(name, file_objects, group)
-        ad_objects.append(assay_data)
-
-    # Analysis (processed data)
-
-    # Here loading the data into the datamodel is a bit simpler: create dataFile objects for each file
-    # and then Analysis object with the additional attributes
-    # We only want one Analysis object per file but the standard structure of the objects is a list
-    analysis_objects = [Analysis.from_magetab([DataFile.from_magetab(f_attrib)], f_attrib)
-                        for f_attrib in processed_data.values()]
-
-    # Assembling it all into a submission object
-    sub = Submission(sub_info,
-                     project_object,
-                     study_object,
-                     protocol_objects,
-                     sample_objects,
-                     assay_objects,
-                     ad_objects,
-                     analysis_objects)
-
-    return sub
 
 
 def datamodel2json_conversion(submission, working_dir, logger):

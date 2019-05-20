@@ -11,8 +11,8 @@ import os
 import utils.converter_utils
 from utils.common_utils import create_logger, file_exists
 from utils.converter_utils import get_sdrf_path, guess_submission_type
-from converter.converting import data_objects_from_magetab
-from converter.datamodel2magetab import generate_idf, generate_sdrf, write_sdrf_file
+from converter.magetab2dm import data_objects_from_magetab
+from converter.dm2magetab import generate_idf, generate_sdrf, write_sdrf_file
 
 process_name = "magetab_writer"
 
