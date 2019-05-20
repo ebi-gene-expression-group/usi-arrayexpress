@@ -1,5 +1,5 @@
 import unittest
-from converter.datamodel2magetab import get_protocol_positions, sort_protocol_refs_to_dict, flatten_sample_attribute
+from converter.dm2magetab import get_protocol_positions, sort_protocol_refs_to_dict, flatten_sample_attribute
 from converter.datamodel import Protocol, Attribute, Unit
 
 

@@ -39,15 +39,18 @@
                 "minLength": 1,
                 "enum": [
                   "sample collection protocol",
+                  "growth protocol",
                   "conversion protocol",
                   "dissection protocol",
+                  "treatment protocol",
                   "normalization data transformation protocol",
+                  "high throughput sequence alignment protocol",
                   "array scanning and feature extraction protocol",
                   "nucleic acid hybridization to array protocol",
-                  "growth protocol",
                   "nucleic acid labeling protocol",
                   "nucleic acid extraction protocol",
-                  "treatment protocol"
+                  "nucleic acid library construction protocol",
+                  "nucleic acid sequencing protocol"
                 ]
               },
               "units": {
@@ -73,18 +76,38 @@
           }
         },
         "software": {
-          "description": "The type of software used for the procedure.",
-          "type": "string"
+          "description": "The type of software used for the procedure."
         },
         "hardware": {
-          "description": "The type of hardware used for the procedure. Mandatory for type nucleic acid sequencing protocol.",
-          "type": "string"
+          "description": "The type of hardware used for the procedure. Mandatory for type nucleic acid sequencing protocol."
         },
         "performer": {
-          "description": "The person, institute or company who performed the procedure. Mandatory for type nucleic acid sequencing protocol.",
-          "type": "string"
+          "description": "The person, institute or company who performed the procedure. Mandatory for type nucleic acid sequencing protocol."
         }
-      }
+      },
+      "patternProperties": {
+        "^.*$": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "properties": {
+                    "value": { "type": "string", "minLength": 1 },
+                    "units": { "type": "string", "minLength": 1 },
+                    "terms": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "url": {"type": "string", "format": "uri" }
+                            },
+                            "required": ["url"]
+                        }
+                    }
+                },
+                "required": ["value"]
+            }
+          }
+        }
     }
   }
 }

@@ -3,7 +3,7 @@ import unittest
 import logging
 
 from converter import datamodel
-from converter.converting import data_objects_from_magetab
+from converter.magetab2dm import data_objects_from_magetab
 from validator import metadata_validation
 from utils.converter_utils import guess_submission_type_from_sdrf, guess_submission_type_from_idf, \
     read_sdrf_file, read_idf_file

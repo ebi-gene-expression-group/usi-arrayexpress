@@ -1,8 +1,13 @@
+"""This test fetches all JSON files from the usijson directory and validates them
+against the schema with matching name in the json_schemas folder."""
+
 import unittest
 import os
 import jsonschema
 import json
 import re
+
+from converter.magetab2dm import mtab2usi_conversion
 
 
 class TestJsonSchemasAndObjects(unittest.TestCase):
@@ -11,7 +16,12 @@ class TestJsonSchemasAndObjects(unittest.TestCase):
         test_dir = os.path.dirname(os.path.abspath(__file__))
         base_dir = os.path.dirname(test_dir)
         self.schema_dir = os.path.join(base_dir, "json_schemas")
-        self.data_dir = os.path.join(test_dir, "test_data", "usijson")
+        self.mage_dir = os.path.join(test_dir, "test_data")
+        self.json_dir = os.path.join(test_dir, "test_data", "usijson")
+        # Re-write JSON files
+        magetab_files = [os.path.join(self.mage_dir, f) for f in os.listdir(self.mage_dir) if f.endswith(".idf.txt")]
+        for idf_file in magetab_files:
+            mtab2usi_conversion(idf_file)
 
     def test_validate_json_schemas(self):
 
@@ -26,7 +36,7 @@ class TestJsonSchemasAndObjects(unittest.TestCase):
 
     def test_validate_json_object_against_schema(self):
 
-        test_objects = [os.path.join(self.data_dir, f) for f in os.listdir(self.data_dir) if f.endswith(".json")]
+        test_objects = [os.path.join(self.json_dir, f) for f in os.listdir(self.json_dir) if f.endswith(".json")]
 
         types = ("project", "study", "protocol", "sample", "assay_data", "analysis")
         for test_file_name in test_objects:

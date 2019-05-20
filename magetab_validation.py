@@ -10,7 +10,7 @@ import os
 from utils.common_utils import create_logger, file_exists
 from utils.converter_utils import get_sdrf_path, guess_submission_type_from_sdrf, guess_submission_type_from_idf, \
     read_sdrf_file, read_idf_file
-from converter.converting import data_objects_from_magetab
+from converter.magetab2dm import data_objects_from_magetab
 
 import validator.magetab_prevalidation as pre
 import validator.metadata_validation as mv
