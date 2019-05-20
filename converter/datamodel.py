@@ -168,7 +168,9 @@ class SeqAssay(Assay):
         lib_attribs = {a.lower(): comments[a] for a in lib_attrib_cv if comments.get(a)}
 
         # Get technology type(s) from assay attributes
-        technology_type = remove_duplicates([a.get("technology_type") for a in assay_attributes])
+        technology_type = remove_duplicates([a.get("technology_type", "") for a in assay_attributes])
+        if len(technology_type) > 0:
+            technology_type = technology_type[0]
 
         # Get accession from ENA Experiment in assay comments
         accession = remove_duplicates([a.get('comments', {}).get('ENA_EXPERIMENT', "") for a in assay_attributes])
@@ -197,7 +199,7 @@ class SeqAssay(Assay):
                 # Expecting only one sequencing protocol per assay
                 break
 
-        return cls(alias, accession, technology_type[0], protocolrefs, samplerefs, lib_attribs)
+        return cls(alias, accession, technology_type, protocolrefs, samplerefs, lib_attribs)
 
     @classmethod
     def from_json(cls, assay_object):

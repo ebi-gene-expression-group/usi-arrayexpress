@@ -160,7 +160,8 @@ def parse_sdrf(sdrf_file):
                     # Get Characteristics
                     if "characteristics" in header_dict and i in header_dict["characteristics"]:
                         last_attribute = get_value(header[i])
-                        sample_attributes["characteristics"][last_attribute] = {"value": row[i]}
+                        if row[i]:
+                            sample_attributes["characteristics"][last_attribute] = {"value": row[i]}
                     # Add units
                     elif "unit" in header_dict and i in header_dict["unit"]:
                         if i - 1 in header_dict["characteristics"] and last_attribute:
@@ -318,11 +319,12 @@ def parse_sdrf(sdrf_file):
         for i in header_dict.get("factorvalue", []):
             # Get value and category
             factor_type = get_value(header[i])
-            factors[factor_type] = {"value": row[i]}
-            # Getting units (simplified)
-            if i+1 in header_dict.get("unit", []):
-                factors[factor_type]["unit"] = {"value": row[i+1],
-                                                "unit_type": get_value(header[i + 1])}
+            if row[i]:
+                factors[factor_type] = {"value": row[i]}
+                # Getting units (simplified)
+                if i+1 in header_dict.get("unit", []):
+                    factors[factor_type]["unit"] = {"value": row[i+1],
+                                                    "unit_type": get_value(header[i + 1])}
         # Add to the sample attributes of the current sample
         # Note this will deliberately overwrite if there are different values within one sample (see comment above)
         samples[sample_name]["factors"] = factors
@@ -355,6 +357,8 @@ def parse_data_file_columns(data_nodes, header_dict, header, node_map, row, data
             for node_range in node_map[rdn]:
                 node_index = node_range[0]
                 file_name = row[node_index]
+                if not file_name:
+                    continue
                 # Initialise dict entry for each new file
                 if file_name not in data_dict:
                     data_dict[file_name] = file_attributes

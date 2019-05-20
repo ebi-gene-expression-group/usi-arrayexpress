@@ -13,8 +13,8 @@ def generate_usi_project_object(project):
     project_object["title"] = project.title
     project_object["description"] = project.description
     project_object["contacts"] = [attrib2dict(contact) for contact in project.contacts]
-    project_object["publications"] = [attrib2dict(pub) for pub in project.publications]
     project_object["releaseDate"] = project.releaseDate
+    project_object["publications"] = [attrib2dict(pub) for pub in project.publications]
 
     return project_object
 
@@ -24,11 +24,8 @@ def generate_usi_study_object(study, sub_info):
     study_object["alias"] = study.alias
     study_object["title"] = study.title
     study_object["description"] = study.description
-
     study_object["studyType"] = "FunctionalGenomics"
-
     study_object["projectRef"] = generate_usi_ref_object(study.projectref, sub_info)
-    study_object["protocolRefs"] = study.protocolrefs
     study_object["protocolRefs"] = [generate_usi_ref_object(ref, sub_info) for ref in study.protocolrefs]
 
     study_attributes = defaultdict(list)
@@ -45,7 +42,7 @@ def generate_usi_study_object(study, sub_info):
 
     # Optional attributes
     if study.date_of_experiment:
-        study_attributes["date_of_experiment"] = generate_usi_attribute_entry(study.date_of_experiment)
+        study_attributes["date_of_experiment"] = study.date_of_experiment
 
     study_object["attributes"] = study_attributes
 
@@ -77,7 +74,7 @@ def generate_usi_sample_object(sample):
     if sample.description:
         sample_object['description'] = sample
 
-    attributes = {}
+    attributes = OrderedDict()
     for a_name, a_attrib in sample.attributes.items():
         attributes[a_name] = generate_usi_attribute_entry(a_attrib)
     sample_object['attributes'] = attributes
@@ -91,7 +88,6 @@ def generate_usi_assay_object(assay, study_info):
 
     if assay.accession:
         assay_object['alias'] = assay.accession
-        assay_object['title'] = assay.alias
     else:
         assay_object['alias'] = assay.alias
 
@@ -111,7 +107,7 @@ def generate_usi_assay_object(assay, study_info):
     protocol_refs = assay.protocolrefs
     if not isinstance(protocol_refs, list):
         protocol_refs = [protocol_refs]
-    assay_object["protcolUses"] = [generate_usi_ref_object(ref, study_info) for ref in protocol_refs]
+    assay_object["protocolUses"] = [generate_usi_ref_object(ref, study_info) for ref in protocol_refs]
 
     return assay_object
 
@@ -121,7 +117,6 @@ def generate_usi_data_object(assay_data, sub_info):
     ad_object = OrderedDict()
 
     ad_object["alias"] = assay_data.alias
-    ad_object["data_type"] = assay_data.data_type
 
     ad_object["files"] = []
     files = assay_data.files
@@ -131,6 +126,9 @@ def generate_usi_data_object(assay_data, sub_info):
 
     ad_object["assayRefs"] = [generate_usi_ref_object(x, sub_info) for x in assay_data.assayrefs]
 
+    ad_object["attributes"] = OrderedDict()
+    ad_object["attributes"]["data_type"] = assay_data.data_type
+
     return ad_object
 
 
@@ -139,9 +137,11 @@ def generate_usi_analysis_object(analysis, sub_info):
     analysis_object = OrderedDict()
     analysis_object["alias"] = analysis.alias
     analysis_object["files"] = [attrib2dict(fo) for fo in analysis.files]
-    analysis_object["data_type"] = analysis.data_type
     analysis_object["assayDataRefs"] = [generate_usi_ref_object(x, sub_info) for x in analysis.assaydatarefs]
-    analysis_object["protocolRefs"] = [generate_usi_ref_object(p, sub_info) for p in analysis.protocolrefs]
+    analysis_object["protocolUses"] = [generate_usi_ref_object(p, sub_info) for p in analysis.protocolrefs]
+
+    analysis_object["attributes"] = OrderedDict()
+    analysis_object["attributes"]["data_type"] = analysis.data_type
 
     return analysis_object
 
