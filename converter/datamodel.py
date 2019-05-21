@@ -25,6 +25,10 @@ class Sample:
         self.description = description
         self.attributes = attributes
 
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.taxon}, " \
+               "{self.taxonId}, {self.material_type}, {self.description}, {self.attributes})".format(self=self)
+
     @classmethod
     def from_magetab(cls, sample_attributes):
         alias = sample_attributes.get("name")
@@ -58,6 +62,40 @@ class Sample:
                                            new_unit,
                                            c_attrib.get("term_accession"),
                                            c_attrib.get("term_source"))
+
+        return cls(alias, accession, taxon, taxonId, attributes, material_type, description)
+
+    @classmethod
+    def from_json(cls, sample):
+        alias = sample.get("alias")
+        accession = sample.get("accession")
+        taxon = sample.get("taxon")
+        taxonId = sample.get("taxonId")
+
+        raw_attributes = sample.get("attributes")
+        attributes = OrderedDict()
+        material_type = None
+        description = None
+
+        for c_name, attrib_values in raw_attributes.items():
+            # The attribute values are a list even though we only expect one value per category
+            for c_attrib in attrib_values:
+                new_unit = None
+                unit_attrib = c_attrib.get("units")
+                if unit_attrib:
+                    new_unit = Unit(unit_attrib, None, None, None)
+                terms = None
+                term_attrib = c_attrib.get("terms")
+                if term_attrib:
+                    terms = "; ".join([t.get("url") for t in term_attrib])
+
+                if re.match("^\s*material[\s_-]*type\s*$", c_name, flags=re.IGNORECASE):
+                    material_type = c_attrib.get("value")
+                elif re.match("^\s*description\s*$", c_name, flags=re.IGNORECASE):
+                    description = c_attrib.get("value")
+                else:
+                    # All other attributes get converted to Attribute object
+                    attributes[c_name] = Attribute(c_attrib.get("value"), new_unit, terms, None)
 
         return cls(alias, accession, taxon, taxonId, attributes, material_type, description)
 
@@ -543,18 +581,19 @@ class Publication:
 
 
 class Attribute:
-    def __init__(self, value, unit, term_accession, term_source="EFO"):
+    def __init__(self, value, unit, term_accession, term_source):
         self.value = value
         self.unit = unit
         self.term_source = term_source
         self.term_accession = term_accession
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.value}, {self.unit}, {self.term_accession})".format(self=self)
+        return "{self.__class__.__name__}({self.value}, {self.unit}, {self.term_accession}, " \
+               "{self.term_source})".format(self=self)
 
 
 class Unit:
-    def __init__(self, value, unit_type, term_accession, term_source="EFO"):
+    def __init__(self, value, unit_type, term_accession, term_source):
         self.value = value
         self.unit_type = unit_type
         self.term_source = term_source
