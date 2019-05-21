@@ -10,7 +10,7 @@ from converter.datamodel import Project, Study, Protocol, Sample, MicroarrayAssa
 from utils.common_utils import create_logger
 
 from utils.converter_utils import get_controlled_vocabulary, get_name, get_value, read_sdrf_file, read_idf_file, \
-    get_sdrf_path, strip_extension
+    get_sdrf_path, strip_extension, guess_submission_type
 
 
 def get_protocol_refs(sdrf_row, header_dict, node_map, node2_index):
@@ -489,13 +489,14 @@ def mtab2usi_conversion(idf_file_path):
     logger = create_logger(current_dir, process_name, idf_file_name)
 
     sdrf_file_path = get_sdrf_path(idf_file_path, logger)
+    submission_type, idf_data = guess_submission_type(idf_file_path, sdrf_file_path, logger)
 
-    sub = data_objects_from_magetab(idf_file_path, sdrf_file_path)
+    sub = data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type)
 
     datamodel2json_conversion(sub, current_dir, logger)
 
 
-def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="sequencing"):
+def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
     """
     Parse IDF/SDRF files and transform metadata to common datamodel
 
