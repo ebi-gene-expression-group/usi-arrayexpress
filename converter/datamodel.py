@@ -3,7 +3,9 @@ import os
 import re
 from collections import OrderedDict
 
-from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, get_taxon
+from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, \
+    get_taxon, get_term_from_url
+from utils.common_utils import get_ontology_from_term_url
 
 
 class Sample:
@@ -84,18 +86,21 @@ class Sample:
                 unit_attrib = c_attrib.get("units")
                 if unit_attrib:
                     new_unit = Unit(unit_attrib, None, None, None)
-                terms = None
+                term = None
+                term_source = None
                 term_attrib = c_attrib.get("terms")
                 if term_attrib:
-                    terms = "; ".join([t.get("url") for t in term_attrib])
-
+                    # A list again, but we can only work with one term, overwriting the rest
+                    for t in term_attrib:
+                        term = get_term_from_url(t.get("url"))
+                        term_source = get_ontology_from_term_url(t.get("url"))
                 if re.match("^\s*material[\s_-]*type\s*$", c_name, flags=re.IGNORECASE):
                     material_type = c_attrib.get("value")
                 elif re.match("^\s*description\s*$", c_name, flags=re.IGNORECASE):
                     description = c_attrib.get("value")
                 else:
                     # All other attributes get converted to Attribute object
-                    attributes[c_name] = Attribute(c_attrib.get("value"), new_unit, terms, None)
+                    attributes[c_name] = Attribute(c_attrib.get("value"), new_unit, term, term_source)
 
         return cls(alias, accession, taxon, taxonId, attributes, material_type, description)
 

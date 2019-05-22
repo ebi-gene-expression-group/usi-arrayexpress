@@ -134,6 +134,25 @@ def get_efo_url(term_accession):
         return "http://purl.obolibrary.org/obo/" + url_friendly_term
 
 
+def get_term_from_url(term_url):
+    """Return ontology term accession for a given term url
+
+    :param term_url: The expected pattern is a URL from OLS
+    :return: term accession (the last bit of the URL)
+    """
+    return term_url.split('/')[-1]
+
+
+def get_ontology_from_term(term_accession):
+    """Return the source ontology for a given ontology term
+    This should only be used for terms that are not in EFO"""
+
+    term = re.sub(':', '_', term_accession)
+    term_parts = term.split('_')
+    if len(term_parts) > 1:
+        return term_parts[0]
+
+
 def strip_extension(filename):
     """Take a filename string as input and strip off the file extension and any patterns to be ignored"""
     extensions = ('\.fastq\.gz$', '\.fq\.gz$', '\.txt\.gz$', '\.fastq\.bz2$', '\.[a-zA-Z0-9]+$', )
