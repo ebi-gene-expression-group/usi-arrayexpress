@@ -1,4 +1,4 @@
-import json
+
 import unittest
 from collections import OrderedDict
 
@@ -21,16 +21,15 @@ class TestJSONparsing(unittest.TestCase):
                       "cell line": [
                           {"value": "KG1"}
                       ],
-                      "genotype": [
-                          {"value": "wild type genotype"}]
+                      "material type": [
+                          {"value": "cell"}]
                   }}
         target = Sample("Control 1", None, "Homo sapiens", 9606,
                         OrderedDict([
                             ("organism", Attribute("Homo sapiens", None, None, None)),
                             ("disease", Attribute("acute myeloid leukemia", None, None, None)),
                             ("cell line", Attribute("KG1", None, None, None)),
-                            ("genotype", Attribute("wild type genotype", None, None, None))]),
-                        None, None)
+                            ]), "cell", None)
         converted_sample = Sample.from_json(source)
         self.assertEqual(str(converted_sample), str(target))
 

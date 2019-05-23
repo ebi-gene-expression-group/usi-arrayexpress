@@ -263,6 +263,12 @@ def guess_submission_type(idf_file, sdrf_file, logger):
     return submission_type, idf_dict,
 
 
+def guess_submission_type_from_json(study_object):
+    """Try to infer submission type from study experiment type annotation"""
+
+    all_types = get_controlled_vocabulary("experiment_type", "ontology")
+
+
 def get_name(header_string):
     """Return the first part of an SDRF header in lower case and without spaces."""
     no_spaces = header_string.replace(' ', '')
