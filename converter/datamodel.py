@@ -3,6 +3,7 @@ import os
 import re
 from collections import OrderedDict
 
+from converter import json2dm
 from utils.converter_utils import is_accession, get_controlled_vocabulary, remove_duplicates, \
     get_taxon, get_term_from_url
 from utils.common_utils import get_ontology_from_term_url
@@ -432,6 +433,20 @@ class Study:
         date_of_experiment = study_info.get("date_of_experiment", None)
         comments = study_info.get("comments", {})
         experiment_type = comments.get("experiment_type", [])
+
+        return cls(alias, accession, title, description, protocolrefs, projectref,
+                   ef_objects, ed_objects, experiment_type, date_of_experiment,
+                   comments)
+
+    @classmethod
+    def from_json(cls, study):
+        alias = study.get("alias")
+        accession = study.get("accession")
+        title = study.get("title")
+        description = study.get("description")
+        attributes = study.get("attributes", {})
+        factors = [json2dm.generate_attribute_from_json(f) for f in study.get("experimental_factor")]
+        designs = [json2dm.generate_attribute_from_json(f) for f in study.get("experimental_design")]
 
         return cls(alias, accession, title, description, protocolrefs, projectref,
                    ef_objects, ed_objects, experiment_type, date_of_experiment,

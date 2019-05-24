@@ -140,7 +140,9 @@ def get_term_from_url(term_url):
     :param term_url: The expected pattern is a URL from OLS
     :return: term accession (the last bit of the URL)
     """
-    return term_url.split('/')[-1]
+
+    if term_url:
+        return term_url.split('/')[-1]
 
 
 def get_ontology_from_term(term_accession):
@@ -263,10 +265,18 @@ def guess_submission_type(idf_file, sdrf_file, logger):
     return submission_type, idf_dict,
 
 
-def guess_submission_type_from_json(study_object):
+def guess_submission_type_from_study(study_object):
     """Try to infer submission type from study experiment type annotation"""
 
     all_types = get_controlled_vocabulary("experiment_type", "ontology")
+
+    for exptype in study_object.experiment_types:
+        if exptype in all_types["sequencing"]:
+            return "sequencing"
+        elif exptype in all_types["microarray"]:
+            return "microarray"
+        elif exptype in all_types["singlecell"]:
+            return "singlecell"
 
 
 def get_name(header_string):
