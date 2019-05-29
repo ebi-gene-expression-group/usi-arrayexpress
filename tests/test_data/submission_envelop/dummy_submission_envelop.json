@@ -6,11 +6,9 @@
       "name": "Test User"
     },
     "team": {
-      "name": "my-test-team",
-      "description": null,
-      "profile": {}
+      "name": "my-test-team"
     },
-    "submissionDate": null
+    "submissionDate": "2019-05-26"
   },
   "supportingSamplesRequired": [],
   "supportingSamples": [],
@@ -653,7 +651,3 @@
     }
   ]
 }
-
-
-
-

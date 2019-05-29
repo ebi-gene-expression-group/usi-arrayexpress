@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArrayExpress Submission Schema",
+  "description": "Schema describing a complete ArrayExpress submissions",
+  "version": "1.0.0",
+  "author": "arrayexpress",
+  "type": "object",
+  "required": [
+    "submission",
+    "projects",
+    "studies",
+    "protocols",
+    "samples",
+    "assays",
+    "assayData",
+    "analyses"
+    ],
+  "properties": {
+    "submission": {
+      "type": "object",
+      "required": [
+        "id",
+        "submissionDate",
+        "submitter",
+        "team"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "UUID of the submission"
+        },
+        "submissionDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when the experiment was submitted"
+        },
+        "submitter": {
+          "type": "object",
+          "description": "Information about the USI submitter account",
+          "properties": {
+            "email": {
+              "type": "string",
+              "format": "email",
+              "description": "Email address linked to the submission account"
+            },
+            "name": {
+              "type": "string",
+              "description": "The submitter's name"
+            }
+          }
+        },
+        "team": {
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the USI user group"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the USI team"
+            }
+          }
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "$ref": "arrayexpress_project_schema.json"
+      }
+    },
+    "studies": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "$ref": "arrayexpress_study_schema.json"
+      }
+    },
+    "protocols": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "$ref": "arrayexpress_protocol_schema.json"
+      }
+    },
+    "samples": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "arrayexpress_sample_schema.json"
+      }
+    },
+    "assays": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "arrayexpress_microarray_assay_schema.json"
+          },
+          {
+            "$ref": "arrayexpress_sequencing_assay_schema.json"}
+          ]
+        }
+      },
+    "assayData": {
+      "type": "array",
+      "items": {
+        "$ref": "arrayexpress_assay_data_schema.json"
+      }
+    },
+    "analyses": {
+      "type": "array",
+      "items": {
+        "$ref": "arrayexpress_analysis_schema.json"
+      }
+    }
+  }
+}
