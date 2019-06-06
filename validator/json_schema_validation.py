@@ -5,19 +5,24 @@ import jsonschema
 
 import json_schemas
 from utils.converter_utils import read_json_file
+from utils.common_utils import create_logger
 
 
-def validate_submission_json(json_file, schema_file=None):
+def validate_submission_json(json_file, schema_file=None, logger=None):
     """Match a JSON object against a JSON schema and return a human-readable list of all validation errors."""
 
-    json_data = read_json_file(json_file)
-
+    if not logger:
+        # Create local logger in the directory of the JSON data file
+        logger = create_logger(os.path.dirname(json_file), "json_validation", os.path.basename(json_file),
+                               logger_name="JSON")
     if not schema_file:
         # If no other schema is given, load the schema describing a full ArrayExpress submission
         schema_file, schema = load_arrayexpress_submission_schema()
     else:
         # Parse the schema_file
         schema = read_json_file(schema_file)
+
+    json_data = read_json_file(json_file)
 
     # Create validator with resolver to help locate the referenced submittable schemas with absolute path
     resolver = jsonschema.RefResolver("file://" + schema_file, schema)
@@ -32,7 +37,7 @@ def validate_submission_json(json_file, schema_file=None):
 
     # Print out all error messages with where and why details
     for e in validation_errors:
-        print(format_json_error_message(e))
+        logger.error(format_json_error_message(e))
 
 
 def load_arrayexpress_submission_schema():

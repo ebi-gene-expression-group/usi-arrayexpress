@@ -36,9 +36,11 @@ def main():
     # Exit if IDF file doesn't exist
     file_exists(json_file)
 
-    #logger = create_logger(os.path.dirname(json_file), process_name, json_file)
+    # Create logger for JSON errors
+    json_logger = create_logger(os.path.dirname(json_file), process_name, os.path.basename(json_file),
+                                logger_name="JSON")
 
-    validate_submission_json(json_file)
+    validate_submission_json(json_file, logger=json_logger)
 
     #sub = json2dm.data_objects_from_json(json_data, json_file)
     #print(sub.sample)
