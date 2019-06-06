@@ -280,7 +280,7 @@
       "accession": null,
       "alias": "raw_data",
       "team": {
-        "name": "test-team",
+        "name": "my-test-team",
         "description": null,
         "profile": {}
       },
@@ -335,8 +335,8 @@
       "description": "This is just a test experiment",
       "contacts": [
         {
-          "firstName": "Searcher",
-          "lastName": "R",
+          "firstName": "R",
+          "lastName": "Searcher",
           "email": "fake@test.com",
           "affiliation": "EMBL-EBI",
           "address": "Wellcome Genome Campus",
