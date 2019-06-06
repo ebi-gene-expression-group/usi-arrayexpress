@@ -39,7 +39,7 @@ def main():
     # Create logger for JSON errors
     json_logger = create_logger(os.path.dirname(json_file), process_name, os.path.basename(json_file),
                                 logger_name="JSON")
-
+    # Validate the submission JSON against the full ArrayExpress submission schema
     validate_submission_json(json_file, logger=json_logger)
 
     #sub = json2dm.data_objects_from_json(json_data, json_file)

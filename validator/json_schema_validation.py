@@ -19,12 +19,12 @@ def validate_submission_json(json_file, schema_file=None, logger=None):
         # If no other schema is given, load the schema describing a full ArrayExpress submission
         schema_file, schema = load_arrayexpress_submission_schema()
     else:
-        # Parse the schema_file
         schema = read_json_file(schema_file)
 
     json_data = read_json_file(json_file)
 
-    # Create validator with resolver to help locate the referenced submittable schemas with absolute path
+    # Create validator with 'resolver' to help locate the referenced sub-schemas when interpreting $ref values
+    # in the submission schema (creates absolute paths to the 'submittable' schema files)
     resolver = jsonschema.RefResolver("file://" + schema_file, schema)
     validator = jsonschema.Draft4Validator(schema, resolver=resolver)
 
@@ -75,7 +75,7 @@ def format_json_error_message(error_object):
                   "\n\t".join([format_json_error_message(sub_error) for sub_error in error_object.context])
 
     error_string = "Error in {}: ({} error) {}".format(
-        format_traceback_path(error_object.absolute_path), error_object.validator,  message)
+        format_traceback_path(error_object.absolute_path), error_object.validator, message)
 
     return error_string
 
