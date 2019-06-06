@@ -2,7 +2,7 @@
 
 """
 This script takes a JSON submission envelope file (with all submittables)
-and runs metadata conversionfrom USI-JSON to MAGE-TAB format.
+and runs metadata conversion from USI-JSON to MAGE-TAB format.
 """
 
 import argparse
@@ -11,7 +11,6 @@ import os
 from converter import json2dm
 from validator.json_schema_validation import validate_submission_json
 from utils.common_utils import file_exists, create_logger
-from utils.converter_utils import read_json_file
 
 
 def parse_args():
