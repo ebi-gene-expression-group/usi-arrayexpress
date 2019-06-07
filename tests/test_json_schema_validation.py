@@ -27,8 +27,8 @@ class TestValidateJson(TestCase):
     def setUp(self):
         # This test uses a very simple test JSON and test schema
         wd = os.path.dirname(os.path.realpath(__file__))
-        self.schema_file = os.path.join(wd, 'test_data', 'simple_test_schema.json')
-        self.test_data_file = os.path.join(wd, 'test_data', 'simple_test_json.json')
+        self.schema_file = os.path.join(wd, 'test_data', 'simple_schema.json')
+        self.test_data_file = os.path.join(wd, 'test_data', 'simple_data.json')
 
     def test_validate_submission_json(self):
         # This function currently has no output, just testing it runs without errors
