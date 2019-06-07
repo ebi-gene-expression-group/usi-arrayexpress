@@ -10,7 +10,7 @@ from datetime import datetime
 from utils.converter_utils import get_term_from_url, get_ontology_from_term
 
 
-def create_logger(working_dir, process_name, object_name, log_level=20, logger_name=__name__):
+def create_logger(working_dir, process_name, object_name, log_level=20, logger_name=""):
 
     # Need to give getLogger file_path (name) argument - so that it creates a unique logger for a given file_path
     log_file_name = "{}_{}_{}.log".format(process_name, object_name, datetime.now().strftime('%Y-%m-%d'))
