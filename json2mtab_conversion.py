@@ -17,8 +17,6 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('json',
                         help="Path to the USI-JSON file")
-    parser.add_argument('-s', '--schema',
-                        help="Path to the JSON schema file")
     parser.add_argument('-v', '--verbose', action='store_const', const=10, default=20,
                         help="Option to output detailed logging (debug level).")
     args = parser.parse_args()
