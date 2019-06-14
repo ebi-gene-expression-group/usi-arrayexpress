@@ -124,8 +124,7 @@ class JSONConverter:
         if len(path) == 1:
             return json_object.get(path[0])
         else:
-            next_level = json_object.get(path.pop(0), {})
-            return self.interpret_path(path, next_level)
+            return self.interpret_path(path[1:], json_object.get(path[0], {}))
 
     def import_publication(self, element, translation={}):
         return self.convert_datamodel_object(element, "publication")
@@ -135,6 +134,12 @@ class JSONConverter:
 
     @staticmethod
     def generate_attribute_from_json(element, translation={}):
+        """
+        Convert a USI-JSON formatted attribute to a datamodel.Attribute object
+        :param element: the USI-JSON attribute object
+        :param translation: (optional) a dictionary with translations for controlled terms
+        :return: datamodel.Attribute object
+        """
 
         term_accession = None
         term_source = None
@@ -154,12 +159,7 @@ class JSONConverter:
             # USI does not support ontology annotations for unit terms
             unit = datamodel.Unit(unit_value, None, None, None)
 
-        attribute = datamodel.Attribute(value,
-                                        unit,
-                                        term_accession,
-                                        term_source)
-
-        return attribute
+        return datamodel.Attribute(value, unit, term_accession, term_source)
 
     @staticmethod
     def get_reference_value_from_json(element, translation={}):
@@ -175,9 +175,9 @@ class JSONConverter:
 
     @staticmethod
     def import_string(element, translation={}):
-        if translation:
-            return translation.get(element, str(element))
-        return str(element)
+        """Return the string value with optional translation according to controlled vocabulary."""
+        return translation.get(element, str(element))
+
 
 
 
