@@ -1,9 +1,100 @@
 {
-  "project": {},
+  "project": {
+    "alias" : {
+      "description": "unique project name (auto-generated from MAGE-TAB file name)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["alias"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "BioStudies accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["accession"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "title": {
+      "description": "(optional) submitter provided project description",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["title"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "description": {
+      "description": "(optional) free-text project description",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["description"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "releaseDate": {
+      "description": "date of public release",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["releaseDate"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "publications": {
+      "description": "list of Publication class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/publication"
+      },
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path" : ["publications"],
+          "from_type": "list",
+          "method": "import_publication"
+        }
+      }
+    },
+    "contacts": {
+      "description": "list of Contact class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/contact"
+      },
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path" : ["contacts"],
+          "from_type": "array",
+          "method": "import_contacts"
+        }
+      }
+    }
+  },
   "study": {
     "alias": {
-      "type": "string",
       "description": "UUID of the USI submission",
+      "type": "string",
       "import": {
         "ae": {
           "parent": "study",
@@ -16,8 +107,8 @@
       }
     },
     "accession": {
-      "type": "string",
       "description": "ArrayExpress experiment accession",
+      "type": "string",
       "import": {
         "ae": {
           "parent": "study",
@@ -216,6 +307,164 @@
       }
     },
     "parameters": {}
+  },
+  "publication": {
+    "articleTitle": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["articleTitle"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "authors": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["authors"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "pubmedId": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["pubmedId"],
+          "from_type": "integer",
+          "method": "import_string"
+        }
+      }
+    },
+    "doi": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["doi"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["publicationStatus"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    }
+  },
+  "contact": {
+    "firstName":{
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["first"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "lastName":{
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["lastName"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "email": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["email"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "affiliation": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["affiliation"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "address": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["address"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "phone": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["phone"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["roles"],
+          "from_type": "array",
+          "method": "import_string"
+        }
+      }
+    },
+    "middleInitials": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["middleInitials"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "fax": {
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["fax"],
+          "from_type": "array",
+          "method": "import_string"
+        }
+      }
+    }
   }
 }
 

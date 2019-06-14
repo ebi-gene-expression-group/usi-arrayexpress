@@ -382,6 +382,16 @@ class Project:
 
         return cls(alias, accession, title, description, releaseDate, publications, contacts)
 
+    @classmethod
+    def from_dict(cls, project_dict):
+        return cls(alias=project_dict.get("alias"),
+                   accession=project_dict.get("accession"),
+                   title=project_dict.get("title"),
+                   description=project_dict.get("description"),
+                   releaseDate=project_dict.get("releaseDate"),
+                   publications=[Publication.from_dict(p) for p in project_dict.get("publications")],
+                   contacts=project_dict.get("contacts"))
+
 
 class Study:
     def __init__(self, alias, accession, title, description, protocolrefs, projectref,
@@ -623,6 +633,18 @@ class Contact:
                "{self.affiliation}, {self.address}, {self.phone}, {self.roles}, " \
                "{self.middleInitials}, {self.fax})".format(self=self)
 
+    @classmethod
+    def from_dict(cls, conversion_dict):
+        return cls(firstName=conversion_dict.get("firstName"),
+                   lastName=conversion_dict.get("lastName"),
+                   email=conversion_dict.get("email"),
+                   affiliation=conversion_dict.get("affiliation"),
+                   address=conversion_dict.get("address"),
+                   phone=conversion_dict.get("phone"),
+                   roles=conversion_dict.get("roles"),
+                   middleInitials=conversion_dict.get("middleInitials"),
+                   fax=conversion_dict.get("fax"))
+
 
 class Publication:
     def __init__(self, articleTitle, authors, pubmedId, doi, status):
@@ -631,6 +653,18 @@ class Publication:
         self.pubmedId = pubmedId
         self.doi = doi
         self.status = status
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.articleTitle}, {self.authors}, {self.pubmedId}, " \
+               "{self.doi}, {self.status})".format(self=self)
+
+    @classmethod
+    def from_dict(cls, conversion_dict):
+        return cls(articleTitle=conversion_dict.get("articleTitle"),
+                   authors=conversion_dict.get("authors"),
+                   pubmedId=conversion_dict.get("pubmedId"),
+                   doi=conversion_dict.get("doi"),
+                   status=conversion_dict.get("status"))
 
 
 class Attribute:

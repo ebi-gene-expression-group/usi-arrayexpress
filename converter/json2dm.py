@@ -52,7 +52,12 @@ class JSONConverter:
 
     def convert(self, envelope_json):
         sub_info = {}
-        project = None
+
+        project_json = next(iter(envelope_json.get("projects", [])))
+        project_dict = self.convert_datamodel_object(project_json, "project")
+
+        project = datamodel.Project.from_dict(self.convert_datamodel_object(project_json, "project"))
+        print(project)
 
         # We only take the first study in the list
         study_json = next(iter(envelope_json.get("studies", [])))
@@ -117,6 +122,12 @@ class JSONConverter:
             next_level = json_object.get(path.pop(0), {})
             return self.interpret_path(path, next_level)
 
+    def import_publication(self, element):
+        return self.convert_datamodel_object(element, "publication")
+
+    def import_contacts(self, element):
+        return self.convert_datamodel_object(element, "contact")
+
     @staticmethod
     def generate_attribute_from_json(element):
 
@@ -157,5 +168,6 @@ class JSONConverter:
     @staticmethod
     def import_string(element):
         return str(element)
+
 
 
