@@ -53,25 +53,27 @@ class JSONConverter:
     def convert(self, envelope_json):
         sub_info = {}
 
+        # We only take the first project in the list
         project_json = next(iter(envelope_json.get("projects", [])))
-        project_dict = self.convert_datamodel_object(project_json, "project")
-
         project = datamodel.Project.from_dict(self.convert_datamodel_object(project_json, "project"))
         print(project)
 
         # We only take the first study in the list
         study_json = next(iter(envelope_json.get("studies", [])))
-        study_attributes = self.convert_datamodel_object(study_json, "study")
-        study = datamodel.Study.from_dict(study_attributes)
+        study = datamodel.Study.from_dict(self.convert_datamodel_object(study_json, "study"))
 
         protocol_json = envelope_json.get("protocols")
         protocols = [datamodel.Protocol.from_dict(self.convert_datamodel_object(p, "protocol")) for p in protocol_json]
-        print(protocols)
 
         samples = []
         assays = []
         assay_data = []
         analysis = []
+
+        print(project)
+        print(study)
+        print(protocols)
+
         submission = datamodel.Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
         return submission
 
@@ -93,6 +95,7 @@ class JSONConverter:
             print(mapping_info)
             path = mapping_info.get("path", [])
             method = mapping_info.get("method", "")
+            translation = mapping_info.get("translation", {})
             if method:
                 convert_function = getattr(self, method)
             if path and convert_function:
@@ -101,11 +104,13 @@ class JSONConverter:
                 if isinstance(target_object, list):
                     if attribute_info.get("type") == "string":
                         # Take the first entry
-                        submittable_attributes[attribute] = next(iter([convert_function(o) for o in target_object]))
+                        submittable_attributes[attribute] = next(iter([convert_function(o, translation=translation)
+                                                                       for o in target_object]))
                     else:
-                        submittable_attributes[attribute] = [convert_function(o) for o in target_object]
+                        submittable_attributes[attribute] = [convert_function(o, translation=translation)
+                                                             for o in target_object]
                 elif target_object:
-                    submittable_attributes[attribute] = convert_function(target_object)
+                    submittable_attributes[attribute] = convert_function(target_object, translation=translation)
         print(submittable_attributes)
         return submittable_attributes
 
@@ -122,18 +127,21 @@ class JSONConverter:
             next_level = json_object.get(path.pop(0), {})
             return self.interpret_path(path, next_level)
 
-    def import_publication(self, element):
+    def import_publication(self, element, translation={}):
         return self.convert_datamodel_object(element, "publication")
 
-    def import_contacts(self, element):
+    def import_contacts(self, element, translation={}):
         return self.convert_datamodel_object(element, "contact")
 
     @staticmethod
-    def generate_attribute_from_json(element):
+    def generate_attribute_from_json(element, translation={}):
 
         term_accession = None
         term_source = None
         unit = None
+
+        # Try to translate the value or if not in the look-up return the value string directly
+        value = translation.get(element.get("value"), element.get("value"))
 
         terms = element.get("terms", [])
         if terms:
@@ -146,7 +154,7 @@ class JSONConverter:
             # USI does not support ontology annotations for unit terms
             unit = datamodel.Unit(unit_value, None, None, None)
 
-        attribute = datamodel.Attribute(element.get("value"),
+        attribute = datamodel.Attribute(value,
                                         unit,
                                         term_accession,
                                         term_source)
@@ -154,7 +162,7 @@ class JSONConverter:
         return attribute
 
     @staticmethod
-    def get_reference_value_from_json(element):
+    def get_reference_value_from_json(element, translation={}):
         """References can contain an accession or a combination of alias and team.
         We prefer the accession if there is one, otherwise use the alias (which should be
         unique within the submission)."""
@@ -166,7 +174,9 @@ class JSONConverter:
             return ""
 
     @staticmethod
-    def import_string(element):
+    def import_string(element, translation={}):
+        if translation:
+            return translation.get(element, str(element))
         return str(element)
 
 

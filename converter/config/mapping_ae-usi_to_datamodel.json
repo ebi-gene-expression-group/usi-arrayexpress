@@ -360,7 +360,13 @@
           "parent": "publication",
           "path": ["publicationStatus"],
           "from_type": "sting",
-          "method": "import_string"
+          "method": "import_string",
+          "translation": {
+            "Unknown" : "",
+            "InPreparation": "in preparation",
+            "Submitted": "submitted",
+            "Published": "published"
+          }
         }
       }
     }
