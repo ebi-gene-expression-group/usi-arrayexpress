@@ -1,0 +1,223 @@
+{
+  "project": {},
+  "study": {
+    "alias": {
+      "type": "string",
+      "description": "UUID of the USI submission",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "type": "string",
+      "description": "ArrayExpress experiment accession",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "accession"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "title": {
+      "description": "submitter provided study description",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "title"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "description": {
+      "description": "free-text description of study background and aim",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "description"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "experimental_factor": {
+      "description": "list of experimental factors as Attribute class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#definitions/attribute"
+      },
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "experimental_factor"
+          ],
+          "from_type": "attribute_object",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "experimental_design": {
+      "description": "(optional) list of experimental designs as Attribute class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#definitions/attribute"
+      },
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "experimental_design"
+          ],
+          "from_type": "attribute_object",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "experiment_type": {
+      "description": "experiment type ontology terms",
+      "type": "array",
+      "items": {
+      },
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "experiment_type"
+          ],
+          "from_type": "attribute_object",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "date_of_experiment": {
+      "description": "(optional) date of experiment",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "date_of_experiment"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used in the study",
+      "type": "array",
+      "import": {
+        "ae": {
+          "path": ["protocolRefs"],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "projectref": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["projectRef"],
+          "from_type": "ref_object",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "comments": {}
+  },
+  "protocol": {
+    "alias": {
+      "description": "protocol accession or unique name in experiment",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["alias"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession":{
+      "description": "ArrayExpress protocol accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["accession"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "description": {
+      "description": "free-text description of protocol",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["description"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "protocol_type": {
+      "description": "experiment type ontology term",
+      "type": "attribute_object",
+      "import": {
+        "ae": {
+          "path": ["attributes", "protocol_type"],
+          "from_type": "array",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "hardware": {
+      "description": "free-text hardware description, sequencer model for sequencing experiments",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "hardware"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "software":{
+      "description": "free-text software description",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "software"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "parameters": {}
+  }
+}
+
+
+

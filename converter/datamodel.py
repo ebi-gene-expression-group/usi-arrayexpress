@@ -304,6 +304,17 @@ class Protocol:
 
         return cls(alias, accession, description, protocol_type, hardware, software, parameters)
 
+    @classmethod
+    def from_dict(cls, protocol_dict):
+        return cls(
+            alias=protocol_dict.get("alias"),
+            accession=protocol_dict.get("accession"),
+            description=protocol_dict.get("description"),
+            protocol_type=protocol_dict.get("protocol_type"),
+            hardware=protocol_dict.get("hardware"),
+            software=protocol_dict.get("software"),
+            parameters=protocol_dict.get("parameters"))
+
 
 class Project:
     def __init__(self, alias, accession, title, description, releaseDate, publications, contacts):
@@ -405,9 +416,10 @@ class Study:
         self.comments = comments
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.title}," \
+        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.title}, " \
                "{self.description}, {self.protocolrefs}, {self.projectref}, {self.experimental_factor}, " \
-               "{self.experimental_design}, {self.experiment_type}, {self.comments})".format(self=self)
+               "{self.experimental_design}, {self.experiment_type}, {self.date_of_experiment}, " \
+               "{self.comments})".format(self=self)
 
     @classmethod
     def from_magetab(cls, study_info):
@@ -445,12 +457,33 @@ class Study:
         title = study.get("title")
         description = study.get("description")
         attributes = study.get("attributes", {})
-        factors = [json2dm.generate_attribute_from_json(f) for f in study.get("experimental_factor")]
-        designs = [json2dm.generate_attribute_from_json(f) for f in study.get("experimental_design")]
+        ef_objects = [json2dm.generate_attribute_from_json(f) for f in attributes.get("experimental_factor", [])]
+        ed_objects = [json2dm.generate_attribute_from_json(f) for f in attributes.get("experimental_design", [])]
 
-        return cls(alias, accession, title, description, protocolrefs, projectref,
-                   ef_objects, ed_objects, experiment_type, date_of_experiment,
-                   comments)
+        projectref = json2dm.get_reference_value_from_json(study.get("projectRef"))
+        protocolrefs = [json2dm.get_reference_value_from_json(p) for p in study.get("protocolRefs", [])]
+
+        experiment_type = attributes.get("experiment_type")
+        date_of_experiment = attributes.get("date_of_experiment")
+        comments = None
+
+        return cls(alias, accession, title, description, protocolrefs, projectref, ef_objects, ed_objects,
+                   experiment_type, date_of_experiment, comments)
+
+    @classmethod
+    def from_dict(cls, converted_dict):
+        return cls(
+            alias=converted_dict.get("alias"),
+            accession=converted_dict.get("accession"),
+            title=converted_dict.get("title"),
+            description=converted_dict.get("description"),
+            protocolrefs=converted_dict.get("protocolrefs"),
+            projectref=converted_dict.get("projectref"),
+            experimental_factor=converted_dict.get("experimental_factor"),
+            experimental_design=converted_dict.get("experimental_design"),
+            experiment_type=converted_dict.get("experiment_type"),
+            date_of_experiment=converted_dict.get("date_of_experiment"),
+            comments=converted_dict.get("comments"))
 
 
 class AssayData:

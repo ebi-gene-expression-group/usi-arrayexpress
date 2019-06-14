@@ -505,34 +505,34 @@
       "title": "My first ArrayExpress experiment submitted via JSON (one matrix file)",
       "description": "This is amazing, I can't believe it. Also how did this work so fast?",
       "attributes": {
-        "attributes": {
-          "experimental_factor": [
-            {
-              "value": "genotype",
-              "terms": [
-                {
-                  "url": "http://www.ebi.ac.uk/efo/EFO_0000513"
-                }
-              ]
-            }
-          ],
-          "experimental_design": [
-            {
-              "value": "case control design",
-              "terms": [
-                {
-                  "url": "http://www.ebi.ac.uk/efo/EFO_0001427"
-                }
-              ]
-            }
-          ],
-          "experiment_type": [
-            {
-              "value": "transcription profiling by array"
-            }
-          ],
-          "date_of_experiment": "2019-05-17"
-        }
+
+        "experimental_factor": [
+          {
+            "value": "genotype",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0000513"
+              }
+            ]
+          }
+        ],
+        "experimental_design": [
+          {
+            "value": "case control design",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0001427"
+              }
+            ]
+          }
+        ],
+        "experiment_type": [
+          {
+            "value": "transcription profiling by array"
+          }
+        ],
+        "date_of_experiment": "2019-05-17"
+
       },
       "protocolRefs": [
         {
