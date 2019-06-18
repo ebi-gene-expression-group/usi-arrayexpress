@@ -308,6 +308,78 @@
     },
     "parameters": {}
   },
+  "sample": {
+    "alias": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["alias"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["accession"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "taxon": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["taxon"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "taxonId": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["taxonId"],
+          "from_type": "integer",
+          "method": "import_string"
+        }
+      }
+    },
+    "material_type": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "material_type"],
+          "from_type": "attribute_object",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "description"],
+          "from_type": "attribute_object",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "attributes": {
+      "type": "array",
+      "import": {
+        "ae": {
+          "path": ["attributes"],
+          "from_type": "array",
+          "method": "generate_sample_attribute_dict"
+        }
+      }
+    }
+  },
   "publication": {
     "articleTitle": {
       "type": "string",

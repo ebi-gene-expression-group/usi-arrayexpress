@@ -105,6 +105,24 @@ class Sample:
 
         return cls(alias, accession, taxon, taxonId, attributes, material_type, description)
 
+    @classmethod
+    def from_dict(cls, sample_dict):
+        # Material type is part of the attributes but we want it as a defined attribute of the class,
+        # so we need to pull it out of the dict before adding all other attributes
+        material_type = None
+        attributes = sample_dict.get("attributes", {})
+        if attributes.get("material_type"):
+            # Assuming material_type property has already been converted to an Attribute class object
+            material_type = sample_dict.get("material_type", {}).value
+            del(attributes["material_type"])
+        return cls(alias=sample_dict.get("alias"),
+                   accession=sample_dict.get("accession"),
+                   taxon=sample_dict.get("taxon"),
+                   taxonId=sample_dict.get("taxonId"),
+                   material_type=material_type,
+                   description=sample_dict.get("description"),
+                   attributes=sample_dict.get("attributes"))
+
 
 class Assay:
     def __init__(self, alias, accession, technology_type, protocolrefs, sampleref):
@@ -141,7 +159,7 @@ class MicroarrayAssay(Assay):
         Assay attributes specific to microarray assays
 
         :param label: string, the label type
-        :param arrayref: string, ArrayExpress array design format accession
+        :param array_design: string, ArrayExpress array design format accession
         """
         Assay.__init__(self, alias, accession, technology_type, protocolrefs, sampleref)
         self.label = label

@@ -56,7 +56,6 @@ class JSONConverter:
         # We only take the first project in the list
         project_json = next(iter(envelope_json.get("projects", [])))
         project = datamodel.Project.from_dict(self.convert_datamodel_object(project_json, "project"))
-        print(project)
 
         # We only take the first study in the list
         study_json = next(iter(envelope_json.get("studies", [])))
@@ -65,7 +64,8 @@ class JSONConverter:
         protocol_json = envelope_json.get("protocols")
         protocols = [datamodel.Protocol.from_dict(self.convert_datamodel_object(p, "protocol")) for p in protocol_json]
 
-        samples = []
+        samples_json = envelope_json.get("samples")
+        samples = [datamodel.Sample.from_dict(self.convert_datamodel_object(s, "sample")) for s in samples_json]
         assays = []
         assay_data = []
         analysis = []
@@ -73,6 +73,7 @@ class JSONConverter:
         print(project)
         print(study)
         print(protocols)
+        print(samples)
 
         submission = datamodel.Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
         return submission
@@ -178,6 +179,10 @@ class JSONConverter:
         """Return the string value with optional translation according to controlled vocabulary."""
         return translation.get(element, str(element))
 
+    def generate_sample_attribute_dict(self, sample_attributes, translation={}):
+
+        return {category: self.generate_attribute_from_json(attribute[0])
+                for category, attribute in sample_attributes.items()}
 
 
 

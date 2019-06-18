@@ -487,7 +487,8 @@
         ],
         "genotype": [
           {"value": "knockout"}
-        ]
+        ],
+        "material_type": [{"value": "cell"}]
       }
     }
   ],
