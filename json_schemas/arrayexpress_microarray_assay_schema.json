@@ -143,6 +143,7 @@
     "sampleUses": {
       "type": "array",
       "minLength": 1,
+      "maxLength": 1,
       "items": {
         "type": "object",
         "properties": {
