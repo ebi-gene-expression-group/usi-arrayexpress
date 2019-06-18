@@ -197,7 +197,7 @@
             "experiment_type"
           ],
           "from_type": "attribute_object",
-          "method": "generate_attribute_from_json"
+          "method": "get_string_from_attribute"
         }
       }
     },

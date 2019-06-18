@@ -51,7 +51,6 @@ class JSONConverter:
         print(mapping_file)
 
     def convert(self, envelope_json):
-        sub_info = {}
 
         # We only take the first project in the list
         project_json = next(iter(envelope_json.get("projects", [])))
@@ -66,6 +65,9 @@ class JSONConverter:
 
         samples_json = envelope_json.get("samples")
         samples = [datamodel.Sample.from_dict(self.convert_datamodel_object(s, "sample")) for s in samples_json]
+
+        # To pick the right assay sub-type we need to guess the experiment type from the experiment type
+        submission_type = guess_submission_type_from_study(study)
         assays = []
         assay_data = []
         analysis = []
@@ -74,6 +76,13 @@ class JSONConverter:
         print(study)
         print(protocols)
         print(samples)
+
+        sub_info = {
+            "team": envelope_json.get("submission", {}).get("team", {}).get("name"),
+            "alias": envelope_json.get("submission", {}).get("id", {}),
+            "submission_type": submission_type
+        }
+        print(sub_info)
 
         submission = datamodel.Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
         return submission
@@ -178,6 +187,11 @@ class JSONConverter:
     def import_string(element, translation={}):
         """Return the string value with optional translation according to controlled vocabulary."""
         return translation.get(element, str(element))
+
+    @staticmethod
+    def get_string_from_attribute(element, translation={}):
+        """Return the value of an attribute as string."""
+        return translation.get(str(element.get("value")), str(element.get("value")))
 
     def generate_sample_attribute_dict(self, sample_attributes, translation={}):
 
