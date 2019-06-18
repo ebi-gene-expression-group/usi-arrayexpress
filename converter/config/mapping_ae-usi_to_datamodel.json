@@ -380,6 +380,167 @@
       }
     }
   },
+  "assay": {
+    "alias": {
+      "description": "unique name of the assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "not applicable for microarray"
+    },
+    "technology_type": {
+      "description": "array assay or sequencing assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "technology_type"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used to generate assay data",
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "protocolUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "sampleref": {
+      "description": "sample accession/name",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "sampleUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    }
+  },
+  "microarray_assay": {
+    "alias": {
+      "description": "unique name of the assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "not applicable for microarray"
+    },
+    "technology_type": {
+      "description": "array assay or sequencing assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "technology_type"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used to generate assay data",
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "protocolUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "sampleref": {
+      "description": "sample accession/name",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "sampleUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "label": {
+      "description": "the label type",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "label"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "array_design": {
+      "description": "ArrayExpress array design format accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "array_design"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    }
+  },
+  "sequencing_assay": {
+    "alias": {},
+    "accession": {},
+    "technology_type": {},
+    "protocolrefs": {},
+    "sampleref": {}
+  },
   "publication": {
     "articleTitle": {
       "type": "string",

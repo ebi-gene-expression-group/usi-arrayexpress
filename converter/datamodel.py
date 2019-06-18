@@ -192,8 +192,14 @@ class MicroarrayAssay(Assay):
         return cls(alias, accession, technology_type[0], protocolrefs, sampleref, label, array_design[0])
 
     @classmethod
-    def from_json(self):
-        pass
+    def from_dict(cls, assay_dict):
+        return cls(alias=assay_dict.get("alias"),
+                   accession=assay_dict.get("accession"),
+                   technology_type=assay_dict.get("technology_type"),
+                   protocolrefs=assay_dict.get("protocolrefs"),
+                   sampleref=assay_dict.get("sampleref"),
+                   label=assay_dict.get("label"),
+                   array_design=assay_dict.get("array_design"))
 
 
 class SeqAssay(Assay):

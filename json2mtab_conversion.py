@@ -48,7 +48,6 @@ def main():
     mapping_file = path.join(wd, "converter", "config", "mapping_ae-usi_to_datamodel.json")
     ae_converter = json2dm.JSONConverter(mapping_file, import_key="ae")
     sub = ae_converter.convert(json_data)
-    print(sub.study)
 
 
 if __name__ == '__main__':

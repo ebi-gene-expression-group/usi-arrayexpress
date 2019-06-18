@@ -45,13 +45,28 @@ def data_objects_from_json(json_data, json_file_path):
 class JSONConverter:
 
     def __init__(self, mapping_file, import_key="ae"):
+        """
+        The conversion relies on the instructions in the mapping file. This is a JSON schema representation
+        of the datamodel that describes the import for each attribute.
+        The following keys are expected:
+        "import: the name of the import route, e.g. "ae" for a USI ArrayExpress submission
+        Each import element should have:
+            "path": describes the way through the JSON to find the element to convert, as a list of element names
+            "method": contain the names of the function that should be applied to a given object The "path"
+
+        :param mapping_file: JSON schema describing the import strategy for each element in the datamodel
+        :param import_key: the key to select the import strategy from the mapping file
+        """
         self.mapping = read_json_file(mapping_file)
         self.import_key = import_key
 
-        print(mapping_file)
-
     def convert(self, envelope_json):
-
+        """
+        Converter that takes a JSON as input and converts it to a Submission class object
+        based on the specifications in the mapping file
+        :param envelope_json:
+        :return: Submission object
+        """
         # We only take the first project in the list
         project_json = next(iter(envelope_json.get("projects", [])))
         project = datamodel.Project.from_dict(self.convert_datamodel_object(project_json, "project"))
@@ -68,7 +83,10 @@ class JSONConverter:
 
         # To pick the right assay sub-type we need to guess the experiment type from the experiment type
         submission_type = guess_submission_type_from_study(study)
-        assays = []
+        print(envelope_json.get("assays", []))
+        if submission_type == "microarray":
+            assays = [datamodel.MicroarrayAssay.from_dict(self.convert_datamodel_object(a, "microarray_assay"))
+                      for a in envelope_json.get("assays", [])]
         assay_data = []
         analysis = []
 
@@ -76,6 +94,7 @@ class JSONConverter:
         print(study)
         print(protocols)
         print(samples)
+        print(assays)
 
         sub_info = {
             "team": envelope_json.get("submission", {}).get("team", {}).get("name"),
