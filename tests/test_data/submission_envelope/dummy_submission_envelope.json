@@ -27,6 +27,11 @@
           {
             "value": "A-MEXP-2072"
           }
+        ],
+        "technology_type": [
+          {
+            "value": "microarray assay"
+          }
         ]
       },
       "studyRef": {

@@ -84,6 +84,7 @@ class JSONConverter:
         # To pick the right assay sub-type we need to guess the experiment type from the experiment type
         submission_type = guess_submission_type_from_study(study)
         print(envelope_json.get("assays", []))
+        assays = []
         if submission_type == "microarray":
             assays = [datamodel.MicroarrayAssay.from_dict(self.convert_datamodel_object(a, "microarray_assay"))
                       for a in envelope_json.get("assays", [])]
@@ -158,7 +159,7 @@ class JSONConverter:
     def import_publication(self, element, translation={}):
         return self.convert_datamodel_object(element, "publication")
 
-    def import_contacts(self, element, translation={}):
+    def import_contact(self, element, translation={}):
         return self.convert_datamodel_object(element, "contact")
 
     @staticmethod

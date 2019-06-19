@@ -86,7 +86,7 @@
           "parent": "project",
           "path" : ["contacts"],
           "from_type": "array",
-          "method": "import_contacts"
+          "method": "import_contact"
         }
       }
     }
@@ -610,7 +610,7 @@
       "import": {
         "ae": {
           "parent": "contact",
-          "path": ["first"],
+          "path": ["firstName"],
           "from_type": "sting",
           "method": "import_string"
         }

@@ -414,7 +414,7 @@ class Project:
                    description=project_dict.get("description"),
                    releaseDate=project_dict.get("releaseDate"),
                    publications=[Publication.from_dict(p) for p in project_dict.get("publications")],
-                   contacts=project_dict.get("contacts"))
+                   contacts=[Contact.from_dict(p) for p in project_dict.get("contacts")])
 
 
 class Study:
