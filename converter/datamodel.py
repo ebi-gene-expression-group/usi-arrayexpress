@@ -571,6 +571,15 @@ class AssayData:
 
         return cls(alias, datafile_objects, data_type, assayrefs, protocolrefs, accession)
 
+    @classmethod
+    def from_dict(cls, conversion_dict):
+        return cls(alias=conversion_dict.get("alias"),
+                   files=[DataFile.from_dict(d) for d in conversion_dict.get("files")],
+                   data_type=conversion_dict.get("data_type"),
+                   assayrefs=conversion_dict.get("assayrefs", []),
+                   protocolrefs=conversion_dict.get("protocolrefs", []),
+                   accession=conversion_dict.get("accession"))
+
 
 class Analysis:
     def __init__(self, alias, files, data_type, assaydatarefs, protocolrefs):
@@ -608,6 +617,14 @@ class Analysis:
 
         return cls(alias, datafile_objects, data_type, assaydatarefs, protocolrefs)
 
+    @classmethod
+    def from_dict(cls, conversion_dict):
+        return cls(alias=conversion_dict.get("alias"),
+                   files=[DataFile.from_dict(d) for d in conversion_dict.get("files")],
+                   data_type=conversion_dict.get("data_type"),
+                   assaydatarefs=conversion_dict.get("assaydatarefs", []),
+                   protocolrefs=conversion_dict.get("protocolrefs", []))
+
 
 # Helper classes
 
@@ -639,6 +656,13 @@ class DataFile:
 
         return cls(name, ftp_location, checksum)
 
+    @classmethod
+    def from_dict(cls, conversion_dict):
+        return cls(name=conversion_dict.get("name"),
+                   ftp_location=conversion_dict.get("ftp_location"),
+                   checksum=conversion_dict.get("checksum"),
+                   checksum_method=conversion_dict.get("checksum_method"))
+
 
 class Contact:
     def __init__(self, firstName, lastName, email, affiliation, address, phone, roles, middleInitials, fax):
@@ -665,7 +689,7 @@ class Contact:
                    affiliation=conversion_dict.get("affiliation"),
                    address=conversion_dict.get("address"),
                    phone=conversion_dict.get("phone"),
-                   roles=conversion_dict.get("roles"),
+                   roles=conversion_dict.get("roles", []),
                    middleInitials=conversion_dict.get("middleInitials"),
                    fax=conversion_dict.get("fax"))
 

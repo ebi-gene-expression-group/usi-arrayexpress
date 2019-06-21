@@ -64,13 +64,13 @@
       "description": "list of Publication class objects",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/publication"
+        "$ref": "#/publication"
       },
       "import": {
         "ae": {
           "parent": "project",
           "path" : ["publications"],
-          "from_type": "list",
+          "from_type": "array",
           "method": "import_publication"
         }
       }
@@ -541,6 +541,84 @@
     "protocolrefs": {},
     "sampleref": {}
   },
+  "assay_data": {
+     "alias": {
+       "description": "unique name in the experiment (Assay Name in SDRF)",
+       "type": "string",
+       "import": {
+         "ae": {
+           "from_type": "string",
+           "parent": "assay_data",
+           "path": ["alias"],
+           "method": "import_string"
+         }
+       }
+     },
+    "files": {
+      "description": "list of DataFile class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#/data_file"
+      },
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "files"
+          ],
+          "method": "import_file"
+        }
+      }
+    },
+    "data_type": {
+      "description": "raw or raw matrix",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "parent": "assay_data",
+          "path": [
+            "attributes",
+            "data_type"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "assayrefs": {
+      "description": "assay name/accessions",
+      "type": "array",
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "assayRefs"
+          ],
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol name/accessions used to generate data file",
+      "type": "array"
+      },
+    "accession": {
+      "description": "(not for microarray) ENA run accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "parent": "assay_data",
+          "path": [
+            "accession"
+          ],
+          "method": "import_string"
+        }
+      }
+    }
+  },
   "publication": {
     "articleTitle": {
       "type": "string",
@@ -700,6 +778,57 @@
           "parent": "contact",
           "path": ["fax"],
           "from_type": "array",
+          "method": "import_string"
+        }
+      }
+    }
+  },
+  "data_file": {
+    "name": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": [
+            "name"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "checksum": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": [
+            "checksum"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "checksum_method": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": [
+            "checksum_method"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "ftp_location": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": [
+            "attributes",
+            "ftp_location"
+          ],
           "method": "import_string"
         }
       }

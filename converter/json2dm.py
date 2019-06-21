@@ -69,26 +69,30 @@ class JSONConverter:
         """
         # We only take the first project in the list
         project_json = next(iter(envelope_json.get("projects", [])))
-        project = datamodel.Project.from_dict(self.convert_datamodel_object(project_json, "project"))
+        project = datamodel.Project.from_dict(self.convert_submittable(project_json, "project"))
 
         # We only take the first study in the list
         study_json = next(iter(envelope_json.get("studies", [])))
-        study = datamodel.Study.from_dict(self.convert_datamodel_object(study_json, "study"))
+        study = datamodel.Study.from_dict(self.convert_submittable(study_json, "study"))
 
         protocol_json = envelope_json.get("protocols")
-        protocols = [datamodel.Protocol.from_dict(self.convert_datamodel_object(p, "protocol")) for p in protocol_json]
+        protocols = [datamodel.Protocol.from_dict(self.convert_submittable(p, "protocol")) for p in protocol_json]
 
         samples_json = envelope_json.get("samples")
-        samples = [datamodel.Sample.from_dict(self.convert_datamodel_object(s, "sample")) for s in samples_json]
+        samples = [datamodel.Sample.from_dict(self.convert_submittable(s, "sample")) for s in samples_json]
 
         # To pick the right assay sub-type we need to guess the experiment type from the experiment type
         submission_type = guess_submission_type_from_study(study)
-        print(envelope_json.get("assays", []))
+
         assays = []
         if submission_type == "microarray":
-            assays = [datamodel.MicroarrayAssay.from_dict(self.convert_datamodel_object(a, "microarray_assay"))
+            assays = [datamodel.MicroarrayAssay.from_dict(self.convert_submittable(a, "microarray_assay"))
                       for a in envelope_json.get("assays", [])]
-        assay_data = []
+
+        # TODO: Sequencing and Singlecell assays
+
+        assay_data = [datamodel.AssayData.from_dict(self.convert_submittable(ad, "assay_data"))
+                      for ad in envelope_json.get("assayData")]
         analysis = []
 
         print(project)
@@ -107,7 +111,7 @@ class JSONConverter:
         submission = datamodel.Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
         return submission
 
-    def convert_datamodel_object(self, submittable_object, submittable_name):
+    def convert_submittable(self, submittable_object, submittable_name):
         """
         Use the mapping instructions and convert the different attributes accordingly.
         :param submittable_object: part of a JSON submission envelope containing the details for a single "submittable"
@@ -115,14 +119,12 @@ class JSONConverter:
         :return: dictionary of the datamodel class attributes with the values to be inserted
         """
         submittable_attributes = {}
-        print(submittable_object)
+
         # Go through attributes in the config
         for attribute, attribute_info in self.mapping.get(submittable_name, {}).items():
-            print(attribute)
             # Get information how to convert
             convert_function = None
             mapping_info = attribute_info.get("import", {}).get(self.import_key, {})
-            print(mapping_info)
             path = mapping_info.get("path", [])
             method = mapping_info.get("method", "")
             translation = mapping_info.get("translation", {})
@@ -130,9 +132,9 @@ class JSONConverter:
                 convert_function = getattr(self, method)
             if path and convert_function:
                 target_object = self.interpret_path(path, submittable_object)
-                print(target_object)
+
                 if isinstance(target_object, list):
-                    if attribute_info.get("type") == "string":
+                    if attribute_info.get("type") in ["string", "attribute_object"]:
                         # Take the first entry
                         submittable_attributes[attribute] = next(iter([convert_function(o, translation=translation)
                                                                        for o in target_object]))
@@ -141,7 +143,7 @@ class JSONConverter:
                                                              for o in target_object]
                 elif target_object:
                     submittable_attributes[attribute] = convert_function(target_object, translation=translation)
-        print(submittable_attributes)
+
         return submittable_attributes
 
     def interpret_path(self, path, json_object):
@@ -157,10 +159,13 @@ class JSONConverter:
             return self.interpret_path(path[1:], json_object.get(path[0], {}))
 
     def import_publication(self, element, translation={}):
-        return self.convert_datamodel_object(element, "publication")
+        return self.convert_submittable(element, "publication")
 
     def import_contact(self, element, translation={}):
-        return self.convert_datamodel_object(element, "contact")
+        return self.convert_submittable(element, "contact")
+
+    def import_file(self, element, translation={}):
+        return self.convert_submittable(element, "data_file")
 
     @staticmethod
     def generate_attribute_from_json(element, translation={}):
