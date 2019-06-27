@@ -93,7 +93,9 @@ class JSONConverter:
 
         assay_data = [datamodel.AssayData.from_dict(self.convert_submittable(ad, "assay_data"))
                       for ad in envelope_json.get("assayData")]
-        analysis = []
+
+        analysis = [datamodel.Analysis.from_dict(self.convert_submittable(a, "analysis"))
+                    for a in envelope_json.get("analyses")]
 
         print(project)
         print(study)

@@ -619,6 +619,70 @@
       }
     }
   },
+  "analysis": {
+    "alias": {
+      "description": "unique name in the experiment (auto-generated from processed file name in SDRF)",
+      "type": "string",
+      "import": {
+         "ae": {
+           "from_type": "string",
+           "parent": "analysis",
+           "path": ["alias"],
+           "method": "import_string"
+         }
+       }
+    },
+    "files": {
+      "description": "list of DataFile class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#/data_file"
+      },
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "analysis",
+          "path": [
+            "files"
+          ],
+          "method": "import_file"
+        }
+      }
+    },
+    "data_type": {
+      "description": "processed or processed matrix",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "parent": "analysis",
+          "path": [
+            "attributes",
+            "data_type"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "assaydatarefs": {
+      "description": "list of assay data name/accessions",
+      "type": "array",
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "assayDataRefs"
+          ],
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "list of protocol name/accessions used to generate data file",
+      "type": "array"
+    }
+  },
   "publication": {
     "articleTitle": {
       "type": "string",
