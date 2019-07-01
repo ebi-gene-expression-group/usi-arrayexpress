@@ -535,11 +535,77 @@
     }
   },
   "sequencing_assay": {
-    "alias": {},
-    "accession": {},
-    "technology_type": {},
-    "protocolrefs": {},
-    "sampleref": {}
+    "alias": {
+      "description": "unique name of the assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "not applicable for microarray"
+    },
+    "technology_type": {
+      "description": "array assay or sequencing assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "technology_type"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used to generate assay data",
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "protocolUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "sampleref": {
+      "description": "sample accession/name",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "sampleUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "lib_attribs": {
+      "description": "dictionary of library attributes",
+      "type": "dict",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": ["attributes"],
+          "method": "import_lib_attribs"
+        }
+      }
+    }
   },
   "assay_data": {
      "alias": {
@@ -894,6 +960,118 @@
             "ftp_location"
           ],
           "method": "import_string"
+        }
+      }
+    }
+  },
+  "lib_attribs": {
+    "library_layout" : {
+      "description": "paired or single-end sequencing",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_layout"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_selection": {
+      "description": "type of nucleic acid enrichment",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_selection"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_strategy": {
+      "description": "sequencing approach",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_strategy"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_source": {
+      "description": "type of nucleic acid input",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_source"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "orientation": {
+      "description": "orientation of the reads in the paired fastq",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["orientation"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "nominal_length": {
+      "description": "length of the insert in the sequenced fragments (paired-end only)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "integer",
+          "path": ["nominal_length"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "nominal_sdev": {
+      "description": "standard deviation of the insert size (paired-end only)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "integer",
+          "path": ["nominal_sdev"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "platform_type": {
+      "description": "manufacturer of the sequencing equipment",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["platform_type"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "instrument_model": {
+      "description": "model of the sequencing machine",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["instrument_model"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_strand": {
+      "description": "first or second strand (for directional sequencing)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_strand"],
+          "method": "get_string_from_attribute"
         }
       }
     }

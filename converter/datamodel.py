@@ -121,7 +121,7 @@ class Sample:
                    taxonId=sample_dict.get("taxonId"),
                    material_type=material_type,
                    description=sample_dict.get("description"),
-                   attributes=sample_dict.get("attributes"))
+                   attributes=sample_dict.get("attributes", {}))
 
 
 class Assay:
@@ -196,7 +196,7 @@ class MicroarrayAssay(Assay):
         return cls(alias=assay_dict.get("alias"),
                    accession=assay_dict.get("accession"),
                    technology_type=assay_dict.get("technology_type"),
-                   protocolrefs=assay_dict.get("protocolrefs"),
+                   protocolrefs=assay_dict.get("protocolrefs", []),
                    sampleref=assay_dict.get("sampleref"),
                    label=assay_dict.get("label"),
                    array_design=assay_dict.get("array_design"))
@@ -270,9 +270,13 @@ class SeqAssay(Assay):
         return cls(alias, accession, technology_type, protocolrefs, samplerefs, lib_attribs)
 
     @classmethod
-    def from_json(cls, assay_object):
-
-        pass
+    def from_dict(cls, assay_dict):
+        return cls(alias=assay_dict.get("alias"),
+                   accession=assay_dict.get("accession"),
+                   technology_type=assay_dict.get("technology_type"),
+                   protocolrefs=assay_dict.get("protocolrefs"),
+                   sampleref=assay_dict.get("sampleref"),
+                   lib_attribs=assay_dict.get("lib_attribs"))
 
 
 class Protocol:
@@ -413,8 +417,8 @@ class Project:
                    title=project_dict.get("title"),
                    description=project_dict.get("description"),
                    releaseDate=project_dict.get("releaseDate"),
-                   publications=[Publication.from_dict(p) for p in project_dict.get("publications")],
-                   contacts=[Contact.from_dict(p) for p in project_dict.get("contacts")])
+                   publications=[Publication.from_dict(p) for p in project_dict.get("publications", [])],
+                   contacts=[Contact.from_dict(p) for p in project_dict.get("contacts", [])])
 
 
 class Study:
@@ -511,13 +515,13 @@ class Study:
             accession=converted_dict.get("accession"),
             title=converted_dict.get("title"),
             description=converted_dict.get("description"),
-            protocolrefs=converted_dict.get("protocolrefs"),
+            protocolrefs=converted_dict.get("protocolrefs", []),
             projectref=converted_dict.get("projectref"),
-            experimental_factor=converted_dict.get("experimental_factor"),
-            experimental_design=converted_dict.get("experimental_design"),
-            experiment_type=converted_dict.get("experiment_type"),
+            experimental_factor=converted_dict.get("experimental_factor", []),
+            experimental_design=converted_dict.get("experimental_design", []),
+            experiment_type=converted_dict.get("experiment_type", []),
             date_of_experiment=converted_dict.get("date_of_experiment"),
-            comments=converted_dict.get("comments"))
+            comments=converted_dict.get("comments", {}))
 
 
 class AssayData:
@@ -574,7 +578,7 @@ class AssayData:
     @classmethod
     def from_dict(cls, conversion_dict):
         return cls(alias=conversion_dict.get("alias"),
-                   files=[DataFile.from_dict(d) for d in conversion_dict.get("files")],
+                   files=[DataFile.from_dict(d) for d in conversion_dict.get("files", [])],
                    data_type=conversion_dict.get("data_type"),
                    assayrefs=conversion_dict.get("assayrefs", []),
                    protocolrefs=conversion_dict.get("protocolrefs", []),
@@ -620,7 +624,7 @@ class Analysis:
     @classmethod
     def from_dict(cls, conversion_dict):
         return cls(alias=conversion_dict.get("alias"),
-                   files=[DataFile.from_dict(d) for d in conversion_dict.get("files")],
+                   files=[DataFile.from_dict(d) for d in conversion_dict.get("files", [])],
                    data_type=conversion_dict.get("data_type"),
                    assaydatarefs=conversion_dict.get("assaydatarefs", []),
                    protocolrefs=conversion_dict.get("protocolrefs", []))

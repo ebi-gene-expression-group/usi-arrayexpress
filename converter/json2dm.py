@@ -68,17 +68,17 @@ class JSONConverter:
         :return: Submission object
         """
         # We only take the first project in the list
-        project_json = next(iter(envelope_json.get("projects", [])))
+        project_json = next(iter(envelope_json.get("projects", [])), {})
         project = datamodel.Project.from_dict(self.convert_submittable(project_json, "project"))
 
         # We only take the first study in the list
-        study_json = next(iter(envelope_json.get("studies", [])))
+        study_json = next(iter(envelope_json.get("studies", [])), {})
         study = datamodel.Study.from_dict(self.convert_submittable(study_json, "study"))
 
-        protocol_json = envelope_json.get("protocols")
+        protocol_json = envelope_json.get("protocols", [])
         protocols = [datamodel.Protocol.from_dict(self.convert_submittable(p, "protocol")) for p in protocol_json]
 
-        samples_json = envelope_json.get("samples")
+        samples_json = envelope_json.get("samples", [])
         samples = [datamodel.Sample.from_dict(self.convert_submittable(s, "sample")) for s in samples_json]
 
         # To pick the right assay sub-type we need to guess the experiment type from the experiment type
@@ -89,13 +89,15 @@ class JSONConverter:
             assays = [datamodel.MicroarrayAssay.from_dict(self.convert_submittable(a, "microarray_assay"))
                       for a in envelope_json.get("assays", [])]
 
-        # TODO: Sequencing and Singlecell assays
+        elif submission_type in ["singlecell", "sequencing"]:
+            assays = [datamodel.SeqAssay.from_dict(self.convert_submittable(a, "sequencing_assay"))
+                      for a in envelope_json.get("assays", [])]
 
         assay_data = [datamodel.AssayData.from_dict(self.convert_submittable(ad, "assay_data"))
-                      for ad in envelope_json.get("assayData")]
+                      for ad in envelope_json.get("assayData", [])]
 
         analysis = [datamodel.Analysis.from_dict(self.convert_submittable(a, "analysis"))
-                    for a in envelope_json.get("analyses")]
+                    for a in envelope_json.get("analyses", [])]
 
         print(project)
         print(study)
@@ -134,7 +136,6 @@ class JSONConverter:
                 convert_function = getattr(self, method)
             if path and convert_function:
                 target_object = self.interpret_path(path, submittable_object)
-
                 if isinstance(target_object, list):
                     if attribute_info.get("type") in ["string", "attribute_object"]:
                         # Take the first entry
@@ -168,6 +169,9 @@ class JSONConverter:
 
     def import_file(self, element, translation={}):
         return self.convert_submittable(element, "data_file")
+
+    def import_lib_attribs(self, element, translation={}):
+        return self.convert_submittable(element, "lib_attribs")
 
     @staticmethod
     def generate_attribute_from_json(element, translation={}):
@@ -207,8 +211,6 @@ class JSONConverter:
             return element.get("accession")
         elif element and element.get("alias"):
             return element.get("alias")
-        else:
-            return ""
 
     @staticmethod
     def import_string(element, translation={}):
