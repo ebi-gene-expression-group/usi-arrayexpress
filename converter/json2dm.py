@@ -6,6 +6,7 @@ from utils.converter_utils import guess_submission_type_from_study, get_term_fro
 from utils.common_utils import get_ontology_from_term_url
 
 
+# Not used
 def data_objects_from_json(json_data, json_file_path):
     """
     Read in a USI JSON submission envelope, convert metadata to the common data model and return a submission object
@@ -60,7 +61,7 @@ class JSONConverter:
         self.mapping = read_json_file(mapping_file)
         self.import_key = import_key
 
-    def convert(self, envelope_json):
+    def convert(self, envelope_json, submission_type=None):
         """
         Converter that takes a JSON as input and converts it to a Submission class object
         based on the specifications in the mapping file
@@ -81,8 +82,12 @@ class JSONConverter:
         samples_json = envelope_json.get("samples", [])
         samples = [datamodel.Sample.from_dict(self.convert_submittable(s, "sample")) for s in samples_json]
 
-        # To pick the right assay sub-type we need to guess the experiment type from the experiment type
-        submission_type = guess_submission_type_from_study(study)
+        # To pick the right assay sub-type we need to know the submission type
+        submission_type = getattr(study, "study_type")
+
+        # Try to guess the experiment type from the experiment type
+        if not submission_type:
+            submission_type = guess_submission_type_from_study(study)
 
         assays = []
         if submission_type == "microarray":

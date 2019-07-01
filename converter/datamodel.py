@@ -424,7 +424,7 @@ class Project:
 class Study:
     def __init__(self, alias, accession, title, description, protocolrefs, projectref,
                  experimental_factor, experimental_design, experiment_type, date_of_experiment,
-                 comments=None):
+                 study_type=None, comments=None):
         """
         Attributes of the study
         :param alias: string, unique study name (auto-generated from MAGE-TAB file name)
@@ -437,6 +437,7 @@ class Study:
         :param experimental_design: list, Attribute class objects
         :param experiment_type: list, experiment type ontology terms
         :param date_of_experiment: string, (optional) date of experiment
+        :param study_type: string, submission type (microarray, sequencing, singlecell)
         :param comments: dictionary, (optional) known IDF comments
                         keys: string, comment category
                         values: list, comment values
@@ -451,13 +452,14 @@ class Study:
         self.experimental_design = experimental_design
         self.experiment_type = experiment_type
         self.date_of_experiment = date_of_experiment
+        self.study_type = study_type
         self.comments = comments
 
     def __repr__(self):
         return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.title}, " \
                "{self.description}, {self.protocolrefs}, {self.projectref}, {self.experimental_factor}, " \
                "{self.experimental_design}, {self.experiment_type}, {self.date_of_experiment}, " \
-               "{self.comments})".format(self=self)
+               "{self.study_type}, {self.comments})".format(self=self)
 
     @classmethod
     def from_magetab(cls, study_info):
@@ -485,7 +487,7 @@ class Study:
         experiment_type = comments.get("experiment_type", [])
 
         return cls(alias, accession, title, description, protocolrefs, projectref,
-                   ef_objects, ed_objects, experiment_type, date_of_experiment,
+                   ef_objects, ed_objects, experiment_type, date_of_experiment, None,
                    comments)
 
     @classmethod
@@ -503,10 +505,11 @@ class Study:
 
         experiment_type = attributes.get("experiment_type")
         date_of_experiment = attributes.get("date_of_experiment")
+        study_type = attributes.get("study_type")
         comments = None
 
         return cls(alias, accession, title, description, protocolrefs, projectref, ef_objects, ed_objects,
-                   experiment_type, date_of_experiment, comments)
+                   experiment_type, date_of_experiment, study_type, comments)
 
     @classmethod
     def from_dict(cls, converted_dict):
@@ -521,6 +524,7 @@ class Study:
             experimental_design=converted_dict.get("experimental_design", []),
             experiment_type=converted_dict.get("experiment_type", []),
             date_of_experiment=converted_dict.get("date_of_experiment"),
+            study_type=converted_dict.get("study_type"),
             comments=converted_dict.get("comments", {}))
 
 

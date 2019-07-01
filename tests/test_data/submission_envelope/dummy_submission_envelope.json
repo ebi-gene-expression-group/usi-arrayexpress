@@ -13,7 +13,37 @@
   "supportingSamplesRequired": [],
   "supportingSamples": [],
   "uploadedFiles": [],
-  "analyses": [],
+  "analyses": [
+    {
+      "id": "fce2442f-3e9d-4db9-8f67-fa3e1036f1c3",
+      "accession": null,
+      "alias": "raw_data",
+      "team": {
+        "name": "my-test-team",
+        "description": null,
+        "profile": {}
+      },
+      "files": [
+        {
+          "name": "proecessed_data.txt",
+          "checksum": null,
+          "checksumMethod": null,
+          "type": null,
+          "unencryptedChecksum": null,
+          "label": null
+        }
+      ],
+      "assayDataRefs": [
+        {
+          "alias": "raw_data",
+          "team": "my-test-team"
+        }
+      ],
+      "attributes": {
+        "data_type": "raw matrix"
+      }
+    }
+  ],
   "assays": [
     {
       "alias": "Control 1:Cy3",
