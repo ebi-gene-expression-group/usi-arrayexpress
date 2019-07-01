@@ -3,7 +3,7 @@ import re
 import os
 from converter import datamodel
 from utils.converter_utils import guess_submission_type_from_study, get_term_from_url, read_json_file
-from utils.common_utils import get_ontology_from_term_url
+from utils.common_utils import get_ontology_from_term_url, get_term_parent
 
 
 # Not used
@@ -205,8 +205,10 @@ class JSONConverter:
             term_source = get_ontology_from_term_url(term.get("url"))
         unit_value = element.get("units")
         if unit_value:
-            # USI does not support ontology annotations for unit terms
-            unit = datamodel.Unit(unit_value, None, None, None)
+            # Generate unit type as this is not a field in USI's unit model
+            unit_type = get_term_parent("efo", unit_value)
+            # USI does not support ontology annotations for unit terms, initialising with None
+            unit = datamodel.Unit(unit_value, unit_type, None, None)
 
         return datamodel.Attribute(value, unit, term_accession, term_source)
 
