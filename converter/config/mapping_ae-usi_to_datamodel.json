@@ -237,6 +237,21 @@
         }
       }
     },
+    "study_type": {
+      "description": "submission type: microarray, sequencing, singlecell",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "study_type"
+          ],
+          "from_type": "attribute_object",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
     "comments": {}
   },
   "protocol": {

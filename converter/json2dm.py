@@ -166,6 +166,9 @@ class JSONConverter:
         else:
             return self.interpret_path(path[1:], json_object.get(path[0], {}))
 
+    # The following are converting functions that do the conversion from JSON sub-elements
+    # For each data object the function in the mapping file (under import > method) is called
+    
     def import_publication(self, element, translation={}):
         return self.convert_submittable(element, "publication")
 
@@ -231,6 +234,4 @@ class JSONConverter:
 
         return {category: self.generate_attribute_from_json(attribute[0])
                 for category, attribute in sample_attributes.items()}
-
-
 
