@@ -46,7 +46,8 @@ def main():
 
     wd = path.dirname(path.realpath(__file__))
     mapping_file = path.join(wd, "converter", "config", "mapping_ae-usi_to_datamodel.json")
-    ae_converter = json2dm.JSONConverter(mapping_file, import_key="ae")
+    mapping = read_json_file(mapping_file)
+    ae_converter = json2dm.JSONConverter(mapping, import_key="ae")
     sub = ae_converter.convert(json_data)
 
 

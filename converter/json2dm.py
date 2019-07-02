@@ -1,8 +1,10 @@
 
 import re
 import os
+from collections import OrderedDict
+
 from converter import datamodel
-from utils.converter_utils import guess_submission_type_from_study, get_term_from_url, read_json_file
+from utils.converter_utils import guess_submission_type_from_study, get_term_from_url
 from utils.common_utils import get_ontology_from_term_url, get_term_parent
 
 
@@ -45,7 +47,7 @@ def data_objects_from_json(json_data, json_file_path):
 
 class JSONConverter:
 
-    def __init__(self, mapping_file, import_key="ae"):
+    def __init__(self, mapping, import_key="ae"):
         """
         The conversion relies on the instructions in the mapping file. This is a JSON schema representation
         of the datamodel that describes the import for each attribute.
@@ -55,10 +57,10 @@ class JSONConverter:
             "path": describes the way through the JSON to find the element to convert, as a list of element names
             "method": contain the names of the function that should be applied to a given object The "path"
 
-        :param mapping_file: JSON schema describing the import strategy for each element in the datamodel
+        :param mapping: JSON schema object describing the import strategy for each element in the datamodel
         :param import_key: the key to select the import strategy from the mapping file
         """
-        self.mapping = read_json_file(mapping_file)
+        self.mapping = mapping
         self.import_key = import_key
 
     def convert(self, envelope_json, submission_type=None):
@@ -127,7 +129,7 @@ class JSONConverter:
         :param submittable_name: name of the submittable as referenced in the mapping file
         :return: dictionary of the datamodel class attributes with the values to be inserted
         """
-        submittable_attributes = {}
+        submittable_attributes = OrderedDict()
 
         # Go through attributes in the config
         for attribute, attribute_info in self.mapping.get(submittable_name, {}).items():
@@ -151,7 +153,7 @@ class JSONConverter:
                                                              for o in target_object]
                 elif target_object:
                     submittable_attributes[attribute] = convert_function(target_object, translation=translation)
-
+        print(submittable_attributes)
         return submittable_attributes
 
     def interpret_path(self, path, json_object):
@@ -234,6 +236,6 @@ class JSONConverter:
 
     def generate_sample_attribute_dict(self, sample_attributes, translation={}):
 
-        return {category: self.generate_attribute_from_json(attribute[0])
-                for category, attribute in sample_attributes.items()}
+        return OrderedDict([(category, self.generate_attribute_from_json(attribute[0]))
+                            for category, attribute in sample_attributes.items()])
 
