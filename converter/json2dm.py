@@ -207,8 +207,8 @@ class JSONConverter:
             term_source = get_ontology_from_term_url(term.get("url"))
         unit_value = element.get("units")
         if unit_value:
-            # Generate unit type as this is not a field in USI's unit model
-            unit_type = get_term_parent("efo", unit_value)
+            # Generate unit type as this is not a field in USI's unit model, also remove "derived" from the label
+            unit_type = re.sub("\\s*derived\\s*", "", get_term_parent("efo", unit_value), 1)
             # USI does not support ontology annotations for unit terms, initialising with None
             unit = datamodel.Unit(unit_value, unit_type, None, None)
 

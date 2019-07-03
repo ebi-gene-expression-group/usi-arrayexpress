@@ -72,7 +72,7 @@ class TestSampleParsing(unittest.TestCase):
         target = Sample("Control 1", None, "Homo sapiens", 9606,
                         OrderedDict([
                             ("organism", Attribute("Homo sapiens", None, None, None)),
-                            ("age", Attribute("12", Unit("year", "derived time unit", None, None), None, None)),
+                            ("age", Attribute("12", Unit("year", "time unit", None, None), None, None)),
                             ("cell line", Attribute("KG1", None, "EFO_0002218", "EFO"))]),
                         None, None)
         sample_dict = self.converter.convert_submittable(source, "sample")
