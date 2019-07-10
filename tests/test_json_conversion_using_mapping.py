@@ -48,7 +48,7 @@ class TestSampleParsing(unittest.TestCase):
                             ("disease", Attribute("acute myeloid leukemia", None, None, None)),
                             ("cell line", Attribute("KG1", None, None, None)),
                             ]), "cell", None)
-        sample_dict = self.converter.convert_submittable(source, "sample")
+        sample_dict = self.converter.convert_attributes(source, "sample")
         converted_sample = Sample.from_dict(sample_dict)
         self.assertEqual(str(target), str(converted_sample))
 
@@ -75,7 +75,7 @@ class TestSampleParsing(unittest.TestCase):
                             ("age", Attribute("12", Unit("year", "time unit", None, None), None, None)),
                             ("cell line", Attribute("KG1", None, "EFO_0002218", "EFO"))]),
                         None, None)
-        sample_dict = self.converter.convert_submittable(source, "sample")
+        sample_dict = self.converter.convert_attributes(source, "sample")
         converted_sample = Sample.from_dict(sample_dict)
         self.assertEqual(str(target), str(converted_sample))
 
@@ -93,7 +93,7 @@ class TestSampleParsing(unittest.TestCase):
                         OrderedDict([
                             ("compound", Attribute("sodium arsanilate", None, "CHEBI_36049", "CHEBI"))]),
                         None, None)
-        sample_dict = self.converter.convert_submittable(source, "sample")
+        sample_dict = self.converter.convert_attributes(source, "sample")
         converted_sample = Sample.from_dict(sample_dict)
         self.assertEqual(str(target), str(converted_sample))
 

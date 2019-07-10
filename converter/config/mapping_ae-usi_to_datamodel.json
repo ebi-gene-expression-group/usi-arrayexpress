@@ -1,95 +1,103 @@
 {
   "project": {
-    "alias" : {
-      "description": "unique project name (auto-generated from MAGE-TAB file name)",
-      "type": "string",
-      "import": {
-        "ae": {
-          "parent": "project",
-          "path": ["alias"],
-          "from_type": "sting",
-          "method": "import_string"
+    "import": {
+      "ae": {
+        "path": ["projects"],
+        "method": "import_first_object_from_list"
         }
       }
     },
-    "accession": {
-      "description": "BioStudies accession",
-      "type": "string",
-      "import": {
-        "ae": {
-          "parent": "project",
-          "path": ["accession"],
-          "from_type": "sting",
-          "method": "import_string"
+    "attributes": {
+      "alias" : {
+        "description": "unique project name (auto-generated from MAGE-TAB file name)",
+        "type": "string",
+        "import": {
+          "ae": {
+            "parent": "project",
+            "path": ["alias"],
+            "from_type": "sting",
+            "method": "import_string"
+          }
         }
-      }
-    },
-    "title": {
-      "description": "(optional) submitter provided project description",
-      "type": "string",
-      "import": {
-        "ae": {
-          "parent": "project",
-          "path": ["title"],
-          "from_type": "sting",
-          "method": "import_string"
-        }
-      }
-    },
-    "description": {
-      "description": "(optional) free-text project description",
-      "type": "string",
-      "import": {
-        "ae": {
-          "parent": "project",
-          "path": ["description"],
-          "from_type": "sting",
-          "method": "import_string"
-        }
-      }
-    },
-    "releaseDate": {
-      "description": "date of public release",
-      "type": "string",
-      "import": {
-        "ae": {
-          "parent": "project",
-          "path": ["releaseDate"],
-          "from_type": "sting",
-          "method": "import_string"
-        }
-      }
-    },
-    "publications": {
-      "description": "list of Publication class objects",
-      "type": "array",
-      "items": {
-        "$ref": "#/publication"
       },
-      "import": {
-        "ae": {
-          "parent": "project",
-          "path" : ["publications"],
-          "from_type": "array",
-          "method": "import_publication"
+      "accession": {
+        "description": "BioStudies accession",
+        "type": "string",
+        "import": {
+          "ae": {
+            "parent": "project",
+            "path": ["accession"],
+            "from_type": "sting",
+            "method": "import_string"
+          }
         }
-      }
-    },
-    "contacts": {
-      "description": "list of Contact class objects",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/contact"
       },
-      "import": {
-        "ae": {
-          "parent": "project",
-          "path" : ["contacts"],
-          "from_type": "array",
-          "method": "import_contact"
+      "title": {
+        "description": "(optional) submitter provided project description",
+        "type": "string",
+        "import": {
+          "ae": {
+            "parent": "project",
+            "path": ["title"],
+            "from_type": "sting",
+            "method": "import_string"
+          }
+        }
+      },
+      "description": {
+        "description": "(optional) free-text project description",
+        "type": "string",
+        "import": {
+          "ae": {
+            "parent": "project",
+            "path": ["description"],
+            "from_type": "sting",
+            "method": "import_string"
+          }
+        }
+      },
+      "releaseDate": {
+        "description": "date of public release",
+        "type": "string",
+        "import": {
+          "ae": {
+            "parent": "project",
+            "path": ["releaseDate"],
+            "from_type": "sting",
+            "method": "import_string"
+          }
+        }
+      },
+      "publications": {
+        "description": "list of Publication class objects",
+        "type": "array",
+        "items": {
+          "$ref": "#/publication"
+        },
+        "import": {
+          "ae": {
+            "parent": "project",
+            "path" : ["publications"],
+            "from_type": "array",
+            "method": "import_publication"
+          }
+        }
+      },
+      "contacts": {
+        "description": "list of Contact class objects",
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/contact"
+        },
+        "import": {
+          "ae": {
+            "parent": "project",
+            "path" : ["contacts"],
+            "from_type": "array",
+            "method": "import_contact"
+          }
         }
       }
-    }
   },
   "study": {
     "alias": {
