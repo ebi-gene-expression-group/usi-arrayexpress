@@ -506,7 +506,7 @@ class AssayData:
 
 
 class Analysis:
-    def __init__(self, alias, files, data_type, assaydatarefs, protocolrefs):
+    def __init__(self, alias, files, data_type, samplerefs, assayrefs, assaydatarefs, protocolrefs):
         """
         :param alias: string, unique name in the experiment (auto-generated from processed file name in SDRF)
         :param files: list, DataFile class objects
@@ -517,6 +517,8 @@ class Analysis:
         self.alias = alias
         self.files = files
         self.data_type = data_type
+        self.samplerefs = samplerefs
+        self.assayrefs = assayrefs
         self.assaydatarefs = assaydatarefs
         self.protocolrefs = protocolrefs
 
@@ -532,14 +534,15 @@ class Analysis:
             data_type = "processed"
 
         protocolrefs = file_attributes.get("protocol_ref")
-
+        sampleref = file_attributes.get("sample_ref")
         # Assay ref is generated based on le_ref (for MA) or extract_ref (for HTS)
         if file_attributes.get("le_ref"):
-            assaydatarefs = remove_duplicates(file_attributes.get("le_ref"))
+            assayref = remove_duplicates(file_attributes.get("le_ref"))
         else:
-            assaydatarefs = remove_duplicates(file_attributes.get("extract_ref"))
+            assayref = remove_duplicates(file_attributes.get("extract_ref"))
+        assaydatarefs = file_attributes.get("assay_ref")
 
-        return cls(alias, datafile_objects, data_type, assaydatarefs, protocolrefs)
+        return cls(alias, datafile_objects, data_type, sampleref, assayref, assaydatarefs, protocolrefs)
 
 
 # Helper classes

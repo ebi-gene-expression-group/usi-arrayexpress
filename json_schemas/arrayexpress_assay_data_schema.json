@@ -73,8 +73,7 @@
       "items": {
           "type": "object",
           "properties": {
-              "protocolRef": { "$ref": "#/definitions/submittableRef" },
-              "attributes": { "$ref": "#/definitions/attributes" }
+              "protocolRef": { "$ref": "#/definitions/submittableRef" }
         }
       }
     }

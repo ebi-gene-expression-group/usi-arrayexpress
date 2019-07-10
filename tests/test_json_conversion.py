@@ -5,7 +5,7 @@ from collections import OrderedDict
 from converter.datamodel import Sample, Attribute, Unit
 
 
-class TestJSONparsing(unittest.TestCase):
+class TestSampleParsing(unittest.TestCase):
 
     def test_generate_simple_sample_object(self):
         source = {"alias": "Control 1",
@@ -75,3 +75,9 @@ class TestJSONparsing(unittest.TestCase):
                         None, None)
         converted_sample = Sample.from_json(source)
         self.assertEqual(str(converted_sample), str(target))
+
+
+class TestStudyParsing(unittest.TestCase):
+
+    def test_generate_simple_study(self):
+        pass
