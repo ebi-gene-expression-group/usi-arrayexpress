@@ -191,7 +191,6 @@ class JSONConverter:
         :param translation: (optional) a dictionary with translations for controlled terms
         :return: datamodel.Attribute object
         """
-
         term_accession = None
         term_source = None
         unit = None

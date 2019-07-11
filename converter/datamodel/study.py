@@ -50,24 +50,22 @@ class Study(AccessionedSubmittable):
     @classmethod
     def from_magetab(cls, study_info):
         accession = study_info.get("accession")
-
         idf_file = os.path.basename(study_info.get("idf_filename", ""))
         alias = re.sub("\.idf\.txt$", "", idf_file)
         projectref = "project_" + alias
-
         title = study_info.get("title")
         description = study_info.get("description")
         ef = study_info.get("experimental_factor", [])
-
-        ef_objects = [Attribute(d.get("experimental_factor"), None,
-                                d.get("term_accession"),
-                                d.get("term_source")) for d in ef]
+        ef_objects = [Attribute(value=d.get("experimental_factor"),
+                                unit=None,
+                                term_accession=d.get("term_accession"),
+                                term_source=d.get("term_source")) for d in ef]
         ed = study_info.get("experimental_design", [])
-        ed_objects = [Attribute(d.get("experimental_design"), None,
-                                d.get("term_accession"),
-                                d.get("term_source")) for d in ed]
+        ed_objects = [Attribute(value=d.get("experimental_design"),
+                                unit=None,
+                                term_accession=d.get("term_accession"),
+                                term_source=d.get("term_source")) for d in ed]
         protocolrefs = study_info.get("protocolRefs", [])
-
         date_of_experiment = study_info.get("date_of_experiment", None)
         comments = study_info.get("comments", {})
         experiment_type = comments.get("experiment_type", [])

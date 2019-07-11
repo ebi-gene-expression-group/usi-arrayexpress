@@ -21,8 +21,8 @@ class Project(AccessionedSubmittable):
         AccessionedSubmittable.__init__(self, **kwargs)
         self.title = kwargs.get("title")
         self.releaseDate = kwargs.get("releaseDate")
-        self.publications = kwargs.get("publications", [])
-        self.contacts = kwargs.get("contacts", [])
+        self.publications = [Publication(**p) for p in kwargs.get("publications", [])]
+        self.contacts = [Contact(**c) for c in kwargs.get("contacts", [])]
 
     def __repr__(self):
         return "{self.__class__.__name__}(alias={self.alias}, accession={self.accession}, " \
@@ -39,19 +39,18 @@ class Project(AccessionedSubmittable):
         comments = study_info.get("comments")
         accession = comments.get("biostudiesaccession", None)
         releaseDate = study_info.get("releaseDate", None)
-
         contact_terms = get_controlled_vocabulary("contact_terms")
         contacts_raw = study_info.get("contacts", [])
-        contacts = [Contact(c.get(contact_terms["Person First Name"]),
-                            c.get(contact_terms["Person Last Name"]),
-                            c.get(contact_terms["Person Email"]),
-                            c.get(contact_terms["Person Affiliation"]),
-                            c.get(contact_terms["Person Address"]),
-                            c.get(contact_terms["Person Phone"]),
-                            c.get(contact_terms["Person Roles"]),
-                            c.get(contact_terms["Person Mid Initials"]),
-                            c.get(contact_terms["Person Fax"])
-                            ) for c in contacts_raw]
+        contacts = [{contact_terms["Person First Name"]: c.get(contact_terms["Person First Name"]),
+                     contact_terms["Person Last Name"]: c.get(contact_terms["Person Last Name"]),
+                     contact_terms["Person Email"]: c.get(contact_terms["Person Email"]),
+                     contact_terms["Person Affiliation"]: c.get(contact_terms["Person Affiliation"]),
+                     contact_terms["Person Address"]: c.get(contact_terms["Person Address"]),
+                     contact_terms["Person Phone"]: c.get(contact_terms["Person Phone"]),
+                     contact_terms["Person Roles"]: c.get(contact_terms["Person Roles"]),
+                     contact_terms["Person Mid Initials"]: c.get(contact_terms["Person Mid Initials"]),
+                     contact_terms["Person Fax"]: c.get(contact_terms["Person Fax"])}
+                    for c in contacts_raw]
         # Transform roles to list
         for c in contacts:
             if c.roles:
@@ -60,12 +59,12 @@ class Project(AccessionedSubmittable):
         # Get publication terms and create list of
         publications_raw = study_info.get("publications", [])
         pub_terms = get_controlled_vocabulary("publication_terms")
-        publications = [Publication(pub.get(pub_terms["Publication Title"]),
-                                    pub.get(pub_terms["Publication Author List"]),
-                                    pub.get(pub_terms["PubMed ID"]),
-                                    pub.get(pub_terms["Publication DOI"]),
-                                    pub.get(pub_terms["Publication Status"])) for pub in publications_raw]
-
+        publications = [{pub_terms["Publication Title"]: pub.get(pub_terms["Publication Title"]),
+                        pub_terms["Publication Author List"]: pub.get(pub_terms["Publication Author List"]),
+                        pub_terms["PubMed ID"]: pub.get(pub_terms["PubMed ID"]),
+                        pub_terms["Publication DOI"]: pub.get(pub_terms["Publication DOI"]),
+                        pub_terms["Publication Status"]: pub.get(pub_terms["Publication Status"])}
+                        for pub in publications_raw]
         title = study_info.get("title")
         description = study_info.get("description")
 
@@ -76,13 +75,3 @@ class Project(AccessionedSubmittable):
                    releaseDate=releaseDate,
                    publications=publications,
                    contacts=contacts)
-
-    @classmethod
-    def from_dict(cls, project_dict):
-        return cls(alias=project_dict.get("alias"),
-                   accession=project_dict.get("accession"),
-                   title=project_dict.get("title"),
-                   description=project_dict.get("description"),
-                   releaseDate=project_dict.get("releaseDate"),
-                   publications=[Publication.from_dict(p) for p in project_dict.get("publications", [])],
-                   contacts=[Contact.from_dict(p) for p in project_dict.get("contacts", [])])

@@ -84,3 +84,6 @@ class Unit:
                "term_source={self.term_source}, term_accession={self.term_accession})".format(self=self)
 
 
+if __name__ == '__main__':
+    df = DataFile(**{"name": "dog"})
+    print(df)

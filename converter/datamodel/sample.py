@@ -2,7 +2,6 @@ from collections import OrderedDict
 
 from converter.datamodel.submittable import AccessionedSubmittable
 from converter.datamodel.components import Attribute, Unit
-
 from utils.converter_utils import get_taxon
 
 
@@ -21,7 +20,12 @@ class Sample(AccessionedSubmittable):
         self.taxon = kwargs.get("taxon")
         self.taxonId = kwargs.get("taxonId")
         self.material_type = kwargs.get("material_type")
-        self.attributes = kwargs.get("attributes")
+        self.attributes = kwargs.get("attributes", {})
+
+        # Set material type if found in attributes
+        if not self.material_type and "material_type" in self.attributes:
+            self.material_type = self.attributes.get("material_type").value
+            del self.attributes["material_type"]
 
     def __repr__(self):
         return "{self.__class__.__name__}(alias={self.alias}, accession={self.accession}, taxon={self.taxon}, " \
@@ -52,15 +56,15 @@ class Sample(AccessionedSubmittable):
             new_unit = None
             if "unit" in c_attrib:
                 unit_attrib = c_attrib.get("unit")
-                new_unit = Unit(unit_attrib.get("value"),
-                                unit_attrib.get("unit_type"),
-                                unit_attrib.get("term_accession"),
-                                unit_attrib.get("term_source"))
+                new_unit = Unit(value=unit_attrib.get("value"),
+                                unit_type=unit_attrib.get("unit_type"),
+                                term_accession=unit_attrib.get("term_accession"),
+                                term_source=unit_attrib.get("term_source"))
 
-            attributes[c_name] = Attribute(c_attrib.get("value"),
-                                           new_unit,
-                                           c_attrib.get("term_accession"),
-                                           c_attrib.get("term_source"))
+            attributes[c_name] = Attribute(value=c_attrib.get("value"),
+                                           unit=new_unit,
+                                           term_accession=c_attrib.get("term_accession"),
+                                           term_source=c_attrib.get("term_source"))
 
         return cls(alias=alias,
                    accession=accession,
@@ -70,20 +74,4 @@ class Sample(AccessionedSubmittable):
                    material_type=material_type,
                    description=description)
 
-    @classmethod
-    def from_dict(cls, sample_dict):
-        # Material type is part of the attributes but we want it as a defined attribute of the class,
-        # so we need to pull it out of the dict before adding all other attributes
-        material_type = None
-        attributes = sample_dict.get("attributes", {})
-        if attributes.get("material_type"):
-            # Assuming material_type property has already been converted to an Attribute class object
-            material_type = sample_dict.get("material_type", {}).value
-            del(attributes["material_type"])
-        return cls(alias=sample_dict.get("alias"),
-                   accession=sample_dict.get("accession"),
-                   taxon=sample_dict.get("taxon"),
-                   taxonId=sample_dict.get("taxonId"),
-                   material_type=material_type,
-                   description=sample_dict.get("description"),
-                   attributes=sample_dict.get("attributes", {}))
+

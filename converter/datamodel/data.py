@@ -1,4 +1,3 @@
-import types
 
 from converter.datamodel.submittable import DependentSubmittable
 from converter.datamodel.components import DataFile
@@ -8,13 +7,13 @@ from utils.converter_utils import remove_duplicates
 class DataSubmittable(DependentSubmittable):
     def __init__(self, **kwargs):
         DependentSubmittable.__init__(self, **kwargs)
-        self.files = [DataFile(d) for d in kwargs.get("files", [])]
+        self.files = [DataFile(**d) for d in kwargs.get("files", [])]
         self.data_type = kwargs.get("data_type")
 
 
 class AssayData(DataSubmittable):
     """
-    Attributes of the assay data
+    Attributes of the assay data (raw data object)
     :param alias: string, unique name in the experiment (auto-generated from Assay Name in SDRF)
     :param files: list, DataFile class objects
     :param data_type: string, raw or raw matrix
@@ -29,8 +28,9 @@ class AssayData(DataSubmittable):
         self.accession = kwargs.get("accession")
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.alias}, {self.files}, {self.data_type}, " \
-               "{self.assayrefs}, {self.protocolrefs}, {self.accession})".format(self=self)
+        return "{self.__class__.__name__}(alias={self.alias}, files={self.files}, " \
+               "data_type={self.data_type}, assayrefs={self.assayrefs}, " \
+               "protocolrefs={self.protocolrefs}, accession={self.accession})".format(self=self)
 
     @classmethod
     def from_magetab(cls, name, datafile_objects, file_attributes):
@@ -69,6 +69,7 @@ class AssayData(DataSubmittable):
 
 class Analysis(DataSubmittable):
     """
+    Attributes for the analysis (processed data object)
     :param alias: string, unique name in the experiment (auto-generated from processed file name in SDRF)
     :param files: list, DataFile class objects
     :param data_type: string, processed or processed matrix
@@ -78,7 +79,12 @@ class Analysis(DataSubmittable):
 
     def __init__(self, **kwargs):
         DataSubmittable.__init__(self, **kwargs)
-        self.assayrefs = kwargs.get("assaydatarefs")
+        self.assaydatarefs = kwargs.get("assaydatarefs")
+
+    def __repr__(self):
+        return "{self.__class__.__name__}(alias={self.alias}, files={self.files}, " \
+               "data_type={self.data_type}, assaydatarefs={self.assaydatarefs}, " \
+               "protocolrefs={self.protocolrefs})".format(self=self)
 
     @classmethod
     def from_magetab(cls, datafile_objects, file_attributes):
@@ -105,15 +111,4 @@ class Analysis(DataSubmittable):
                    assaydatarefs=assaydatarefs,
                    protocolrefs=protocolrefs)
 
-    @classmethod
-    def from_dict(cls, conversion_dict):
-        return cls(alias=conversion_dict.get("alias"),
-                   files=[DataFile.from_dict(d) for d in conversion_dict.get("files", [])],
-                   data_type=conversion_dict.get("data_type"),
-                   assaydatarefs=conversion_dict.get("assaydatarefs", []),
-                   protocolrefs=conversion_dict.get("protocolrefs", []))
 
-
-if __name__ == '__main__':
-    a = Analysis(assaydatarefs='refs')
-    print(a.return_all())
