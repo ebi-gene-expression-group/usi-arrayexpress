@@ -1,4 +1,5 @@
 from converter.datamodel.submittable import DependentSubmittable
+from utils.converter_utils import remove_duplicates, get_controlled_vocabulary
 
 
 class Assay(DependentSubmittable):
@@ -16,8 +17,8 @@ class Assay(DependentSubmittable):
         self.sampleref = kwargs.get("sampleref")
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.alias}, {self.accession}, {self.technology_type}, " \
-               "{self.protocolrefs}, {self.sampleref})".format(self=self)
+        return "{self.__class__.__name__}(alias={self.alias}, technology_type={self.technology_type}, " \
+               "protocolrefs={self.protocolrefs}, sampleref={self.sampleref})".format(self=self)
 
 
 class MicroarrayAssay(Assay):
