@@ -35,11 +35,11 @@ class Publication:
         self.authors = kwargs.get("authors")
         self.pubmedId = kwargs.get("pubmedId")
         self.doi = kwargs.get("doi")
-        self.status = kwargs.get("status")
+        self.publicationStatus = kwargs.get("publicationStatus")
 
     def __repr__(self):
         return "{self.__class__.__name__}(articleTitle={self.articleTitle}, authors={self.authors}, " \
-               "pubmedId={self.pubmedId}, doi={self.doi}, status={self.status})".format(self=self)
+               "pubmedId={self.pubmedId}, doi={self.doi}, status={self.publicationStatus})".format(self=self)
 
 
 class Attribute:

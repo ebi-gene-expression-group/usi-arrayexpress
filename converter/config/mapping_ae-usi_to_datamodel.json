@@ -806,7 +806,7 @@
         }
       }
     },
-    "status": {
+    "publicationStatus": {
       "type": "string",
       "import": {
         "ae": {
