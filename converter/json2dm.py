@@ -1,6 +1,5 @@
 
 import re
-import os
 from collections import OrderedDict
 
 from converter.datamodel.submission import Submission

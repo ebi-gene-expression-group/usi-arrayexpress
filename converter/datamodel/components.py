@@ -10,24 +10,6 @@ class DataFile:
         return "{self.__class__.__name__}(name={self.name}, checksum={self.checksum}, " \
                "checksum_method={self.checksum_method}, ftp_location={self.ftp_location})".format(self=self)
 
-    @classmethod
-    def from_magetab(cls, file_attributes):
-
-        name = file_attributes.get("name")
-        comments = file_attributes.get("comments", {})
-        checksum = comments.get("MD5")
-
-        if "ArrayExpress FTP file" in comments:
-            ftp_location = comments.get("ArrayExpress FTP file")
-        elif "FASTQ_URI" in comments:
-            ftp_location = comments.get("FASTQ_URI")
-        elif "Derived ArrayExpress FTP file" in comments:
-            ftp_location = comments.get("Derived ArrayExpress FTP file")
-        else:
-            ftp_location = None
-
-        return cls(name=name, checksum=checksum, checksum_method="MD5", ftp_location=ftp_location)
-
 
 class Contact:
     def __init__(self, **kwargs):
@@ -83,7 +65,3 @@ class Unit:
         return "{self.__class__.__name__}(value={self.value}, unit_type={self.unit_type}, " \
                "term_source={self.term_source}, term_accession={self.term_accession})".format(self=self)
 
-
-if __name__ == '__main__':
-    df = DataFile(**{"name": "dog"})
-    print(df)

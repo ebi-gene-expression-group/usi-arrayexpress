@@ -47,15 +47,11 @@ class Project(AccessionedSubmittable):
                      contact_terms["Person Affiliation"]: c.get(contact_terms["Person Affiliation"]),
                      contact_terms["Person Address"]: c.get(contact_terms["Person Address"]),
                      contact_terms["Person Phone"]: c.get(contact_terms["Person Phone"]),
-                     contact_terms["Person Roles"]: c.get(contact_terms["Person Roles"]),
+                     contact_terms["Person Roles"]: re.split("\s*;\s*", c.get(contact_terms["Person Roles"])),
                      contact_terms["Person Mid Initials"]: c.get(contact_terms["Person Mid Initials"]),
                      contact_terms["Person Fax"]: c.get(contact_terms["Person Fax"])}
                     for c in contacts_raw]
-        # Transform roles to list
-        for c in contacts:
-            if c.roles:
-                roles = c.roles
-                c.roles = roles.split(';')
+
         # Get publication terms and create list of
         publications_raw = study_info.get("publications", [])
         pub_terms = get_controlled_vocabulary("publication_terms")

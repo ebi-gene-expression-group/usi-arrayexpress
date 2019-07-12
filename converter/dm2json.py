@@ -2,7 +2,7 @@
 
 from collections import OrderedDict, defaultdict
 
-from converter.datamodel import Attribute
+from converter.datamodel.components import Attribute
 from utils.converter_utils import is_accession, get_efo_url, write_json_file, attrib2dict
 
 
