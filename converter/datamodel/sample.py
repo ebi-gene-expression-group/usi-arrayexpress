@@ -22,9 +22,8 @@ class Sample(AccessionedSubmittable):
         self.material_type = kwargs.get("material_type")
         self.attributes = kwargs.get("attributes", {})
 
-        # Set material type if found in attributes
-        if not self.material_type and "material_type" in self.attributes:
-            self.material_type = self.attributes.get("material_type").value
+        # Remove material type from attributes if already defined in main attribute
+        if self.material_type and "material_type" in self.attributes:
             del self.attributes["material_type"]
 
     def __repr__(self):

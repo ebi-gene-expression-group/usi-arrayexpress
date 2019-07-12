@@ -370,7 +370,7 @@
         "ae": {
           "path": ["attributes", "material_type"],
           "from_type": "attribute_object",
-          "method": "generate_attribute_from_json"
+          "method": "get_string_from_attribute"
         }
       }
     },
@@ -471,9 +471,6 @@
           "method": "import_string"
         }
       }
-    },
-    "accession": {
-      "description": "not applicable for microarray"
     },
     "technology_type": {
       "description": "array assay or sequencing assay",
