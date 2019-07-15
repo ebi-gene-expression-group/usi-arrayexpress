@@ -7,7 +7,7 @@ class Submittable:
 
     def get_all_attributes(self):
         """Return a list of all attributes"""
-        return [k for k, v in self.__dict__.items() if not isinstance(v, function)]
+        return [k for k, v in self.__dict__.items() if not callable(v)]
 
 
 class AccessionedSubmittable(Submittable):
