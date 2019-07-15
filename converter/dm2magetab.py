@@ -87,11 +87,14 @@ def generate_sdrf(sub):
 
         # Add source node
         row.extend([OrderedDict(sample_values)])
-        print(row)
 
         # Get all assay objects that belong to this sample (based on alias or accession)
-        assays = [assay for assay in sub.assay if assay.sampleref in (sample.alias, sample.accession)]
-
+        if sample.accession:
+            assays = [assay for assay in sub.assay if assay.sampleref == sample.accession]
+        else:
+            assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
+        print(sample.alias, sample.accession)
+        print(assays)
         for assay in assays:
             # Reformat protocol REFs for edges between nodes
             all_protocols.update((sub.get_protocol(pref) for pref in assay.protocolrefs))
@@ -120,7 +123,7 @@ def generate_sdrf(sub):
                     if attribute_value:
                         extract_values.append(("Comment[{}]".format(aa.upper()), attribute_value))
                 row2 = row[:] + [protocol_refs[1], OrderedDict(extract_values)]
-                print(row2)
+
             # Get all assay data objects that belong to this assay
             data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]
 
@@ -133,7 +136,7 @@ def generate_sdrf(sub):
 
                 all_protocols.update((sub.get_protocol(pref) for pref in ad.protocolrefs))
                 protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
-                print(protocol_refs)
+
                 assay_values = [("Assay Name", assay_name),
                                 ("Technology Type", assay.technology_type)]
 
@@ -144,7 +147,7 @@ def generate_sdrf(sub):
                     row3 = row2[:] + [protocol_refs[3], OrderedDict(assay_values)]
                 else:
                     row3 = row2[:] + [protocol_refs[4], OrderedDict(assay_values)]
-                print(row3)
+
                 # Get all data files
                 data_values = []
                 for f in ad.files:
@@ -157,7 +160,6 @@ def generate_sdrf(sub):
                         data_values.append(("Comment[{}]".format(f.checksum_method.upper()), f.checksum))
 
                     row4 = row3[:] + [OrderedDict(data_values)]
-                    print(row4)
 
                     end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
 

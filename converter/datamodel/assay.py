@@ -125,7 +125,6 @@ class SeqAssay(Assay):
         protocolrefs.extend(extract_attributes.get("protocol_ref", []))
         protocolrefs = remove_duplicates(protocolrefs)
 
-
         # Get platform and instrument from sequencing protocol
         for p in protocols:
             if p.get("title") in protocolrefs and p.get("protocol_type") == "nucleic acid sequencing protocol":
@@ -141,7 +140,7 @@ class SeqAssay(Assay):
                    accession=accession,
                    technology_type=technology_type,
                    protocolrefs=protocolrefs,
-                   samplerefs=extract_attributes.get("sample_ref"),
+                   sampleref=extract_attributes.get("sample_ref"),
                    **lib_attribs)
 
 
