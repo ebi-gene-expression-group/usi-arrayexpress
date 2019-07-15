@@ -680,20 +680,6 @@
         }
       }
     },
-    "sampleref": {
-      "description": "list of assay data name/accessions",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "array",
-          "parent": "assay_data",
-          "path": [
-            "sampleRefs"
-          ],
-          "method": "get_reference_value_from_json"
-        }
-      }
-    },
     "assayrefs": {
       "description": "list of assay data name/accessions",
       "type": "array",
