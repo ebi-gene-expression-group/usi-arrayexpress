@@ -86,9 +86,9 @@ def generate_usi_assay_object(assay, study_info):
 
     assay_object = OrderedDict()
 
-    if assay.accession:
+    try:
         assay_object['alias'] = assay.accession
-    else:
+    except AttributeError:
         assay_object['alias'] = assay.alias
 
     attributes = assay.get_all_attributes()
