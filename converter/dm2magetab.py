@@ -72,7 +72,7 @@ def generate_sdrf(sub):
     # are collected separately per node block and then merged at the end into one SDRF table.
     for sample in sub.sample:
         row = []
-        all_protocols = []
+        all_protocols = set()
 
         sample_values = [("Source Name", sample.alias)]
         if sample.accession:
@@ -85,39 +85,45 @@ def generate_sdrf(sub):
         if sample.material_type:
             sample_values.append(("Material Type", sample.material_type))
 
-        print(sample_values)
         # Add source node
         row.extend([OrderedDict(sample_values)])
         print(row)
 
-        # Get all assay objects that belong to this sample
-        assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
+        # Get all assay objects that belong to this sample (based on alias or accession)
+        assays = [assay for assay in sub.assay if assay.sampleref in (sample.alias, sample.accession)]
 
         for assay in assays:
             # Reformat protocol REFs for edges between nodes
-            all_protocols.extend([sub.get_protocol(pref) for pref in assay.protocolrefs])
+            all_protocols.update((sub.get_protocol(pref) for pref in assay.protocolrefs))
             protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
             print(protocol_refs)
 
-            extract_values = [("Extract Name", sample.alias)]
-
             if submission_type == "microarray":
+                # Take Extract Name from Sample name
+                extract_values = [("Extract Name", sample.alias)]
                 le_values = [
                     ("Labelled Extract Name", assay.alias),
                     ("Label", assay.label)]
                 # Add protocol refs, extract node and labeled extract node
-                row.extend([protocol_refs[1], OrderedDict(extract_values),
-                            protocol_refs[2], OrderedDict(le_values)])
+                row2 = row[:] + [protocol_refs[1], OrderedDict(extract_values),
+                                 protocol_refs[2], OrderedDict(le_values)]
 
             # submission type is sequencing or singlecell, get assay attributes and convert them to comments
             else:
-                assay_attributes = assay.get_attributes()
+                extract_values = [("Extract Name", assay.alias)]
+                assay_attributes = [at for at in assay.get_all_attributes() if at not in ('alias', 'accession',
+                                                                                          'technology_type',
+                                                                                          'sampleref',
+                                                                                          'protocolrefs')]
                 for aa in assay_attributes:
-                    extract_values.append(("Comment[{}]".format(aa.upper()), getattr(assay, aa)))
-                row.extend([protocol_refs[1], OrderedDict(extract_values)])
-
+                    attribute_value = getattr(assay, aa)
+                    if attribute_value:
+                        extract_values.append(("Comment[{}]".format(aa.upper()), attribute_value))
+                row2 = row[:] + [protocol_refs[1], OrderedDict(extract_values)]
+                print(row2)
             # Get all assay data objects that belong to this assay
             data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]
+
             for ad in data:
                 # For matrix files the Assay Name is inferred from the assay object (i.e. labeled extract name)
                 if ad.data_type == "raw matrix":
@@ -125,8 +131,9 @@ def generate_sdrf(sub):
                 else:
                     assay_name = ad.alias
 
-                all_protocols.extend([sub.get_protocol(pref) for pref in ad.protocolrefs])
+                all_protocols.update((sub.get_protocol(pref) for pref in ad.protocolrefs))
                 protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
+                print(protocol_refs)
                 assay_values = [("Assay Name", assay_name),
                                 ("Technology Type", assay.technology_type)]
 
@@ -134,10 +141,10 @@ def generate_sdrf(sub):
                     assay_values.extend([("Array Design REF", assay.array_design),
                                          ("array-design~~~Term Source REF", "Array Express")])
                     # Add Assay node
-                    row.extend([protocol_refs[3], OrderedDict(assay_values)])
+                    row3 = row2[:] + [protocol_refs[3], OrderedDict(assay_values)]
                 else:
-                    row.extend([protocol_refs[4], OrderedDict(assay_values)])
-
+                    row3 = row2[:] + [protocol_refs[4], OrderedDict(assay_values)]
+                print(row3)
                 # Get all data files
                 data_values = []
                 for f in ad.files:
@@ -157,6 +164,11 @@ def generate_sdrf(sub):
                                  OrderedDict(factor_values)])
 
                     #append_sdrf_row(submission_type, rows, protocol_refs, sample_values, extract_values)
+                    if f.checksum and f.checksum_method:
+                        data_values.append(("Comment[{}]".format(f.checksum_method.upper()), f.checksum))
+
+                    row4 = row3[:] + [OrderedDict(data_values)]
+                    print(row4)
 
                     # Add all lists together to form the complete row of the SDRF. We do this
                     # at the level of raw data files, which means each raw data file gets a row.
@@ -239,7 +251,7 @@ def configure_analysis_and_factors(all_protocols, assay_data, assay, sample, sub
             if f.ftp_location:
                 processed_data_values.append(("Comment[Derived ArrayExpress FTP file]", f.ftp_location))
         # Also add protocol references for how the processed data was generated from assay data
-        all_protocols.extend([sub.get_protocol(pref) for pref in px.protocolrefs])
+        all_protocols.update([sub.get_protocol(pref) for pref in px.protocolrefs])
     # Factor values
     factors = sub.study.experimental_factor
     factor_values = []
