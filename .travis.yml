@@ -13,3 +13,6 @@ script:
   - python tests/run_magetab_writer.py tests/test_data/E-TEST-1.idf.txt
     # Check that IDFs are identical
   - diff tests/test_data/E-TEST-1.idf.txt tests/test_data/E-TEST-1.idf.txt_new.txt
+
+    # Unit tests for the JSON converter
+  - python -m unittest tests/test_json_conversion_using_mapping.py

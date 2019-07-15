@@ -1,0 +1,1094 @@
+{
+  "project": {
+    "alias" : {
+      "description": "unique project name (auto-generated from MAGE-TAB file name)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["alias"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "BioStudies accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["accession"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "title": {
+      "description": "(optional) submitter provided project description",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["title"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "description": {
+      "description": "(optional) free-text project description",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["description"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "releaseDate": {
+      "description": "date of public release",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path": ["releaseDate"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "publications": {
+      "description": "list of Publication class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#/publication"
+      },
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path" : ["publications"],
+          "from_type": "array",
+          "method": "import_publication"
+        }
+      }
+    },
+    "contacts": {
+      "description": "list of Contact class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/contact"
+      },
+      "import": {
+        "ae": {
+          "parent": "project",
+          "path" : ["contacts"],
+          "from_type": "array",
+          "method": "import_contact"
+        }
+      }
+    }
+  },
+  "study": {
+    "alias": {
+      "description": "UUID of the USI submission",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "ArrayExpress experiment accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "accession"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "title": {
+      "description": "submitter provided study description",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "title"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "description": {
+      "description": "free-text description of study background and aim",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "description"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "experimental_factor": {
+      "description": "list of experimental factors as Attribute class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#definitions/attribute"
+      },
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "experimental_factor"
+          ],
+          "from_type": "attribute_object",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "experimental_design": {
+      "description": "(optional) list of experimental designs as Attribute class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#definitions/attribute"
+      },
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "experimental_design"
+          ],
+          "from_type": "attribute_object",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "experiment_type": {
+      "description": "experiment type ontology terms",
+      "type": "array",
+      "items": {
+      },
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "experiment_type"
+          ],
+          "from_type": "attribute_object",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "date_of_experiment": {
+      "description": "(optional) date of experiment",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "date_of_experiment"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used in the study",
+      "type": "array",
+      "import": {
+        "ae": {
+          "path": ["protocolRefs"],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "projectref": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["projectRef"],
+          "from_type": "ref_object",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "study_type": {
+      "description": "submission type: microarray, sequencing, singlecell",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "study",
+          "path": [
+            "attributes",
+            "study_type"
+          ],
+          "from_type": "attribute_object",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "comments": {}
+  },
+  "protocol": {
+    "alias": {
+      "description": "protocol accession or unique name in experiment",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["alias"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession":{
+      "description": "ArrayExpress protocol accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["accession"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "description": {
+      "description": "free-text description of protocol",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["description"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "protocol_type": {
+      "description": "experiment type ontology term",
+      "type": "attribute_object",
+      "import": {
+        "ae": {
+          "path": ["attributes", "protocol_type"],
+          "from_type": "array",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "hardware": {
+      "description": "free-text hardware description, sequencer model for sequencing experiments",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "hardware"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "software":{
+      "description": "free-text software description",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "software"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "parameters": {}
+  },
+  "sample": {
+    "alias": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["alias"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["accession"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "taxon": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["taxon"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "taxonId": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["taxonId"],
+          "from_type": "integer",
+          "method": "import_string"
+        }
+      }
+    },
+    "material_type": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "material_type"],
+          "from_type": "attribute_object",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "description"],
+          "from_type": "attribute_object",
+          "method": "generate_attribute_from_json"
+        }
+      }
+    },
+    "attributes": {
+      "type": "array",
+      "import": {
+        "ae": {
+          "path": ["attributes"],
+          "from_type": "array",
+          "method": "generate_sample_attribute_dict"
+        }
+      }
+    }
+  },
+  "assay": {
+    "alias": {
+      "description": "unique name of the assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "not applicable for microarray"
+    },
+    "technology_type": {
+      "description": "array assay or sequencing assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "technology_type"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used to generate assay data",
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "protocolUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "sampleref": {
+      "description": "sample accession/name",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "sampleUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    }
+  },
+  "microarray_assay": {
+    "alias": {
+      "description": "unique name of the assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "technology_type": {
+      "description": "array assay or sequencing assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "technology_type"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used to generate assay data",
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "protocolUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "sampleref": {
+      "description": "sample accession/name",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "sampleUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "label": {
+      "description": "the label type",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "label"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "array_design": {
+      "description": "ArrayExpress array design format accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "array_design"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    }
+  },
+  "sequencing_assay": {
+    "alias": {
+      "description": "unique name of the assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "not applicable for microarray"
+    },
+    "technology_type": {
+      "description": "array assay or sequencing assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "technology_type"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used to generate assay data",
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "protocolUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "sampleref": {
+      "description": "sample accession/name",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "sampleUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "lib_attribs": {
+      "description": "dictionary of library attributes",
+      "type": "dict",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": ["attributes"],
+          "method": "import_lib_attribs"
+        }
+      }
+    }
+  },
+  "assay_data": {
+     "alias": {
+       "description": "unique name in the experiment (Assay Name in SDRF)",
+       "type": "string",
+       "import": {
+         "ae": {
+           "from_type": "string",
+           "parent": "assay_data",
+           "path": ["alias"],
+           "method": "import_string"
+         }
+       }
+     },
+    "files": {
+      "description": "list of DataFile class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#/data_file"
+      },
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "files"
+          ],
+          "method": "import_file"
+        }
+      }
+    },
+    "data_type": {
+      "description": "raw or raw matrix",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "parent": "assay_data",
+          "path": [
+            "attributes",
+            "data_type"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "assayrefs": {
+      "description": "assay name/accessions",
+      "type": "array",
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "assayRefs"
+          ],
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol name/accessions used to generate data file",
+      "type": "array"
+      },
+    "accession": {
+      "description": "(not for microarray) ENA run accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "parent": "assay_data",
+          "path": [
+            "accession"
+          ],
+          "method": "import_string"
+        }
+      }
+    }
+  },
+  "analysis": {
+    "alias": {
+      "description": "unique name in the experiment (auto-generated from processed file name in SDRF)",
+      "type": "string",
+      "import": {
+         "ae": {
+           "from_type": "string",
+           "parent": "analysis",
+           "path": ["alias"],
+           "method": "import_string"
+         }
+       }
+    },
+    "files": {
+      "description": "list of DataFile class objects",
+      "type": "array",
+      "items": {
+        "$ref": "#/data_file"
+      },
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "analysis",
+          "path": [
+            "files"
+          ],
+          "method": "import_file"
+        }
+      }
+    },
+    "data_type": {
+      "description": "processed or processed matrix",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "parent": "analysis",
+          "path": [
+            "attributes",
+            "data_type"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "assaydatarefs": {
+      "description": "list of assay data name/accessions",
+      "type": "array",
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "assayDataRefs"
+          ],
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "list of protocol name/accessions used to generate data file",
+      "type": "array"
+    }
+  },
+  "publication": {
+    "articleTitle": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["articleTitle"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "authors": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["authors"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "pubmedId": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["pubmedId"],
+          "from_type": "integer",
+          "method": "import_string"
+        }
+      }
+    },
+    "doi": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["doi"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "publicationStatus": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "publication",
+          "path": ["publicationStatus"],
+          "from_type": "sting",
+          "method": "import_string",
+          "translation": {
+            "Unknown" : "",
+            "InPreparation": "in preparation",
+            "Submitted": "submitted",
+            "Published": "published"
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "firstName":{
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["firstName"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "lastName":{
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["lastName"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "email": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["email"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "affiliation": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["affiliation"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "address": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["address"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "phone": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["phone"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["roles"],
+          "from_type": "array",
+          "method": "import_string"
+        }
+      }
+    },
+    "middleInitials": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["middleInitials"],
+          "from_type": "sting",
+          "method": "import_string"
+        }
+      }
+    },
+    "fax": {
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["fax"],
+          "from_type": "array",
+          "method": "import_string"
+        }
+      }
+    }
+  },
+  "data_file": {
+    "name": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": [
+            "name"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "checksum": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": [
+            "checksum"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "checksum_method": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": [
+            "checksum_method"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "ftp_location": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": [
+            "attributes",
+            "ftp_location"
+          ],
+          "method": "import_string"
+        }
+      }
+    }
+  },
+  "lib_attribs": {
+    "library_layout" : {
+      "description": "paired or single-end sequencing",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_layout"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_selection": {
+      "description": "type of nucleic acid enrichment",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_selection"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_strategy": {
+      "description": "sequencing approach",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_strategy"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_source": {
+      "description": "type of nucleic acid input",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_source"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "orientation": {
+      "description": "orientation of the reads in the paired fastq",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["orientation"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "nominal_length": {
+      "description": "length of the insert in the sequenced fragments (paired-end only)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "integer",
+          "path": ["nominal_length"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "nominal_sdev": {
+      "description": "standard deviation of the insert size (paired-end only)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "integer",
+          "path": ["nominal_sdev"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "platform_type": {
+      "description": "manufacturer of the sequencing equipment",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["platform_type"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "instrument_model": {
+      "description": "model of the sequencing machine",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["instrument_model"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_strand": {
+      "description": "first or second strand (for directional sequencing)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "path": ["library_strand"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    }
+  }
+}
+
+
+

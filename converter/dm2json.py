@@ -2,7 +2,7 @@
 
 from collections import OrderedDict, defaultdict
 
-from converter.datamodel import Attribute
+from converter.datamodel.components import Attribute
 from utils.converter_utils import is_accession, get_efo_url, write_json_file, attrib2dict
 
 
@@ -42,7 +42,7 @@ def generate_usi_study_object(study, sub_info):
 
     # Optional attributes
     if study.date_of_experiment:
-        study_attributes["date_of_experiment"] = study.date_of_experiment
+        study_attributes["date_of_experiment"] = generate_usi_attribute_entry(study.date_of_experiment)
 
     study_object["attributes"] = study_attributes
 
@@ -86,14 +86,15 @@ def generate_usi_assay_object(assay, study_info):
 
     assay_object = OrderedDict()
 
-    if assay.accession:
+    try:
         assay_object['alias'] = assay.accession
-    else:
+    except AttributeError:
         assay_object['alias'] = assay.alias
 
-    attributes = assay.get_attributes()
+    attributes = assay.get_all_attributes()
+    assay_attributes = [a for a in attributes if a not in ('alias', 'protocolrefs', 'sampleref', 'accession')]
     assay_object['attributes'] = OrderedDict()
-    for category in attributes:
+    for category in assay_attributes:
         assay_object['attributes'][category] = generate_usi_attribute_entry(getattr(assay, category))
 
     assay_object['studyRef'] = generate_usi_ref_object(study_info.get('alias'), study_info)
