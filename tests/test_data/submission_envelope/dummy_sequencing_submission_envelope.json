@@ -114,7 +114,13 @@
             },
             "title": "Test Title",
             "description": null,
-            "attributes": {},
+            "attributes": {
+              "data_type": [
+                {
+                  "value": "raw"
+                }
+              ]
+            },
             "assayRefs": [
                 {
                     "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",

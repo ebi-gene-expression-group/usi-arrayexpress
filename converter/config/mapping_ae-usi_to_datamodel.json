@@ -688,7 +688,7 @@
             "attributes",
             "data_type"
           ],
-          "method": "import_string"
+          "method": "get_string_from_attribute"
         }
       }
     },
@@ -1008,7 +1008,7 @@
         "ae": {
           "from_type": "string",
           "path": [
-            "checksum_method"
+            "checksumMethod"
           ],
           "method": "import_string"
         }
