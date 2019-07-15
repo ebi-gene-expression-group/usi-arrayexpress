@@ -1,48 +1,17 @@
 
 import re
-import os
 from collections import OrderedDict
 
-from converter import datamodel
+from converter.datamodel.submission import Submission
+from converter.datamodel.sample import Sample
+from converter.datamodel.protocol import Protocol
+from converter.datamodel.study import Study
+from converter.datamodel.project import Project
+from converter.datamodel.data import AssayData, Analysis
+from converter.datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
+from converter.datamodel.components import Attribute, Unit
 from utils.converter_utils import guess_submission_type_from_study, get_term_from_url
 from utils.common_utils import get_ontology_from_term_url, get_term_parent
-
-
-# Not used
-def data_objects_from_json(json_data, json_file_path):
-    """
-    Read in a USI JSON submission envelope, convert metadata to the common data model and return a submission object
-
-    :param json_data: USI submission envelope with all submittables for an AE experiment submission
-    :return: Submission class object
-    """
-
-    # We expect one study, which should be guaranteed by the validation, anyway safely getting first element here
-    study = datamodel.Study.from_json(next(iter(json_data.get("studies", []))))
-
-    # Now we can fill in the submission info after we get the study object
-    submission_info = {
-        "team": json_data.get("submission", {}).get("team", {}).get("name"),
-        "alias": re.sub("\.json", "", os.path.basename(json_file_path)),
-        "metadata": json_file_path,
-        "submission_type": guess_submission_type_from_study(study)
-    }
-
-    # Samples
-    samples = [datamodel.Sample.from_json(s) for s in json_data.get("samples")]
-
-    project = None
-
-    protocols = []
-    assays = []
-    assay_data = []
-    analysis = []
-
-    print(submission_info)
-
-    sub = datamodel.Submission(submission_info, project, study, protocols, samples, assays, assay_data, analysis)
-
-    return sub
 
 
 class JSONConverter:
@@ -72,17 +41,17 @@ class JSONConverter:
         """
         # We only take the first project in the list
         project_json = next(iter(envelope_json.get("projects", [])), {})
-        project = datamodel.Project.from_dict(self.convert_submittable(project_json, "project"))
+        project = Project(**self.convert_submittable(project_json, "project"))
 
         # We only take the first study in the list
         study_json = next(iter(envelope_json.get("studies", [])), {})
-        study = datamodel.Study.from_dict(self.convert_submittable(study_json, "study"))
+        study = Study(**self.convert_submittable(study_json, "study"))
 
         protocol_json = envelope_json.get("protocols", [])
-        protocols = [datamodel.Protocol.from_dict(self.convert_submittable(p, "protocol")) for p in protocol_json]
+        protocols = [Protocol(**self.convert_submittable(p, "protocol")) for p in protocol_json]
 
         samples_json = envelope_json.get("samples", [])
-        samples = [datamodel.Sample.from_dict(self.convert_submittable(s, "sample")) for s in samples_json]
+        samples = [Sample(**self.convert_submittable(s, "sample")) for s in samples_json]
 
         # To pick the right assay sub-type we need to know the submission type
         submission_type = getattr(study, "study_type")
@@ -93,17 +62,17 @@ class JSONConverter:
 
         assays = []
         if submission_type == "microarray":
-            assays = [datamodel.MicroarrayAssay.from_dict(self.convert_submittable(a, "microarray_assay"))
+            assays = [MicroarrayAssay(**self.convert_submittable(a, "microarray_assay"))
                       for a in envelope_json.get("assays", [])]
 
         elif submission_type in ["singlecell", "sequencing"]:
-            assays = [datamodel.SeqAssay.from_dict(self.convert_submittable(a, "sequencing_assay"))
+            assays = [SeqAssay(**self.convert_submittable(a, "sequencing_assay"))
                       for a in envelope_json.get("assays", [])]
 
-        assay_data = [datamodel.AssayData.from_dict(self.convert_submittable(ad, "assay_data"))
+        assay_data = [AssayData(**self.convert_submittable(ad, "assay_data"))
                       for ad in envelope_json.get("assayData", [])]
 
-        analysis = [datamodel.Analysis.from_dict(self.convert_submittable(a, "analysis"))
+        analysis = [Analysis(**self.convert_submittable(a, "analysis"))
                     for a in envelope_json.get("analyses", [])]
 
         print(project)
@@ -119,7 +88,7 @@ class JSONConverter:
         }
         print(sub_info)
 
-        submission = datamodel.Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
+        submission = Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
         return submission
 
     def convert_submittable(self, submittable_object, submittable_name):
@@ -191,7 +160,6 @@ class JSONConverter:
         :param translation: (optional) a dictionary with translations for controlled terms
         :return: datamodel.Attribute object
         """
-
         term_accession = None
         term_source = None
         unit = None
@@ -210,9 +178,15 @@ class JSONConverter:
             # Generate unit type as this is not a field in USI's unit model, also remove "derived" from the label
             unit_type = re.sub("\\s*derived\\s*", "", get_term_parent("efo", unit_value), 1)
             # USI does not support ontology annotations for unit terms, initialising with None
-            unit = datamodel.Unit(unit_value, unit_type, None, None)
+            unit = Unit(value=unit_value,
+                        unit_type=unit_type,
+                        term_accession=None,
+                        term_source=None)
 
-        return datamodel.Attribute(value, unit, term_accession, term_source)
+        return Attribute(value=value,
+                         unit=unit,
+                         term_accession=term_accession,
+                         term_source=term_source)
 
     @staticmethod
     def get_reference_value_from_json(element, translation={}):
