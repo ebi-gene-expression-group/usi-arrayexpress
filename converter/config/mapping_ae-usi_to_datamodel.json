@@ -395,68 +395,6 @@
       }
     }
   },
-  "assay": {
-    "alias": {
-      "description": "unique name of the assay",
-      "type": "string",
-      "import": {
-        "ae": {
-          "parent": "assay",
-          "path": [
-            "alias"
-          ],
-          "from_type": "string",
-          "method": "import_string"
-        }
-      }
-    },
-    "accession": {
-      "description": "not applicable for microarray"
-    },
-    "technology_type": {
-      "description": "array assay or sequencing assay",
-      "type": "string",
-      "import": {
-        "ae": {
-          "parent": "assay",
-          "path": [
-            "attributes",
-            "technology_type"
-          ],
-          "from_type": "string",
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "protocolrefs": {
-      "description": "protocol accessions/name used to generate assay data",
-      "type": "array",
-      "import": {
-        "ae": {
-          "parent": "assay",
-          "path": [
-            "protocolUses"
-          ],
-          "from_type": "array",
-          "method": "get_reference_usage"
-        }
-      }
-    },
-    "sampleref": {
-      "description": "sample accession/name",
-      "type": "string",
-      "import": {
-        "ae": {
-          "parent": "assay",
-          "path": [
-            "sampleUses"
-          ],
-          "from_type": "array",
-          "method": "get_reference_usage"
-        }
-      }
-    }
-  },
   "microarray_assay": {
     "alias": {
       "description": "unique name of the assay",
@@ -742,6 +680,34 @@
         }
       }
     },
+    "sampleref": {
+      "description": "list of assay data name/accessions",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "sampleRefs"
+          ],
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
+    "assayrefs": {
+      "description": "list of assay data name/accessions",
+      "type": "array",
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "assayRefs"
+          ],
+          "method": "get_reference_value_from_json"
+        }
+      }
+    },
     "assaydatarefs": {
       "description": "list of assay data name/accessions",
       "type": "array",
@@ -758,7 +724,17 @@
     },
     "protocolrefs": {
       "description": "list of protocol name/accessions used to generate data file",
-      "type": "array"
+      "type": "array",
+      "import": {
+        "ae": {
+          "from_type": "array",
+          "parent": "assay_data",
+          "path": [
+            "protocolUses"
+          ],
+          "method": "get_reference_usage"
+        }
+      }
     }
   },
   "publication": {

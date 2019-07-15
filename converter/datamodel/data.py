@@ -79,6 +79,8 @@ class Analysis(DataSubmittable):
 
     def __init__(self, **kwargs):
         DataSubmittable.__init__(self, **kwargs)
+        self.sampleref = kwargs.get("sampleref")
+        self.assayrefs = kwargs.get("assayrefs")
         self.assaydatarefs = kwargs.get("assaydatarefs")
 
     def __repr__(self):
