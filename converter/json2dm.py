@@ -198,6 +198,10 @@ class JSONConverter:
         elif element and element.get("alias"):
             return element.get("alias")
 
+    def get_reference_usage(self, element, translation={}):
+        reference = element.get("protocolRef", element.get("sampleRef", {}))
+        return self.get_reference_value_from_json(reference)
+
     @staticmethod
     def import_string(element, translation={}):
         """Return the string value with optional translation according to controlled vocabulary."""

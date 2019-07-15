@@ -438,7 +438,7 @@
             "protocolUses"
           ],
           "from_type": "array",
-          "method": "get_reference_value_from_json"
+          "method": "get_reference_usage"
         }
       }
     },
@@ -452,7 +452,7 @@
             "sampleUses"
           ],
           "from_type": "array",
-          "method": "get_reference_value_from_json"
+          "method": "get_reference_usage"
         }
       }
     }
@@ -497,7 +497,7 @@
             "protocolUses"
           ],
           "from_type": "array",
-          "method": "get_reference_value_from_json"
+          "method": "get_reference_usage"
         }
       }
     },
@@ -511,7 +511,7 @@
             "sampleUses"
           ],
           "from_type": "array",
-          "method": "get_reference_value_from_json"
+          "method": "get_reference_usage"
         }
       }
     },
@@ -589,7 +589,7 @@
             "protocolUses"
           ],
           "from_type": "array",
-          "method": "get_reference_value_from_json"
+          "method": "get_reference_usage"
         }
       }
     },
@@ -603,7 +603,7 @@
             "sampleUses"
           ],
           "from_type": "array",
-          "method": "get_reference_value_from_json"
+          "method": "get_reference_usage"
         }
       }
     },

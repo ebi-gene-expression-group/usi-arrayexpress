@@ -103,12 +103,12 @@ def generate_usi_assay_object(assay, study_info):
     # Can be one or more samples linked to one assay, but schema is expecting an array
     if not isinstance(sample_refs, list):
         sample_refs = [sample_refs]
-    assay_object['sampleUses'] = [generate_usi_ref_object(ref, study_info) for ref in sample_refs]
+    assay_object['sampleUses'] = [{"sampleRef": generate_usi_ref_object(ref, study_info)} for ref in sample_refs]
 
     protocol_refs = assay.protocolrefs
     if not isinstance(protocol_refs, list):
         protocol_refs = [protocol_refs]
-    assay_object["protocolUses"] = [generate_usi_ref_object(ref, study_info) for ref in protocol_refs]
+    assay_object["protocolUses"] = [{"protocolRef": generate_usi_ref_object(ref, study_info)} for ref in protocol_refs]
 
     return assay_object
 
@@ -139,7 +139,7 @@ def generate_usi_analysis_object(analysis, sub_info):
     analysis_object["alias"] = analysis.alias
     analysis_object["files"] = [attrib2dict(fo) for fo in analysis.files]
     analysis_object["assayDataRefs"] = [generate_usi_ref_object(x, sub_info) for x in analysis.assaydatarefs]
-    analysis_object["protocolUses"] = [generate_usi_ref_object(p, sub_info) for p in analysis.protocolrefs]
+    analysis_object["protocolUses"] = [{"protocolRef": generate_usi_ref_object(p, sub_info)} for p in analysis.protocolrefs]
 
     analysis_object["attributes"] = OrderedDict()
     analysis_object["attributes"]["data_type"] = analysis.data_type
