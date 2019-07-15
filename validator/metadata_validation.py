@@ -1,6 +1,6 @@
 import re
 
-from converter import datamodel
+from converter.datamodel.submission import Submission
 from utils import converter_utils
 from utils.converter_utils import ontology_term, is_accession
 from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi, get_ena_instrument_terms_via_usi
@@ -11,7 +11,7 @@ REGEX_DOI_FORMAT = re.compile("^10\.\d{4,9}\/\S+$")
 REGEX_FILE_NAME = re.compile(r"^[A-Za-z0-9._-]+$")
 
 
-def run_protocol_checks(sub: datamodel.Submission, logger):
+def run_protocol_checks(sub: Submission, logger):
     """Run checks on protocol objects and return list of error codes."""
 
     protocols = sub.protocol
@@ -81,7 +81,7 @@ def run_protocol_checks(sub: datamodel.Submission, logger):
     return codes
 
 
-def run_sample_checks(sub: datamodel.Submission, logger):
+def run_sample_checks(sub: Submission, logger):
     """Run checks on sample objects and factor values and return list of error codes."""
 
     samples = sub.sample
@@ -173,7 +173,7 @@ def run_sample_checks(sub: datamodel.Submission, logger):
     return codes
 
 
-def run_study_checks(sub: datamodel.Submission, logger):
+def run_study_checks(sub: Submission, logger):
     """Run checks on study object and return list of error codes."""
 
     study = sub.study
@@ -240,7 +240,7 @@ def run_study_checks(sub: datamodel.Submission, logger):
     return codes
 
 
-def run_project_checks(sub: datamodel.Submission, logger):
+def run_project_checks(sub: Submission, logger):
     """Run checks on project object and return list of error codes."""
 
     project = sub.project
@@ -305,7 +305,7 @@ def run_project_checks(sub: datamodel.Submission, logger):
     return codes
 
 
-def run_assay_checks(sub: datamodel.Submission, logger):
+def run_assay_checks(sub: Submission, logger):
     """Run checks on assay objects and factor values and return list of error codes."""
 
     assays = sub.assay
@@ -325,7 +325,7 @@ def run_assay_checks(sub: datamodel.Submission, logger):
         return codes
 
     for a in assays:
-        additional_attributes = a.get_attributes()
+        additional_attributes = a.get_all_attributes()
         # Assay must have name
         if not a.alias:
             logger.error("Assay \"{}\" does not have a name specified. Not checking it.".format(a))
@@ -408,7 +408,7 @@ def run_assay_checks(sub: datamodel.Submission, logger):
     return codes
 
 
-def run_file_checks(sub: datamodel.Submission, logger):
+def run_file_checks(sub: Submission, logger):
     """Run file checks on assay_data and analysis objects and return list of error codes."""
 
     codes = []
