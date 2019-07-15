@@ -325,7 +325,8 @@ def run_assay_checks(sub: Submission, logger):
         return codes
 
     for a in assays:
-        additional_attributes = a.get_all_attributes()
+        additional_attributes = [at for at in a.get_all_attributes() if at not in ('alias', 'protocolrefs',
+                                                                                   'sampleref', 'accession')]
         # Assay must have name
         if not a.alias:
             logger.error("Assay \"{}\" does not have a name specified. Not checking it.".format(a))

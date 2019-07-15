@@ -88,11 +88,11 @@ def is_accession(accession, archive=None):
     if archive:
         try:
             regex = regex_lookup.get(archive)
-            return re.match(regex, accession)
+            return re.match(regex, str(accession))
         except KeyError:
             print("Not a valid archive type: {}".format(archive))
     else:
-        return re.match(regex_ebi_accession, accession)
+        return re.match(regex_ebi_accession, str(accession))
 
 
 # To store organisms that we have already looked-up in the taxonomy (this is slow...)

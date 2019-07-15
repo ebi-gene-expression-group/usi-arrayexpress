@@ -91,9 +91,10 @@ def generate_usi_assay_object(assay, study_info):
     else:
         assay_object['alias'] = assay.alias
 
-    attributes = assay.get_attributes()
+    attributes = assay.get_all_attributes()
+    assay_attributes = [a for a in attributes if a not in ('alias', 'protocolrefs', 'sampleref', 'accession')]
     assay_object['attributes'] = OrderedDict()
-    for category in attributes:
+    for category in assay_attributes:
         assay_object['attributes'][category] = generate_usi_attribute_entry(getattr(assay, category))
 
     assay_object['studyRef'] = generate_usi_ref_object(study_info.get('alias'), study_info)
