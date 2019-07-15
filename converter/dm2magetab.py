@@ -153,22 +153,12 @@ def generate_sdrf(sub):
                     elif ad.data_type == "raw matrix":
                         data_values.append(("Array Data Matrix File", f.name))
 
-                    processed_data_values, factor_values = configure_analysis_and_factors(all_protocols, ad, assay,
-                                                                                          sample, sub)
-                    protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
-                    # Add data and factor nodes
-                    rows.append(row +
-                                [OrderedDict(data_values),
-                                 protocol_refs[6],
-                                 OrderedDict(processed_data_values),
-                                 OrderedDict(factor_values)])
-
-                    #append_sdrf_row(submission_type, rows, protocol_refs, sample_values, extract_values)
                     if f.checksum and f.checksum_method:
                         data_values.append(("Comment[{}]".format(f.checksum_method.upper()), f.checksum))
 
                     row4 = row3[:] + [OrderedDict(data_values)]
                     print(row4)
+                    end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
 
                     # Add all lists together to form the complete row of the SDRF. We do this
                     # at the level of raw data files, which means each raw data file gets a row.
@@ -176,28 +166,15 @@ def generate_sdrf(sub):
 
                 if not ad.files:
                     # Haven't found any raw data files, checking processed data and factors
-                    processed_data_values, factor_values = configure_analysis_and_factors(all_protocols, assay, sample, sub)
-                    protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
-                    row.extend([protocol_refs[6], OrderedDict(processed_data_values),
-                                OrderedDict(factor_values)])
-                    rows.append(row)
+                    end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row3)
 
             if not data:
                 # Haven't found any raw data, checking processed data and factors
-                processed_data_values, factor_values = configure_analysis_and_factors(all_protocols, None, assay,
-                                                                                      sample, sub)
-                protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
-                row.extend([protocol_refs[6], OrderedDict(processed_data_values),
-                            OrderedDict(factor_values)])
-                rows.append(row)
+                end_row(protocol_positions, all_protocols, None, assay, sample, sub, rows, row2)
 
         # Haven't found any assays, writing sample info only
         if not assays:
-            processed_data_values, factor_values = configure_analysis_and_factors(all_protocols, None, None, sample, sub)
-            protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
-            row.extend([protocol_refs[6], OrderedDict(processed_data_values),
-                        OrderedDict(factor_values)])
-            rows.append(row)
+            end_row(protocol_positions, all_protocols, None, None, sample, sub, rows, row)
 
         # Append the complete row to the table
 
@@ -216,7 +193,7 @@ def generate_sdrf(sub):
                     #                 OrderedDict(data_values), protocol_refs[6],
                     #                 OrderedDict(processed_data_values),
                     #                 OrderedDict(factor_values)])
-    print(rows)
+
     # This goes through the collection of ordered dictionaries and transforms them into pandas data frames,
     # while merging the nodes/attributes for different samples, e.g. all extract attributes from all samples together
     data_frames = []
@@ -261,6 +238,59 @@ def configure_analysis_and_factors(all_protocols, assay_data, assay, sample, sub
             flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value"))
 
     return processed_data_values, factor_values
+
+
+def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, rows, row):
+    """
+    Check for processed data and factor values and terminate the row (i.e. add it to the rows list)
+    If assays or raw data are missing we have several breakpoints in the generation of the SDRF row.
+    Hence, whenever we reach a point where there is no more dependent objects we finish the row
+    by adding processed data, adding protocol edges and add factor values from sample attributes
+
+    :param protocol_positions:
+    :param all_protocols:
+    :param assay_data:
+    :param assay:
+    :param sample:
+    :param sub:
+    :param rows:
+    :param row:
+    :return:
+    """
+    # Processed data
+    processed_data = []
+    if assay_data:
+        processed_data = [px for px in sub.analysis if assay_data.alias in px.assaydatarefs]
+    # Get all analysis objects that belong to this assay data object
+    elif assay:
+        processed_data = [px for px in sub.analysis if assay.alias in px.assayrefs]
+
+    # Collect file names and turn into tuple list
+    processed_data_values = []
+    for px in processed_data:
+        for f in px.files:
+            if px.data_type == "processed":
+                processed_data_values.append(("Derived Array Data File", f.name))
+            elif px.data_type == "processed matrix":
+                processed_data_values.append(("Derived Array Data Matrix File", f.name))
+            if f.ftp_location:
+                processed_data_values.append(("Comment[Derived ArrayExpress FTP file]", f.ftp_location))
+        # Also add protocol references for how the processed data was generated from assay data
+        all_protocols.extend([sub.get_protocol(pref) for pref in px.protocolrefs])
+    # Factor values
+    factors = sub.study.experimental_factor
+    factor_values = []
+    # Look up factor in sample attributes and turn into ordered dict with unit/term columns
+    for f in factors:
+        factor_values.extend(
+            flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value"))
+
+    protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
+
+    row.extend([protocol_refs[6],
+                OrderedDict(processed_data_values),
+                OrderedDict(factor_values)])
+    rows.append(row)
 
 
 def append_sdrf_row(submission_type, rows, protocol_refs, sample_values=[], extract_values=[], le_values=[],
