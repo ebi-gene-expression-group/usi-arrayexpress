@@ -358,7 +358,11 @@
         }
       ],
       "attributes": {
-        "data_type": "raw matrix"
+        "data_type": [
+          {
+            "value": "raw matrix"
+          }
+        ]
       }
     }
   ],
