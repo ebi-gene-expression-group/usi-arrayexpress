@@ -158,11 +158,8 @@ def generate_sdrf(sub):
 
                     row4 = row3[:] + [OrderedDict(data_values)]
                     print(row4)
-                    end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
 
-                    # Add all lists together to form the complete row of the SDRF. We do this
-                    # at the level of raw data files, which means each raw data file gets a row.
-                    # All lists are transformed to dictionaries so that we can use pandas to write a table.
+                    end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
 
                 if not ad.files:
                     # Haven't found any raw data files, checking processed data and factors
@@ -176,27 +173,12 @@ def generate_sdrf(sub):
         if not assays:
             end_row(protocol_positions, all_protocols, None, None, sample, sub, rows, row)
 
-        # Append the complete row to the table
-
-                    #if submission_type == "microarray":
-                    #    rows.append([OrderedDict(sample_values), protocol_refs[1],
-                    #                 OrderedDict(extract_values), protocol_refs[2],
-                    #                 OrderedDict(le_values), protocol_refs[3],
-                    #                 OrderedDict(assay_values), protocol_refs[5],
-                    #                 OrderedDict(data_values), protocol_refs[6],
-                    #                 OrderedDict(processed_data_values),
-                    #                 OrderedDict(factor_values)])
-                    #else:  # submission type is sequencing or singlecell
-                    #    rows.append([OrderedDict(sample_values), protocol_refs[1],
-                    #                 OrderedDict(extract_values), protocol_refs[4],
-                    #                 OrderedDict(assay_values), protocol_refs[5],
-                    #                 OrderedDict(data_values), protocol_refs[6],
-                    #                 OrderedDict(processed_data_values),
-                    #                 OrderedDict(factor_values)])
-
     # This goes through the collection of ordered dictionaries and transforms them into pandas data frames,
     # while merging the nodes/attributes for different samples, e.g. all extract attributes from all samples together
     data_frames = []
+    if len(rows) < 1:
+        raise Exception("Failed to generate SDRF rows")
+
     for i in range(len(rows[0])):
         data_frames.append(pd.DataFrame.from_records([row[i] for row in rows]))
 
@@ -207,55 +189,12 @@ def generate_sdrf(sub):
     return raw_sdrf
 
 
-def configure_analysis_and_factors(all_protocols, assay_data, assay, sample, sub):
-    # Processed data
-    processed_data = []
-    if assay_data:
-        processed_data = [px for px in sub.analysis if assay_data.alias in px.assaydatarefs]
-    # Get all analysis objects that belong to this assay data object
-    elif assay:
-        processed_data = [px for px in sub.analysis if assay.alias in px.assayrefs]
-    elif sample:
-        processed_data = [px for px in sub.analysis if sample.alias in px.samplerefs]
-    # Collect file names and turn into tuple list
-    processed_data_values = []
-    for px in processed_data:
-        for f in px.files:
-            if px.data_type == "processed":
-                processed_data_values.append(("Derived Array Data File", f.name))
-            elif px.data_type == "processed matrix":
-                processed_data_values.append(("Derived Array Data Matrix File", f.name))
-            if f.ftp_location:
-                processed_data_values.append(("Comment[Derived ArrayExpress FTP file]", f.ftp_location))
-        # Also add protocol references for how the processed data was generated from assay data
-        all_protocols.update([sub.get_protocol(pref) for pref in px.protocolrefs])
-    # Factor values
-    factors = sub.study.experimental_factor
-    factor_values = []
-    # Look up factor in sample attributes and turn into ordered dict with unit/term columns
-    for f in factors:
-        factor_values.extend(
-            flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value"))
-
-    return processed_data_values, factor_values
-
-
 def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, rows, row):
     """
     Check for processed data and factor values and terminate the row (i.e. add it to the rows list)
     If assays or raw data are missing we have several breakpoints in the generation of the SDRF row.
     Hence, whenever we reach a point where there is no more dependent objects we finish the row
     by adding processed data, adding protocol edges and add factor values from sample attributes
-
-    :param protocol_positions:
-    :param all_protocols:
-    :param assay_data:
-    :param assay:
-    :param sample:
-    :param sub:
-    :param rows:
-    :param row:
-    :return:
     """
     # Processed data
     processed_data = []
@@ -276,7 +215,7 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
             if f.ftp_location:
                 processed_data_values.append(("Comment[Derived ArrayExpress FTP file]", f.ftp_location))
         # Also add protocol references for how the processed data was generated from assay data
-        all_protocols.extend([sub.get_protocol(pref) for pref in px.protocolrefs])
+        all_protocols.update((sub.get_protocol(pref) for pref in px.protocolrefs))
     # Factor values
     factors = sub.study.experimental_factor
     factor_values = []
@@ -291,26 +230,6 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
                 OrderedDict(processed_data_values),
                 OrderedDict(factor_values)])
     rows.append(row)
-
-
-def append_sdrf_row(submission_type, rows, protocol_refs, sample_values=[], extract_values=[], le_values=[],
-                    assay_values=[], data_values=[], processed_data_values=[], factor_values=[]):
-
-    if submission_type == "microarray":
-        rows.append([OrderedDict(sample_values), protocol_refs[1],
-                 OrderedDict(extract_values), protocol_refs[2],
-                 OrderedDict(le_values), protocol_refs[3],
-                 OrderedDict(assay_values), protocol_refs[5],
-                 OrderedDict(data_values), protocol_refs[6],
-                 OrderedDict(processed_data_values),
-                 OrderedDict(factor_values)])
-    else:  # submission type is sequencing or singlecell
-        rows.append([OrderedDict(sample_values), protocol_refs[1],
-                 OrderedDict(extract_values), protocol_refs[4],
-                 OrderedDict(assay_values), protocol_refs[5],
-                 OrderedDict(data_values), protocol_refs[6],
-                 OrderedDict(processed_data_values),
-                 OrderedDict(factor_values)])
 
 
 def flatten_unit(category, unit_object, make_unique=True, sep="~~~"):
