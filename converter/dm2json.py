@@ -42,7 +42,7 @@ def generate_usi_study_object(study, sub_info):
 
     # Optional attributes
     if study.date_of_experiment:
-        study_attributes["date_of_experiment"] = study.date_of_experiment
+        study_attributes["date_of_experiment"] = generate_usi_attribute_entry(study.date_of_experiment)
 
     study_object["attributes"] = study_attributes
 
