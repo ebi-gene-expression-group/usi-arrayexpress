@@ -99,17 +99,20 @@ class Analysis(DataSubmittable):
         else:
             data_type = "processed"
 
-        protocolrefs = file_attributes.get("protocol_ref")
+        protocolrefs = file_attributes.get("protocol_ref", [])
 
         # Assay ref is generated based on le_ref (for MA) or extract_ref (for HTS)
         if file_attributes.get("le_ref"):
-            assaydatarefs = remove_duplicates(file_attributes.get("le_ref"))
+            assayrefs = remove_duplicates(file_attributes.get("le_ref", []))
         else:
-            assaydatarefs = remove_duplicates(file_attributes.get("extract_ref"))
+            assayrefs = remove_duplicates(file_attributes.get("extract_ref", []))
+
+        assaydatarefs = remove_duplicates(file_attributes.get("assay_ref", []))
 
         return cls(alias=alias,
                    files=datafile_objects,
                    data_type=data_type,
+                   assayrefs=assayrefs,
                    assaydatarefs=assaydatarefs,
                    protocolrefs=protocolrefs)
 
