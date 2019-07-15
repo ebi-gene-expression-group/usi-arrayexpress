@@ -1,0 +1,341 @@
+{
+    "submission": {
+        "id": "c8b641a7-a31c-42fd-8cac-cb64f1f44dd2",
+        "submitter": {
+	        "email": "test@email.com",
+            "name": "Test User"
+        },
+        "team": {
+            "name": "test-team",
+            "description": null,
+            "profile": {}
+        },
+        "submissionDate": null
+    },
+    "uploadedFiles": [],
+    "analyses": [],
+    "assays": [
+        {
+            "id": "913b2806-3dba-4392-8f35-986844466d9f",
+            "accession": null,
+            "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+            "team": {
+                "name": "test-team",
+                "description": null,
+                "profile": {}
+            },
+            "title": "Assay Title ",
+            "description": "Test assay",
+            "attributes": {
+                "platform_type": [
+                    {
+                        "value": "ILLUMINA",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "instrument_model": [
+                    {
+                        "value": "Illumina Genome Analyzer",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "library_layout": [
+                    {
+                        "value": "SINGLE",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "design_description": [
+                    {
+                        "value": "Design Description",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "library_name": [
+                    {
+                        "value": "Example Library",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "library_selection": [
+                    {
+                        "value": "RANDOM",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "library_source": [
+                    {
+                        "value": "GENOMIC",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "library_strategy": [
+                    {
+                        "value": "WGS",
+                        "units": null,
+                        "terms": []
+                    }
+                ]
+            },
+            "studyRef": {
+                "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+                "accession": null,
+                "team": null
+            },
+            "sampleUses": [
+                {
+                    "sampleRef": {
+                        "alias": null,
+                        "accession": "SAMEA1652233",
+                        "team": null
+                    },
+                    "attributes": {}
+                }
+            ],
+            "protocolUses": []
+        }
+    ],
+    "assayData": [
+        {
+            "id": "98295591-2da1-4d28-a988-0ec97c925f95",
+            "accession": null,
+            "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+            "team": {
+                "name": "test-team",
+                "description": null,
+                "profile": {}
+            },
+            "title": "Test Title",
+            "description": null,
+            "attributes": {},
+            "assayRefs": [
+                {
+                    "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+                    "accession": null,
+                    "team": "test-team"
+                }
+            ],
+            "files": [
+                {
+                    "name": "0eb3de83-9ed9-4374-b18a-66f78e42d038_test.fastq.gz",
+                    "checksum": "2debfdcf79f03e4a65a667d21ef9de14",
+                    "checksumMethod": "MD5",
+                    "type": "fastq",
+                    "unencryptedChecksum": null,
+                    "label": null
+                }
+            ]
+        }
+    ],
+    "egaDacs": [],
+    "egaDacPolicies": [],
+    "egaDatasets": [],
+    "projects": [
+      {
+        "id": "",
+        "alias": "test_project",
+      "title": "A test case for a sequencing experiment with one data file",
+      "description": "This is just a test experiment, too.",
+      "contacts": [
+        {
+          "firstName": "R",
+          "lastName": "Searcher",
+          "email": "fake@test.com",
+          "affiliation": "EMBL-EBI",
+          "address": "Wellcome Genome Campus",
+          "roles": [
+            "submitter"
+          ],
+          "middleInitials": "E"
+        },
+        {
+          "firstName": "Another",
+          "lastName": "Collaborator",
+          "email": "fake@test2.com",
+          "affiliation": "EMBL-EBI",
+          "address": "Wellcome Genome Campus",
+          "roles": [
+            "investigator"
+          ]
+        }
+      ],
+      "releaseDate": "2079-12-25",
+      "publications": [
+        {
+          "articleTitle": "A glorious discovery",
+          "authors": "A. Tester, D. Eveloper, R.E. Searcher",
+          "pubmedId": "12345678",
+          "publicationStatus": "InPreparation"
+        }
+      ]
+    }
+    ],
+    "samples": [
+        {
+            "id": "9589cf5b-89a8-4ee8-8be3-898b648e5b62",
+            "accession": "SAMEA1652233",
+            "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+            "team": {
+                "name": "test-team",
+                "description": null,
+                "profile": {}
+            },
+            "title": "Sample title",
+            "description": "Sample description",
+            "attributes": {
+              "cell type": [
+                {
+                  "value": "keratinocyte",
+                  "terms": [
+                    {"url": "http://purl.obolibrary.org/obo/CL_0000312"}
+                  ]
+                }
+              ],
+              "time": [
+                {
+                  "value": 12,
+                  "units": "hour"
+                }
+              ]
+            },
+            "sampleRelationships": [],
+            "taxonId": 9606,
+            "taxon": "Homo sapiens",
+            "releaseDate": null
+        }
+    ],
+    "sampleGroups": [],
+    "studies": [
+        {
+            "id": "e2acafb4-7acc-46c5-b75b-a975b4ce38dd",
+            "accession": "E-DUMY-1",
+            "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+            "team": {
+                "name": "test-team",
+                "description": null,
+                "profile": {}
+            },
+            "title": "Study Title",
+            "description": null,
+            "attributes": {
+                "experimental_factor": [
+                    {
+                        "value": "cell type",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "study_type": [
+                    {
+                        "value": "sequencing",
+                        "units": null,
+                        "terms": []
+                    }
+                ],
+                "experiment_type": [
+                    {
+                        "value": "RNA-seq of coding RNA",
+                        "units": null,
+                        "terms": []
+                    }
+                ]
+            },
+            "protocolRefs": [],
+            "projectRef": {
+                "alias": null,
+                "accession": null,
+                "team": null
+            },
+            "releaseDate": null
+        }
+    ],
+    "protocols": [
+      {
+        "id": "0a8e6d1a-4076-4492-b6cb-cc030f2099d9",
+        "alias": "Protocol 1",
+        "description": "collecting",
+        "attributes": {
+          "protocol_type": [
+            {
+              "value": "sample collection protocol",
+              "terms": [
+                {
+                  "url": "http://www.ebi.ac.uk/efo/EFO_0005518"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "9c39d04a-a5fb-4fa0-8ccf-844ebb94834c",
+        "alias": "Protocol 2",
+        "description": "extracting",
+        "attributes": {
+          "protocol_type": [
+            {
+              "value": "nucleic acid extraction protocol",
+              "terms": [
+                {
+                  "url": "http://www.ebi.ac.uk/efo/EFO_0002944"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "bc1f92c3-b9fe-4662-9550-be642ee7348c",
+        "alias": "Protocol 3",
+        "description": "labelling",
+        "attributes": {
+          "protocol_type": [
+            {
+              "value": "nucleic acid library construction protocol",
+              "terms": [
+                {
+                  "url": ""
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "86f13f02-e567-49a4-ae88-8875095bc404",
+        "alias": "Protocol 4",
+        "description": "sequencing on a fancy machine",
+        "attributes": {
+          "protocol_type": [
+            {
+              "value": "nucleic acid sequencing protocol"
+            }
+          ]
+        }
+      },
+      {
+        "id": "105d7dd9-2d12-439f-bb15-b212c2048717",
+        "alias": "Protocol 5",
+        "description": "normalising",
+        "attributes": {
+          "protocol_type": [
+            {
+              "value": "normalization data transformation protocol",
+              "terms": [
+                {
+                  "url": "http://www.ebi.ac.uk/efo/EFO_0003816"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+}

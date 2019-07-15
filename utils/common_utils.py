@@ -105,6 +105,40 @@ def get_term_descendants(ontology, term_url, logger):
             logger.error("Failed to receive valid response from {}.".format(api_url))
 
 
+def get_term_parent(ontology, term):
+    """Return the label of the parent term of a given ontology (EFO) term."""
+
+    term_url = ols_lookup(ontology, term)
+    url_encoded = url_encode_for_ols(term_url)
+    print(term_url)
+    api_url = "ontologies/{}/terms/{}/parents".format(ontology, url_encoded)
+    data = query_ols(api_url, {}, logging.getLogger())
+    if data:
+        try:
+            for d in data["_embedded"]["terms"]:
+                # Return the first hit
+                return d["label"]
+        except KeyError:
+            logger.error("Failed to receive valid response from {}.".format(api_url))
+
+
+def ols_lookup(ontology, term):
+    """Get ontology term URL for a given term label."""
+
+    # Just in case we already have a url
+    term_encoded = url_encode_for_ols(term)
+    api_url = "search?q={{{}}}&ontology={}".format(term_encoded, ontology)
+    print(api_url)
+    data = query_ols(api_url, {}, logging.getLogger())
+    if data:
+        try:
+            for d in data["response"]["docs"]:
+                # Return the first hit
+                return d["iri"]
+        except KeyError:
+            logging.error("Failed to receive valid response from OLS searching for {}.".format(term))
+
+
 def get_ena_library_terms_via_usi(logger):
     """Read ENA's controlled vocabulary using USI's API and
     return dictionary of the field names that have a set of allowed values (enum)."""

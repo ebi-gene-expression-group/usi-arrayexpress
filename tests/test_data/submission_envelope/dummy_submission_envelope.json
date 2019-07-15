@@ -13,7 +13,37 @@
   "supportingSamplesRequired": [],
   "supportingSamples": [],
   "uploadedFiles": [],
-  "analyses": [],
+  "analyses": [
+    {
+      "id": "fce2442f-3e9d-4db9-8f67-fa3e1036f1c3",
+      "accession": null,
+      "alias": "raw_data",
+      "team": {
+        "name": "my-test-team",
+        "description": null,
+        "profile": {}
+      },
+      "files": [
+        {
+          "name": "proecessed_data.txt",
+          "checksum": null,
+          "checksumMethod": null,
+          "type": null,
+          "unencryptedChecksum": null,
+          "label": null
+        }
+      ],
+      "assayDataRefs": [
+        {
+          "alias": "raw_data",
+          "team": "my-test-team"
+        }
+      ],
+      "attributes": {
+        "data_type": "raw matrix"
+      }
+    }
+  ],
   "assays": [
     {
       "alias": "Control 1:Cy3",
@@ -26,6 +56,11 @@
         "array_design": [
           {
             "value": "A-MEXP-2072"
+          }
+        ],
+        "technology_type": [
+          {
+            "value": "microarray assay"
           }
         ]
       },
@@ -352,7 +387,7 @@
           "articleTitle": "A glorious discovery",
           "authors": "A. Tester, D. Eveloper, R.E. Searcher",
           "pubmedId": "12345678",
-          "status": "in preparation"
+          "publicationStatus": "InPreparation"
         }
       ]
     }
@@ -487,7 +522,8 @@
         ],
         "genotype": [
           {"value": "knockout"}
-        ]
+        ],
+        "material_type": [{"value": "cell"}]
       }
     }
   ],
@@ -505,34 +541,34 @@
       "title": "My first ArrayExpress experiment submitted via JSON (one matrix file)",
       "description": "This is amazing, I can't believe it. Also how did this work so fast?",
       "attributes": {
-        "attributes": {
-          "experimental_factor": [
-            {
-              "value": "genotype",
-              "terms": [
-                {
-                  "url": "http://www.ebi.ac.uk/efo/EFO_0000513"
-                }
-              ]
-            }
-          ],
-          "experimental_design": [
-            {
-              "value": "case control design",
-              "terms": [
-                {
-                  "url": "http://www.ebi.ac.uk/efo/EFO_0001427"
-                }
-              ]
-            }
-          ],
-          "experiment_type": [
-            {
-              "value": "transcription profiling by array"
-            }
-          ],
-          "date_of_experiment": "2019-05-17"
-        }
+
+        "experimental_factor": [
+          {
+            "value": "genotype",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0000513"
+              }
+            ]
+          }
+        ],
+        "experimental_design": [
+          {
+            "value": "case control design",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0001427"
+              }
+            ]
+          }
+        ],
+        "experiment_type": [
+          {
+            "value": "transcription profiling by array"
+          }
+        ],
+        "date_of_experiment": "2019-05-17"
+
       },
       "protocolRefs": [
         {
