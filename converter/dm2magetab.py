@@ -89,10 +89,9 @@ def generate_sdrf(sub):
         row.extend([OrderedDict(sample_values)])
 
         # Get all assay objects that belong to this sample (based on alias or accession)
-        if sample.accession:
-            assays = [assay for assay in sub.assay if assay.sampleref == sample.accession]
-        else:
-            assays = [assay for assay in sub.assay if assay.sampleref == sample.alias]
+
+        assays = [assay for assay in sub.assay if assay.sampleref in (sample.accession, sample.alias)]
+
         print(sample.alias, sample.accession)
         print(assays)
         for assay in assays:
@@ -114,6 +113,8 @@ def generate_sdrf(sub):
             # submission type is sequencing or singlecell, get assay attributes and convert them to comments
             else:
                 extract_values = [("Extract Name", assay.alias)]
+                if assay.accession:
+                    extract_values.append(("Comment[ENA_EXPERIMENT]", assay.accession))
                 assay_attributes = [at for at in assay.get_all_attributes() if at not in ('alias', 'accession',
                                                                                           'technology_type',
                                                                                           'sampleref',
@@ -146,6 +147,8 @@ def generate_sdrf(sub):
                     # Add Assay node
                     row3 = row2[:] + [protocol_refs[3], OrderedDict(assay_values)]
                 else:
+                    if ad.accession:
+                        assay_values.append(("Comment[ENA_RUN]", ad.accession))
                     row3 = row2[:] + [protocol_refs[4], OrderedDict(assay_values)]
 
                 # Get all data files
@@ -158,7 +161,8 @@ def generate_sdrf(sub):
 
                     if f.checksum and f.checksum_method:
                         data_values.append(("Comment[{}]".format(f.checksum_method.upper()), f.checksum))
-
+                    if f.ftp_location:
+                        data_values.append(("Comment[ArrayExpress FTP file]", f.ftp_location))
                     row4 = row3[:] + [OrderedDict(data_values)]
 
                     end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
