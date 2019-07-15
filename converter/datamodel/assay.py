@@ -33,6 +33,11 @@ class MicroarrayAssay(Assay):
         self.label = kwargs.get("label")
         self.array_design = kwargs.get("array_design")
 
+    def __repr__(self):
+        return "{self.__class__.__name__}(alias={self.alias}, technology_type={self.technology_type}, " \
+               "protocolrefs={self.protocolrefs}, sampleref={self.sampleref}, " \
+               "label={self.label}, array_design={self.array_design})".format(self=self)
+
     @classmethod
     def from_magetab(cls, le_attributes, extract_attributes, assay_attributes):
         """Intialise assay attributes from MAGE-TAB data dicts.
@@ -81,6 +86,16 @@ class SeqAssay(Assay):
         self.nominal_sdev = kwargs.get("nominal_sdev")
         self.platform_type = kwargs.get("platform_type")
         self.instrument_model = kwargs.get("instrument_model")
+
+    def __repr__(self):
+        return "{self.__class__.__name__}(alias={self.alias}, technology_type={self.technology_type}, " \
+               "protocolrefs={self.protocolrefs}, sampleref={self.sampleref} " \
+               "accession={self.accession}, library_layout={self.library_layout}, " \
+               "library_selection={self.library_selection}, library_strategy={self.library_strategy}, " \
+               "library_strand={self.library_strand}, library_source={self.library_source}," \
+               "orientation={self.orientation}, nominal_length={self.nominal_length}, " \
+               "nominal_sdev={self.nominal_sdev}, platform_type={self.platform_type}, " \
+               "instrument_model={self.instrument_model})".format(self=self)
 
     @classmethod
     def from_magetab(cls, extract_attributes, assay_attributes, protocols):

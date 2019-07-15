@@ -69,28 +69,30 @@
         "team": "my-test-team"
       },
       "sampleUses": [
-        {
+        {"sampleRef": {
           "alias": "Control 1",
           "team": "my-test-team"
         }
+      }
       ],
       "protocolUses": [
-        {
+        {"protocolRef": {
           "alias": "Protocol 4",
           "team": "my-test-team"
-        },
+        }},
+        {"protocolRef":
         {
           "alias": "Protocol 2",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 3",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 1",
           "team": "my-test-team"
-        }
+        }}
       ]
     },
     {
@@ -123,17 +125,14 @@
           "team": "my-test-team"
         }},
         {"protocolRef": {
-        {
           "alias": "Protocol 2",
           "team": "my-test-team"
         }},
         {"protocolRef": {
-        {
           "alias": "Protocol 3",
           "team": "my-test-team"
         }},
         {"protocolRef": {
-        {
           "alias": "Protocol 1",
           "team": "my-test-team"
         }}
@@ -158,28 +157,28 @@
         "team": "my-test-team"
       },
       "sampleUses": [
-        {
+        {"sampleRef": {
           "alias": "Control 3",
           "team": "my-test-team"
-        }
+        }}
       ],
       "protocolUses": [
-        {
+        {"protocolRef": {
           "alias": "Protocol 4",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 2",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 3",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 1",
           "team": "my-test-team"
-        }
+        }}
       ]
     },
     {
@@ -201,28 +200,28 @@
         "team": "my-test-team"
       },
       "sampleUses": [
-        {
+        {"sampleRef": {
           "alias": "Test 1",
           "team": "my-test-team"
-        }
+        }}
       ],
       "protocolUses": [
-        {
+        {"protocolRef": {
           "alias": "Protocol 4",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 2",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 3",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 1",
           "team": "my-test-team"
-        }
+        }}
       ]
     },
     {
@@ -244,28 +243,28 @@
         "team": "my-test-team"
       },
       "sampleUses": [
-        {
+        {"sampleRef": {
           "alias": "Test 2",
           "team": "my-test-team"
-        }
+        }}
       ],
       "protocolUses": [
-        {
+        {"protocolRef": {
           "alias": "Protocol 4",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 2",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 3",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 1",
           "team": "my-test-team"
-        }
+        }}
       ]
     },
     {
@@ -287,28 +286,28 @@
         "team": "my-test-team"
       },
       "sampleUses": [
-        {
+        {"sampleRef": {
           "alias": "Test 3",
           "team": "my-test-team"
-        }
+        }}
       ],
       "protocolUses": [
-        {
+        {"protocolRef": {
           "alias": "Protocol 4",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 2",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 3",
           "team": "my-test-team"
-        },
-        {
+        }},
+        {"protocolRef": {
           "alias": "Protocol 1",
           "team": "my-test-team"
-        }
+        }}
       ]
     }
   ],

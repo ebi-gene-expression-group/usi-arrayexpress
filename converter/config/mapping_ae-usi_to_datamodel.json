@@ -545,14 +545,104 @@
         }
       }
     },
-    "lib_attribs": {
-      "description": "dictionary of library attributes",
-      "type": "dict",
+
+    "library_layout": {
+      "description": "The layout of the sequencing library, SINGLE or PAIRED.",
+      "type": "string",
       "import": {
         "ae": {
-          "parent": "assay",
-          "path": ["attributes"],
-          "method": "import_lib_attribs"
+          "path": ["attributes", "library_layout"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_source": {
+      "description": "The source material of the sequencing library, e.g. TRANSCRIPTOMIC.",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_source"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_strategy": {
+      "description": "The type of sequencing approach, e.g. RNA-Seq.",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_strategy"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_selection": {
+      "description": "The selection strategy of the faction of nucleic acid that was sequenced.",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_selection"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "nominal_length": {
+      "description": "Nominal length, i.e. length of the insert",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "nominal_length"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "nominal_sdev": {
+      "description": "standard deviation of the nominal length",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "nominal_sdev"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "orientation": {
+      "description": "for paired-end, the orientation of the two reads in the sequence file",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "orientation"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "platform_type": {
+      "description": "manufacturer of the sequencing machine",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "platform_type"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "instrument_model": {
+      "description": "sequencer model",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "instrument_model"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_strand": {
+      "description": "the strand that is being sequenced in directional RNA-seq",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_strand"],
+          "method": "get_string_from_attribute"
         }
       }
     }
