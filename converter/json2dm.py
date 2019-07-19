@@ -32,7 +32,7 @@ class JSONConverter:
         self.mapping = mapping
         self.import_key = import_key
 
-    def convert(self, envelope_json, submission_type=None):
+    def convert(self, envelope_json, submission_type=None, source_file_name=None):
         """
         Converter that takes a JSON as input and converts it to a Submission class object
         based on the specifications in the mapping file
@@ -84,7 +84,8 @@ class JSONConverter:
         sub_info = {
             "team": envelope_json.get("submission", {}).get("team", {}).get("name"),
             "alias": envelope_json.get("submission", {}).get("id", {}),
-            "submission_type": submission_type
+            "submission_type": submission_type,
+            "metadata": source_file_name
         }
         print(sub_info)
 

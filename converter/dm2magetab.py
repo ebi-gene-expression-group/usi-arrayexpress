@@ -4,7 +4,7 @@ import pandas as pd
 
 from collections import OrderedDict, defaultdict
 
-from utils.converter_utils import get_controlled_vocabulary
+from utils.converter_utils import get_controlled_vocabulary, new_file_prefix
 
 
 def generate_idf(sub):
@@ -46,13 +46,14 @@ def generate_idf(sub):
         ("Protocol Description", [p.description for p in sub.protocol]),
         ("Protocol Hardware", [p.hardware for p in sub.protocol]),
         ("Protocol Software", [p.software for p in sub.protocol]),
-        ("SDRF File", sub.info.get("accession", sub.info.get("alias")) + ".sdrf.txt"),
+        ("SDRF File", new_file_prefix(sub) + ".sdrf.txt"),
         ("Term Source Name", ["EFO", "ArrayExpress"]),
         ("Term Source File", ["https://www.ebi.ac.uk/efo/", "https://www.ebi.ac.uk/arrayexpress/"]),
-        ("Comment[AEExperimentType]", [exptype for exptype in sub.study.experiment_type]),
-        ("Comment[ArrayExpressAccession]", sub.info.get("accession"))
+        ("Comment[AEExperimentType]", [exptype for exptype in sub.study.experiment_type])
     ])
 
+    if sub.study.accession:
+        idf["Comment[ArrayExpressAccession]"] = sub.study.accession
     if sub.info.get("submission_type") == "sequencing" or sub.info.get("submission_type") == "singlecell":
         pass
         # TODO: Add comments for ENA accessions Comment[SecondaryAccession] and Comment[SequenceDataURI]

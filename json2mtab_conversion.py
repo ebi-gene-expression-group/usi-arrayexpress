@@ -7,12 +7,11 @@ and runs metadata conversion from USI-JSON to MAGE-TAB format.
 
 import argparse
 from os import path
-import re
 
 from converter import json2dm, dm2magetab
 from validator.json_schema_validation import validate_submission_json
 from utils.common_utils import file_exists, create_logger
-from utils.converter_utils import read_json_file, dict_to_vertcial_table
+from utils.converter_utils import read_json_file, dict_to_vertcial_table, new_file_prefix
 
 
 def parse_args():
@@ -54,7 +53,7 @@ def main():
     mapping_file = path.join(wd, "converter", "config", "mapping_ae-usi_to_datamodel.json")
     mapping = read_json_file(mapping_file)
     ae_converter = json2dm.JSONConverter(mapping, import_key="ae")
-    sub = ae_converter.convert(json_data)
+    sub = ae_converter.convert(json_data, source_file_name=json_file)
 
     # Generate IDF dictionary
     logger.debug("Generating IDF file")
@@ -64,10 +63,7 @@ def main():
     sdrf = dm2magetab.generate_sdrf(sub)
 
     # New file paths
-    prefix = re.sub("\.json", "", path.basename(json_file), flags=re.IGNORECASE)
-    if sub.study.accession:
-        prefix = sub.study.accession
-
+    prefix = new_file_prefix(sub)
     if args.outdir:
         new_idf_file = path.join(args.outdir, prefix + ".idf.txt")
         new_sdrf_file = path.join(args.outdir, prefix + ".sdrf.txt")

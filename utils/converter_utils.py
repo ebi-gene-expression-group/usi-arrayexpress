@@ -364,3 +364,13 @@ def dict_to_vertcial_table(input_dict, filename, logger, sep='\t'):
                     writer.writerow([key, value])
     except Exception as e:
         logger.error("Failed to write csv file: {}".format(str(e)))
+
+
+def new_file_prefix(sub):
+    """Create new file names based on submission metadata or file name"""
+    if sub.study.accession:
+        return sub.study.accession
+    else:
+        # Use prefix of original file name after stripping file extension
+        source_file = sub.info.get("metadata")
+        return re.sub("\.\w+$", "", os.path.basename(source_file), flags=re.IGNORECASE)
