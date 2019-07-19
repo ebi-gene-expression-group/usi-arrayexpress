@@ -1,3 +1,7 @@
+from collections import OrderedDict
+
+from utils.common_utils import get_ontology_source_file
+
 
 class Submission:
     def __init__(self, info, project, study, protocol, sample, assay, assay_data, analysis):
@@ -44,4 +48,15 @@ class Submission:
         """Return the assay data object for a given assay data alias."""
         return self.data_lookup.get(ad_alias)
 
-
+    def get_term_sources(self):
+        term_sources = OrderedDict()
+        # Make sure we have at least EFO (used for protocol types etc.)
+        term_sources["EFO"] = "https://www.ebi.ac.uk/efo.owl"
+        ontologies = {a.term_source for s in self.sample for a in s.attributes.values() if a.term_source}
+        for o in ontologies:
+            if not o.upper() == "EFO":
+                term_sources[o] = get_ontology_source_file(o)
+        # MA submissions need ArrayExpress as Term Ref for array design accessions
+        if self.info.get("submission_type") == "microarray":
+            term_sources["ArrayExpress"] = "https://www.ebi.ac.uk/arrayexpress/"
+        return term_sources

@@ -47,8 +47,8 @@ def generate_idf(sub):
         ("Protocol Hardware", [p.hardware for p in sub.protocol]),
         ("Protocol Software", [p.software for p in sub.protocol]),
         ("SDRF File", new_file_prefix(sub) + ".sdrf.txt"),
-        ("Term Source Name", ["EFO", "ArrayExpress"]),
-        ("Term Source File", ["https://www.ebi.ac.uk/efo/", "https://www.ebi.ac.uk/arrayexpress/"]),
+        ("Term Source Name", [o for o in sub.get_term_sources()]),
+        ("Term Source File", [path for path in sub.get_term_sources().values()]),
         ("Comment[AEExperimentType]", [exptype for exptype in sub.study.experiment_type])
     ])
 

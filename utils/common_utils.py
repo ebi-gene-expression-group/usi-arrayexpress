@@ -52,6 +52,19 @@ def url_encode_for_ols(term_url):
     return urllib.parse.quote(urllib.parse.quote(term_url, safe=""))
 
 
+def get_ontology_source_file(ontology_acronym):
+    """Look up OLS to find the source file for a given ontology"""
+
+    api_url = "ontologies/{}".format(ontology_acronym)
+    data = query_ols(api_url, {}, logging.getLogger())
+    if data:
+        try:
+            source_file = data["config"]["fileLocation"]
+            return source_file
+        except KeyError:
+            logging.error("Failed to receive valid response from OLS searching for {}.".format(ontology_acronym))
+
+
 def get_ontology_from_term_url(term_url):
     """Return the ontology for a given ontology term URL
 
