@@ -12,7 +12,7 @@ class Protocol(AccessionedSubmittable):
     :param protocol_type: object, Attribute class object, experiment type ontology term
     :param hardware: string, free-text hardware description, sequencer model for sequencing experiments
     :param software: string, free-text software description
-    :param parameters: list, parameter values
+    :param performer: string, protocol performer
     """
     def __init__(self, **kwargs):
         AccessionedSubmittable.__init__(self, **kwargs)
@@ -20,11 +20,12 @@ class Protocol(AccessionedSubmittable):
         self.protocol_type = kwargs.get("protocol_type")
         self.hardware = kwargs.get("hardware")
         self.software = kwargs.get("software")
+        self.performer = kwargs.get("performer")
 
     def __repr__(self):
         return "{self.__class__.__name__}(alias={self.alias}, accession={self.accession}, " \
                "description={self.description}, protocol_type={self.protocol_type}, " \
-               "hardware={self.hardware}, software={self.software})".format(self=self)
+               "hardware={self.hardware}, software={self.software}, performer={self.performer})".format(self=self)
 
     def get_ae_attributes(self):
         """Return a list of all AE attributes that have values."""

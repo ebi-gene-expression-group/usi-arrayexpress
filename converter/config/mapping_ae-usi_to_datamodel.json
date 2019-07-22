@@ -306,7 +306,7 @@
         "ae": {
           "path": ["attributes", "hardware"],
           "from_type": "string",
-          "method": "import_string"
+          "method": "get_string_from_attribute"
         }
       }
     },
@@ -317,11 +317,21 @@
         "ae": {
           "path": ["attributes", "software"],
           "from_type": "string",
-          "method": "import_string"
+          "method": "get_string_from_attribute"
         }
       }
     },
-    "parameters": {}
+    "performer": {
+      "description": "performer of the protocol",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "performer"],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    }
   },
   "sample": {
     "alias": {

@@ -620,6 +620,11 @@
               }
             ]
           }
+        ],
+        "performer": [
+          {
+            "value": "someone I used to know"
+          }
         ]
       }
     },

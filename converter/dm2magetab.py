@@ -199,9 +199,10 @@ def generate_sdrf(sub):
 def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, rows, row):
     """
     Check for processed data and factor values and terminate the row (i.e. add it to the rows list)
-    If assays or raw data are missing we have several breakpoints in the generation of the SDRF row.
-    Hence, whenever we reach a point where there is no more dependent objects we finish the row
-    by adding processed data, adding protocol edges and add factor values from sample attributes
+
+    We have several breakpoints in the generation of the SDRF row if assays or raw data are missing.
+    Hence, whenever we reach a point where there are no more dependent objects we finish the row
+    by trying to add processed data, protocol edges and factor values from sample attributes.
     """
     # Processed data
     processed_data = []
@@ -211,7 +212,6 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
     # Try to get processed data files that belong to the assay object instead
     if not processed_data and assay:
         processed_data = [px for px in sub.analysis if assay.alias in px.assayrefs]
-
     # Collect file names and turn into tuple list
     processed_data_values = []
     for px in processed_data:
@@ -224,6 +224,7 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
                 processed_data_values.append(("Comment[Derived ArrayExpress FTP file]", f.ftp_location))
         # Also add protocol references for how the processed data was generated from assay data
         all_protocols.update((sub.get_protocol(pref) for pref in px.protocolrefs))
+
     # Factor values
     factors = sub.study.experimental_factor
     factor_values = []
@@ -330,16 +331,19 @@ def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
      2: {21~~~Protocol REF: Protocol 3},
      3: {31~~~Protocol REF: Protocol 4}}
     """
-    protocol_dict = defaultdict(dict)
+    protocol_dict = defaultdict(OrderedDict)
 
     for pos, p_types in protocol_positions.items():
-        prefs_for_position = [p.alias for p in all_protocols if p.protocol_type.value in p_types]
+        prefs_for_position = [p for p in all_protocols if p.protocol_type.value in p_types]
         # Number of entries in the dict corresponds to the number of columns that will be created and
         # should be equal of the number of protocol refs for the same position
         column_number = 1
         for p in prefs_for_position:
             # Making the secondary key unique
-            protocol_dict[pos][str(pos)+str(column_number)+sep+"Protocol REF"] = p
+            prefix = str(pos) + str(column_number) + sep
+            protocol_dict[pos][prefix + "Protocol REF"] = p.alias
+            if p.performer:
+                protocol_dict[pos][prefix + "Performer"] = p.performer
             column_number += 1
 
     return protocol_dict
