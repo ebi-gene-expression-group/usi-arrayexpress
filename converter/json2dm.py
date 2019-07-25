@@ -32,7 +32,7 @@ class JSONConverter:
         self.mapping = mapping
         self.import_key = import_key
 
-    def convert(self, envelope_json, submission_type=None, source_file_name=None):
+    def convert_usi_sub(self, envelope_json, submission_type=None, source_file_name=None):
         """
         Converter that takes a JSON as input and converts it to a Submission class object
         based on the specifications in the mapping file
@@ -77,19 +77,12 @@ class JSONConverter:
         analysis = [Analysis(**self.convert_submittable(a, "analysis"))
                     for a in envelope_json.get("analyses", [])]
 
-        print(project)
-        print(study)
-        print(protocols)
-        print(samples)
-        print(assays)
-
         sub_info = {
             "team": envelope_json.get("submission", {}).get("team", {}).get("name"),
             "alias": envelope_json.get("submission", {}).get("id", {}),
             "submission_type": submission_type,
             "metadata": source_file_name
         }
-        print(sub_info)
 
         submission = Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
         return submission
@@ -125,7 +118,7 @@ class JSONConverter:
                                                              for o in target_object]
                 elif target_object:
                     submittable_attributes[attribute] = convert_function(target_object, translation=translation)
-        print(submittable_attributes)
+
         return submittable_attributes
 
     def interpret_path(self, path, json_object):

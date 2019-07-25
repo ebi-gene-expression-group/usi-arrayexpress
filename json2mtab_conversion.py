@@ -47,7 +47,7 @@ def main():
     try:
         validate_submission_json(json_file, logger=json_logger)
     except Exception as e:
-        print("ERROR: Cannot read or validate the JSON input\n{}".format(e))
+        logger.error("Cannot read or validate the JSON input\n{}".format(e))
         sys.exit()
 
     json_data = read_json_file(json_file)
@@ -58,7 +58,7 @@ def main():
     mapping_file = path.join(wd, "converter", "config", "mapping_ae-usi_to_datamodel.json")
     mapping = read_json_file(mapping_file)
     ae_converter = json2dm.JSONConverter(mapping, import_key="ae")
-    sub = ae_converter.convert(json_data, source_file_name=json_file)
+    sub = ae_converter.convert_usi_sub(json_data, source_file_name=json_file)
 
     # Generate IDF dictionary
     logger.debug("Generating IDF file")
