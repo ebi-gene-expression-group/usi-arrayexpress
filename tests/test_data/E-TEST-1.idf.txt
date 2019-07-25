@@ -35,6 +35,6 @@ Protocol Hardware
 Protocol Software					
 SDRF File	E-TEST-1.sdrf.txt
 Term Source Name	EFO	ArrayExpress
-Term Source File	https://www.ebi.ac.uk/efo/	https://www.ebi.ac.uk/arrayexpress/
+Term Source File	https://www.ebi.ac.uk/efo.owl	https://www.ebi.ac.uk/arrayexpress/
 Comment[AEExperimentType]	transcription profiling by array
 Comment[ArrayExpressAccession]	E-TEST-1
