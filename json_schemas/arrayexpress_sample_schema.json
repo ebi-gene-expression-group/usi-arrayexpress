@@ -1,109 +1,122 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "ArrayExpress Submission Sample Schema",
-    "description": "A base validation sample schema",
-    "version": "1.0.0",
-    "author": "arrayexpress",
-    "type": "object",
-    "required": [
-      "alias",
-      "taxonId"
-    ],
-    "additionalProperties": false,
-    "properties": {
-        "alias": {
-            "description": "An unique identifier of the sample.",
-            "type": "string",
-            "pattern": "^[^#]",
-            "minLength": 1
-        },
-        "description": {
-            "description": "More extensive free-form description.",
-            "type": "string",
-            "minLength": 1
-        },
-        "taxonId": {
-            "description": "The taxon identifier from NCBI's taxonomy.",
-            "type": "integer",
-            "minimum": 1
-        },
-        "taxon": {
-            "description": "The genus and species of the organism. Should be the latin species name, e.g. Homo sapiens.",
-            "type": "string",
-            "minLength": 1
-        },
-        "releaseDate": {
-            "type": "string",
-            "format": "date"
-        },
-        "attributes": {
-            "description": "Attributes for describing a sample.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ArrayExpress Submission Sample Schema",
+  "description": "A base validation sample schema",
+  "version": "1.0.0",
+  "author": "arrayexpress",
+  "type": "object",
+  "required": [
+    "alias",
+    "taxonId"
+  ],
+  "properties": {
+    "id": {
+      "description": "UUID for the sample issued by the submission system.",
+      "type": "string"
+    },
+    "accession": {
+      "description": "BioSamples accession of the sample.",
+      "type": "string",
+      "minLength": 1
+    },
+    "alias": {
+      "description": "An unique identifier of the sample.",
+      "type": "string",
+      "pattern": "^[^#]",
+      "minLength": 1
+    },
+    "description": {
+      "description": "More extensive free-form description.",
+      "type": "string",
+      "minLength": 1
+    },
+    "taxonId": {
+      "description": "The taxon identifier from NCBI's taxonomy.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "taxon": {
+      "description": "The genus and species of the organism. Should be the latin species name, e.g. Homo sapiens.",
+      "type": "string",
+      "minLength": 1
+    },
+    "releaseDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "attributes": {
+      "description": "Attributes for describing a sample.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "material_type": {
+          "description": "The type of source material.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
             "type": "object",
-            "required": [
-              "organism"
-            ],
-          "additionalProperties": true,
             "properties": {
-                "material_type": {
-                    "description": "The type of source material.",
-                    "type": "string",
-                    "enum": [
-                      "whole organism",
-                      "organism part",
-                      "cell",
-                      "RNA",
-                      "DNA"
-                    ]
-                  },
-                "organism": {
-                    "description": "The genus and species of the organism. Should be the latin species name, e.g. Homo sapiens."
-                }
-            },
-            "patternProperties": {
-                "^.*$": {
-                    "type": "array",
-                    "minItems": 1,
-                    "maxItems": 1,
-                    "items": {
-                        "properties": {
-                            "value": { "type": "string", "minLength": 1 },
-                            "units": { "type": "string", "minLength": 1 },
-                            "terms": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "url": {"type": "string", "format": "uri" }
-                                    },
-                                    "required": ["url"]
-                                }
-                            }
-                        },
-                        "required": ["value"]
-                    }
-                }
-            }
-        },
-        "sampleRelationships": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "alias": { "type": "string", "minLength": 1 },
-                    "accession": { "type": "string", "minLength": 1 },
-                    "team": { "type": "string", "minLength": 1 },
-                    "relationshipNature": {
-                        "type": "string",
-                        "enum": [ "derived from", "child of", "same as", "recurated from" ]
-                    }
-                },
-                "anyOf": [
-                    { "required": ["alias", "team", "relationshipNature"] },
-                    { "required": ["accession", "relationshipNature"] }
+              "value": {
+                "type": "string",
+                "enum": [
+                  "whole organism",
+                  "organism part",
+                  "cell",
+                  "RNA",
+                  "DNA"
                 ]
+              }
             }
+          }
         }
+      },
+      "patternProperties": {
+        "^.*$": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "properties": {
+              "value": { "type": "string", "minLength": 1 },
+              "units": { "type": "string", "minLength": 1 },
+              "terms": {
+                "type": "array",
+                "items": {
+                  "maxItems": 1,
+                  "type": "object",
+                  "properties": {
+                    "url": {"type": "string", "format": "uri" }
+                  },
+                  "required": ["url"]
+                }
+              }
+            },
+            "required": ["value"]
+          }
+        }
+      }
+    },
+    "sampleRelationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "alias": { "type": "string", "minLength": 1 },
+          "accession": { "type": "string", "minLength": 1 },
+          "team": { "type": "string", "minLength": 1 },
+          "relationshipNature": {
+            "type": "string",
+            "enum": [ "derived from", "child of", "same as", "recurated from" ]
+          }
+        },
+        "anyOf": [
+          { "required": ["alias", "team", "relationshipNature"] },
+          { "required": ["accession", "relationshipNature"] }
+        ]
+      }
     }
+  }
 }
 
 

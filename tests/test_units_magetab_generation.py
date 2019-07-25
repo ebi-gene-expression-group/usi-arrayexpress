@@ -1,6 +1,7 @@
 import unittest
 from converter.dm2magetab import get_protocol_positions, sort_protocol_refs_to_dict, flatten_sample_attribute
-from converter.datamodel import Protocol, Attribute, Unit
+from converter.datamodel.components import Attribute, Unit
+from converter.datamodel.protocol import Protocol
 
 
 class TestReadingProtocolPositions(unittest.TestCase):
@@ -28,37 +29,26 @@ class TestTransformingProtocolRefs(unittest.TestCase):
 
     def setUp(self):
         self.protocol_positions = get_protocol_positions("microarray")
-        self.all_protocols = [Protocol("Protocol 1", "P-MTAB-1234", "testing col",
-                                       Attribute("sample collection protocol", None, None),
-                                       None, None, None),
-                              Protocol("Protocol 2", "P-MTAB-1235", "testing scan",
-                                       Attribute("growth protocol", None, None),
-                                       None, None, None),
-                              Protocol("Protocol 3", "P-MTAB-1235", "testing scan",
-                                       Attribute("growth protocol", None, None), None,
-                                       None, None),
-                              Protocol("Protocol 4", "P-MTAB-1235", "testing scan",
-                                       Attribute("treatment protocol", None, None),
-                                       None, None, None),
-                              Protocol("Protocol 5", "P-MTAB-1235", "testing scan",
-                                       Attribute("conversion protocol", None, None),
-                                       None, None, None),
-                              Protocol("Protocol 6", "P-MTAB-1235", "testing scan",
-                                       Attribute("nucleic acid extraction protocol", None, None),
-                                       None, None, None),
-                              Protocol("Protocol 7", "P-MTAB-1235", "testing scan",
-                                       Attribute("nucleic acid labeling protocol", None, None),
-                                       None, None, None),
-                              Protocol("Protocol 8", "P-MTAB-1235", "testing scan",
-                                       Attribute("nucleic acid hybridization to array protocol", None, None),
-                                       None, None, None),
-                              Protocol("Protocol 9", "P-MTAB-1235", "testing scan",
-                                       Attribute("array scanning and feature extraction protocol", None, None),
-                                       None, None, None),
-                              Protocol("Protocol 10", "P-MTAB-1235", "testing scan",
-                                       Attribute("normalization data transformation protocol", None, None),
-                                       None, None, None)
-                              ]
+        self.all_protocols = [Protocol(alias="Protocol 1", accession="P-MTAB-1234", description="testing col",
+                                       protocol_type=Attribute(value="sample collection protocol")),
+                              Protocol(alias="Protocol 2", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="growth protocol")),
+                              Protocol(alias="Protocol 3", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="growth protocol")),
+                              Protocol(alias="Protocol 4", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="treatment protocol")),
+                              Protocol(alias="Protocol 5", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="conversion protocol")),
+                              Protocol(alias="Protocol 6", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="nucleic acid extraction protocol")),
+                              Protocol(alias="Protocol 7", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="nucleic acid labeling protocol")),
+                              Protocol(alias="Protocol 8", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="nucleic acid hybridization to array protocol")),
+                              Protocol(alias="Protocol 9", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="array scanning and feature extraction protocol")),
+                              Protocol(alias="Protocol 10", accession="P-MTAB-1235", description="testing scan",
+                                       protocol_type=Attribute(value="normalization data transformation protocol"))]
 
     def test_microarray_protocol_refs(self):
         for i in range(5):
@@ -80,14 +70,15 @@ class TestFlatteningAttributesToList(unittest.TestCase):
 
     def setUp(self):
         self.test_age_category = "age"
-        self.test_age_attribute = Attribute("24", Unit("year", "time unit", None, None), None, None)
+        self.test_age_attribute = Attribute(value="24", unit=Unit(value="year", unit_type="time unit"))
         self.test_dose_category = "dose"
-        self.test_dose_attribute = Attribute("50", Unit("micromolar", "concentration unit", "EFO_000123", "EFO"), None,
-                                             None)
+        self.test_dose_attribute = Attribute(value="50", unit=Unit(value="micromolar", unit_type="concentration unit",
+                                                                   term_accession="EFO_000123", term_source="EFO"))
         self.test_organism_category = "organism"
-        self.test_organism_attribute = Attribute("Homo sapiens", None, "NCBITaxon_9606", "NCBITAXON")
+        self.test_organism_attribute = Attribute(value="Homo sapiens",
+                                                 term_accession="NCBITaxon_9606", term_source="NCBITAXON")
         self.test_sex_category = "sex"
-        self.test_sex_attribute = Attribute("female", None, None, None)
+        self.test_sex_attribute = Attribute(value="female")
 
     def test_flatten_attribute_with_unit(self):
         result = flatten_sample_attribute(self.test_age_category, self.test_age_attribute, "Characteristics")
@@ -112,5 +103,5 @@ class TestFlatteningAttributesToList(unittest.TestCase):
         assert(result == [("Characteristics[sex]", "female")])
 
     def test_empty_object(self):
-        result = flatten_sample_attribute("", Attribute(None, None, None, None), "Characteristics")
+        result = flatten_sample_attribute("", Attribute(value=None), "Characteristics")
         assert(result == [])

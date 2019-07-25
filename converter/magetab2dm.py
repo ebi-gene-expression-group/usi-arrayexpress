@@ -5,12 +5,16 @@ import re
 from collections import defaultdict, OrderedDict
 
 from converter.dm2json import datamodel2json_conversion
-from converter.datamodel import Project, Study, Protocol, Sample, MicroarrayAssay, SeqAssay, DataFile, AssayData, \
-    Analysis, Submission
+from converter.datamodel.submission import Submission
+from converter.datamodel.sample import Sample
+from converter.datamodel.protocol import Protocol
+from converter.datamodel.study import Study
+from converter.datamodel.project import Project
+from converter.datamodel.data import AssayData, Analysis
+from converter.datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
 from utils.common_utils import create_logger
-
 from utils.converter_utils import get_controlled_vocabulary, get_name, get_value, read_sdrf_file, read_idf_file, \
-    get_sdrf_path, strip_extension
+    get_sdrf_path, strip_extension, guess_submission_type
 
 
 def get_protocol_refs(sdrf_row, header_dict, node_map, node2_index):
@@ -489,13 +493,14 @@ def mtab2usi_conversion(idf_file_path):
     logger = create_logger(current_dir, process_name, idf_file_name)
 
     sdrf_file_path = get_sdrf_path(idf_file_path, logger)
+    submission_type, idf_data = guess_submission_type(idf_file_path, sdrf_file_path, logger)
 
-    sub = data_objects_from_magetab(idf_file_path, sdrf_file_path)
+    sub = data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type)
 
     datamodel2json_conversion(sub, current_dir, logger)
 
 
-def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="sequencing"):
+def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
     """
     Parse IDF/SDRF files and transform metadata to common datamodel
 
@@ -585,7 +590,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="se
     # We use the assay ref (Assay Name) as the alias for the assay_data object
     for name, group in file_groups.items():
         # Create dataFile object for each individual file within the group
-        file_objects = [DataFile.from_magetab(f_attrib) for f_attrib in group]
+        file_objects = [datafile_from_magetab(f_attrib) for f_attrib in group]
         # The assay_data has a common alias and holds the file objects + common attributes of the group)
         assay_data = AssayData.from_magetab(name, file_objects, group)
         ad_objects.append(assay_data)
@@ -595,7 +600,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="se
     # Here loading the data into the datamodel is a bit simpler: create dataFile objects for each file
     # and then Analysis object with the additional attributes
     # We only want one Analysis object per file but the standard structure of the objects is a list
-    analysis_objects = [Analysis.from_magetab([DataFile.from_magetab(f_attrib)], f_attrib)
+    analysis_objects = [Analysis.from_magetab([datafile_from_magetab(f_attrib)], f_attrib)
                         for f_attrib in processed_data.values()]
 
     # Assembling it all into a submission object
@@ -609,3 +614,21 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type="se
                      analysis_objects)
 
     return sub
+
+
+def datafile_from_magetab(file_attributes):
+
+    comments = file_attributes.get("comments", {})
+    if "ArrayExpress FTP file" in comments:
+        ftp_location = comments.get("ArrayExpress FTP file")
+    elif "FASTQ_URI" in comments:
+        ftp_location = comments.get("FASTQ_URI")
+    elif "Derived ArrayExpress FTP file" in comments:
+        ftp_location = comments.get("Derived ArrayExpress FTP file")
+    else:
+        ftp_location = None
+
+    return {"name": file_attributes.get("name"),
+            "checksum": comments.get("MD5"),
+            "checksum_method": "MD5",
+            "ftp_location": ftp_location}

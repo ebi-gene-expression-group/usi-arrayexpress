@@ -52,7 +52,6 @@ def main():
     if not submission_type:
         submission_type = guess_submission_type_from_idf(idf_dict)
     logger.info("Found experiment type: {}".format(submission_type))
-
     # Logger for prevalidation (create new to show different styling)
     mtab_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="MAGE-TAB", log_level=logging_level)
 

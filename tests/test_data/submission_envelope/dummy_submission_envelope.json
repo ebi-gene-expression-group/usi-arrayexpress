@@ -1,0 +1,699 @@
+{
+  "submission": {
+    "id": "c8b641a7-a31c-42fd-8cac-cb64f1f44dd2",
+    "submitter": {
+      "email": "test@email.com",
+      "name": "Test User"
+    },
+    "team": {
+      "name": "my-test-team"
+    },
+    "submissionDate": "2019-05-26"
+  },
+  "supportingSamplesRequired": [],
+  "supportingSamples": [],
+  "uploadedFiles": [],
+  "analyses": [
+    {
+      "id": "fce2442f-3e9d-4db9-8f67-fa3e1036f1c3",
+      "accession": null,
+      "alias": "processed_data",
+      "team": {
+        "name": "my-test-team",
+        "description": null,
+        "profile": {}
+      },
+      "files": [
+        {
+          "name": "proecessed_data.txt"
+        }
+      ],
+      "protocolUses": [
+        {"protocolRef": {
+          "alias": "Protocol 5",
+          "team": "my-test-team"
+        }}],
+      "assayDataRefs": [
+        {
+          "alias": "raw_data",
+          "team": "my-test-team"
+        }
+      ],
+      "attributes": {
+        "data_type": [{"value": "processed matrix"}]
+      }
+    }
+  ],
+  "assays": [
+    {
+      "alias": "Control 1:Cy3",
+      "attributes": {
+        "label": [
+          {
+            "value": "Cy3"
+          }
+        ],
+        "array_design": [
+          {
+            "value": "A-MEXP-2072"
+          }
+        ],
+        "technology_type": [
+          {
+            "value": "array assay"
+          }
+        ]
+      },
+      "studyRef": {
+        "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+        "team": "my-test-team"
+      },
+      "sampleUses": [
+        {"sampleRef": {
+          "alias": "Control 1",
+          "team": "my-test-team"
+        }
+      }
+      ],
+      "protocolUses": [
+        {"protocolRef": {
+          "alias": "Protocol 4",
+          "team": "my-test-team"
+        }},
+        {"protocolRef":
+        {
+          "alias": "Protocol 2",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 3",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 1",
+          "team": "my-test-team"
+        }}
+      ]
+    },
+    {
+      "alias": "Control 2:Cy3",
+      "attributes": {
+        "label": [
+          {
+            "value": "Cy3"
+          }
+        ],
+        "array_design": [
+          {
+            "value": "A-MEXP-2072"
+          }
+        ],
+        "technology_type": [{"value": "array assay"}]
+      },
+      "studyRef": {
+        "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+        "team": "my-test-team"
+      },
+      "sampleUses": [{
+        "sampleRef": {
+          "alias": "Control 2",
+          "team": "my-test-team"
+        }}
+      ],
+      "protocolUses": [
+        {"protocolRef": {
+          "alias": "Protocol 4",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 2",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 3",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 1",
+          "team": "my-test-team"
+        }}
+      ]
+    },
+    {
+      "alias": "Control 3:Cy3",
+      "attributes": {
+        "label": [
+          {
+            "value": "Cy3"
+          }
+        ],
+        "array_design": [
+          {
+            "value": "A-MEXP-2072"
+          }
+        ],
+        "technology_type": [{"value": "array assay"}]
+      },
+      "studyRef": {
+        "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+        "team": "my-test-team"
+      },
+      "sampleUses": [
+        {"sampleRef": {
+          "alias": "Control 3",
+          "team": "my-test-team"
+        }}
+      ],
+      "protocolUses": [
+        {"protocolRef": {
+          "alias": "Protocol 4",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 2",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 3",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 1",
+          "team": "my-test-team"
+        }}
+      ]
+    },
+    {
+      "alias": "Test 1:Cy3",
+      "attributes": {
+        "label": [
+          {
+            "value": "Cy3"
+          }
+        ],
+        "array_design": [
+          {
+            "value": "A-MEXP-2072"
+          }
+        ],
+        "technology_type": [{"value": "array assay"}]
+      },
+      "studyRef": {
+        "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+        "team": "my-test-team"
+      },
+      "sampleUses": [
+        {"sampleRef": {
+          "alias": "Test 1",
+          "team": "my-test-team"
+        }}
+      ],
+      "protocolUses": [
+        {"protocolRef": {
+          "alias": "Protocol 4",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 2",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 3",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 1",
+          "team": "my-test-team"
+        }}
+      ]
+    },
+    {
+      "alias": "Test 2:Cy3",
+      "attributes": {
+        "label": [
+          {
+            "value": "Cy3"
+          }
+        ],
+        "array_design": [
+          {
+            "value": "A-MEXP-2072"
+          }
+        ],
+        "technology_type": [{"value": "array assay"}]
+      },
+      "studyRef": {
+        "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+        "team": "my-test-team"
+      },
+      "sampleUses": [
+        {"sampleRef": {
+          "alias": "Test 2",
+          "team": "my-test-team"
+        }}
+      ],
+      "protocolUses": [
+        {"protocolRef": {
+          "alias": "Protocol 4",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 2",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 3",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 1",
+          "team": "my-test-team"
+        }}
+      ]
+    },
+    {
+      "alias": "Test 3:Cy3",
+      "attributes": {
+        "label": [
+          {
+            "value": "Cy3"
+          }
+        ],
+        "array_design": [
+          {
+            "value": "A-MEXP-2072"
+          }
+        ],
+        "technology_type": [{"value": "array assay"}]
+      },
+      "studyRef": {
+        "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+        "team": "my-test-team"
+      },
+      "sampleUses": [
+        {"sampleRef": {
+          "alias": "Test 3",
+          "team": "my-test-team"
+        }}
+      ],
+      "protocolUses": [
+        {"protocolRef": {
+          "alias": "Protocol 4",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 2",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 3",
+          "team": "my-test-team"
+        }},
+        {"protocolRef": {
+          "alias": "Protocol 1",
+          "team": "my-test-team"
+        }}
+      ]
+    }
+  ],
+  "assayData": [
+    {
+      "id": "fce2442f-3e9d-4db9-8f67-fa3e1036f1c3",
+      "accession": null,
+      "alias": "raw_data",
+      "team": {
+        "name": "my-test-team",
+        "description": null,
+        "profile": {}
+      },
+      "files": [
+        {
+          "name": "raw_data.txt"
+        }
+      ],
+      "assayRefs": [
+        {
+          "alias": "Test 2:Cy3",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Test 1:Cy3",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Test 3:Cy3",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Control 2:Cy3",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Control 1:Cy3",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Control 3:Cy3",
+          "team": "my-test-team"
+        }
+      ],
+      "attributes": {
+        "data_type": [
+          {
+            "value": "raw matrix"
+          }
+        ]
+      }
+    }
+  ],
+  "egaDacs": [],
+  "egaDacPolicies": [],
+  "egaDatasets": [],
+  "projects": [
+    {
+      "alias": "project_E-TEST-1",
+      "title": "A test case for a one-colour microarray experiment with a matrix data file",
+      "description": "This is just a test experiment",
+      "contacts": [
+        {
+          "firstName": "R",
+          "lastName": "Searcher",
+          "email": "fake@test.com",
+          "affiliation": "EMBL-EBI",
+          "address": "Wellcome Genome Campus",
+          "roles": [
+            "submitter"
+          ],
+          "middleInitials": "E"
+        }
+      ],
+      "releaseDate": "2079-12-25",
+      "publications": [
+        {
+          "articleTitle": "A glorious discovery",
+          "authors": "A. Tester, D. Eveloper, R.E. Searcher",
+          "pubmedId": "12345678",
+          "publicationStatus": "in preparation"
+        }
+      ]
+    }
+  ],
+  "samples": [
+    {
+      "id": "21907ca8-cd49-48f8-a1a1-a5788afa08a7",
+      "accession": "SAMEA1111111",
+      "alias": "Control 1",
+      "team": {
+        "name": "my-test-team",
+        "description": null,
+        "profile": {}
+      },
+      "title": "Sample title",
+      "description": "Sample description",
+      "taxonId": 9606,
+      "taxon": "Homo sapiens",
+      "attributes": {
+        "organism": [
+          {"value": "Homo sapiens"}
+        ],
+        "disease": [
+          {"value": "acute myeloid leukemia"}
+        ],
+        "cell line": [
+          {"value": "KG1"}
+        ],
+        "genotype": [
+          {"value": "wild type genotype"}
+        ]
+      }
+    },
+    {
+      "id": "fde80a9a-608b-4ffa-a369-58318e8d99ae",
+      "accession": "SAMEA1111112",
+      "alias": "Control 2",
+      "taxon": "Homo sapiens",
+      "taxonId": 9606,
+      "attributes": {
+        "organism": [
+          {"value": "Homo sapiens"}
+        ],
+        "disease": [
+          {"value": "acute myeloid leukemia"}
+        ],
+        "cell line": [
+          {"value": "KG1"}
+        ],
+        "genotype": [
+          {"value": "wild type genotype"}
+        ]
+      }
+    },
+    {
+      "id": "26b77859-45a7-43ff-98cb-cc2877e8c038",
+      "accession": "SAMEA1111113",
+      "alias": "Control 3",
+      "taxon": "Homo sapiens",
+      "taxonId": 9606,
+      "attributes": {
+        "organism": [
+          {"value": "Homo sapiens"}
+        ],
+        "disease": [
+          {"value": "acute myeloid leukemia"}
+        ],
+        "cell line": [
+          {"value": "KG1"}
+        ],
+        "genotype": [
+          {"value": "wild type genotype"}
+        ]
+      }
+    },
+    {
+      "id": "fac0d041-b45a-416a-aa89-e148f2f3dc18",
+      "accession": "SAMEA1111114",
+      "alias": "Test 1",
+      "taxon": "Homo sapiens",
+      "taxonId": 9606,
+      "attributes": {
+        "organism": [
+          {"value": "Homo sapiens"}
+        ],
+        "disease": [
+          {"value": "acute myeloid leukemia"}
+        ],
+        "cell line": [
+          {"value": "KG1"}
+        ],
+        "genotype": [
+          {"value": "knockout"}
+        ]
+      }
+    },
+    {
+      "id": "f389d86a-c392-4382-9360-5314d494016b",
+      "accession": "SAMEA1111115",
+      "alias": "Test 2",
+      "taxon": "Homo sapiens",
+      "taxonId": 9606,
+      "attributes": {
+        "organism": [
+          {"value": "Homo sapiens"}
+        ],
+        "disease": [
+          {"value": "acute myeloid leukemia"}],
+        "cell line": [
+          {"value": "KG1"}
+        ],
+        "genotype": [
+          {"value": "knockout"}
+        ]
+      }
+    },
+    {
+      "id": "5a06d064-27db-49f3-8e73-38d4acfa48e2",
+      "accession": "SAMEA1111116",
+      "alias": "Test 3",
+      "taxon": "Homo sapiens",
+      "taxonId": 9606,
+      "attributes": {
+        "organism": [
+          {"value": "Homo sapiens"}
+        ],
+        "disease": [
+          {"value": "acute myeloid leukemia"}
+        ],
+        "cell line": [
+          {"value": "KG1"}
+        ],
+        "genotype": [
+          {"value": "knockout"}
+        ],
+        "material_type": [{"value": "cell"}]
+      }
+    }
+  ],
+  "sampleGroups": [],
+  "studies": [
+    {
+      "id": "e2acafb4-7acc-46c5-b75b-a975b4ce38dd",
+      "accession": null,
+      "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+      "team": {
+        "name": "my-test-team",
+        "description": null,
+        "profile": {}
+      },
+      "title": "My first ArrayExpress experiment submitted via JSON (one matrix file)",
+      "description": "This is amazing, I can't believe it. Also how did this work so fast?",
+      "studyType": "FunctionalGenomics",
+      "attributes": {
+
+        "experimental_factor": [
+          {
+            "value": "genotype",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0000513"
+              }
+            ]
+          }
+        ],
+        "experimental_design": [
+          {
+            "value": "case control design",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0001427"
+              }
+            ]
+          }
+        ],
+        "experiment_type": [
+          {
+            "value": "transcription profiling by array"
+          }
+        ],
+        "date_of_experiment": [{"value": "2019-05-17"}]
+      },
+      "protocolRefs": [
+        {
+          "alias": "Protocol 1",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Protocol 2",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Protocol 3",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Protocol 4",
+          "team": "my-test-team"
+        },
+        {
+          "alias": "Protocol 5",
+          "team": "my-test-team"
+        }
+      ],
+      "projectRef": {
+        "alias": "Project 1",
+        "team": "my-test-team"
+      }
+    }
+  ],
+  "protocols": [
+    {
+      "id": "0a8e6d1a-4076-4492-b6cb-cc030f2099d9",
+      "alias": "Protocol 1",
+      "description": "collecting",
+      "attributes": {
+        "protocol_type": [
+          {
+            "value": "sample collection protocol",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0005518"
+              }
+            ]
+          }
+        ],
+        "performer": [
+          {
+            "value": "someone I used to know"
+          }
+        ]
+      }
+    },
+    {
+      "id": "9c39d04a-a5fb-4fa0-8ccf-844ebb94834c",
+      "alias": "Protocol 2",
+      "description": "extracting",
+      "attributes": {
+        "protocol_type": [
+          {
+            "value": "nucleic acid extraction protocol",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0002944"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "bc1f92c3-b9fe-4662-9550-be642ee7348c",
+      "alias": "Protocol 3",
+      "description": "labelling",
+      "attributes": {
+        "protocol_type": [
+          {
+            "value": "nucleic acid labeling protocol",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0003813"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "86f13f02-e567-49a4-ae88-8875095bc404",
+      "alias": "Protocol 4",
+      "description": "hybridising",
+      "attributes": {
+        "protocol_type": [
+          {
+            "value": "nucleic acid hybridization to array protocol",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0003815"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "105d7dd9-2d12-439f-bb15-b212c2048717",
+      "alias": "Protocol 5",
+      "description": "normalising",
+      "attributes": {
+        "protocol_type": [
+          {
+            "value": "normalization data transformation protocol",
+            "terms": [
+              {
+                "url": "http://www.ebi.ac.uk/efo/EFO_0003816"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

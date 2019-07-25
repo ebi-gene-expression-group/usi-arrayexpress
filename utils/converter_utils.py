@@ -22,10 +22,11 @@ def read_json_file(filename):
             data = json.load(fh, encoding="utf-8")
             return data
     except IOError as err:
-        print("Cannot import file: %s" % err)
-    except ValueError as j_err:
-        print("Cannot read JSON file: %s" % j_err)
-        raise
+        raise Exception("Cannot import file {}: {}".format(filename, err))
+    except json.decoder.JSONDecodeError as json_error:
+        raise Exception("There is an problem decoding the content of {}: {}".format(filename, json_error))
+    except ValueError as file_err:
+        raise Exception("Cannot read JSON file {}: {}".format(filename, file_err))
 
 
 def usi_object_file_name(object_type, study_info):
@@ -88,11 +89,11 @@ def is_accession(accession, archive=None):
     if archive:
         try:
             regex = regex_lookup.get(archive)
-            return re.match(regex, accession)
+            return re.match(regex, str(accession))
         except KeyError:
             print("Not a valid archive type: {}".format(archive))
     else:
-        return re.match(regex_ebi_accession, accession)
+        return re.match(regex_ebi_accession, str(accession))
 
 
 # To store organisms that we have already looked-up in the taxonomy (this is slow...)
@@ -132,6 +133,27 @@ def get_efo_url(term_accession):
         return "http://www.ebi.ac.uk/efo/" + url_friendly_term
     else:
         return "http://purl.obolibrary.org/obo/" + url_friendly_term
+
+
+def get_term_from_url(term_url):
+    """Return ontology term accession for a given term url
+
+    :param term_url: The expected pattern is a URL from OLS
+    :return: term accession (the last bit of the URL)
+    """
+
+    if term_url:
+        return term_url.split('/')[-1]
+
+
+def get_ontology_from_term(term_accession):
+    """Return the source ontology for a given ontology term
+    This should only be used for terms that are not in EFO"""
+
+    term = re.sub(':', '_', term_accession)
+    term_parts = term.split('_')
+    if len(term_parts) > 1:
+        return term_parts[0]
 
 
 def strip_extension(filename):
@@ -244,6 +266,20 @@ def guess_submission_type(idf_file, sdrf_file, logger):
     return submission_type, idf_dict,
 
 
+def guess_submission_type_from_study(study_object):
+    """Try to infer submission type from study experiment type annotation"""
+
+    all_types = get_controlled_vocabulary("experiment_type", "ontology")
+
+    for exptype in study_object.experiment_type:
+        if exptype in all_types["sequencing"]:
+            return "sequencing"
+        elif exptype in all_types["microarray"]:
+            return "microarray"
+        elif exptype in all_types["singlecell"]:
+            return "singlecell"
+
+
 def get_name(header_string):
     """Return the first part of an SDRF header in lower case and without spaces."""
     no_spaces = header_string.replace(' ', '')
@@ -329,3 +365,13 @@ def dict_to_vertcial_table(input_dict, filename, logger, sep='\t'):
                     writer.writerow([key, value])
     except Exception as e:
         logger.error("Failed to write csv file: {}".format(str(e)))
+
+
+def new_file_prefix(sub):
+    """Create new file names based on submission metadata or file name"""
+    if sub.study.accession:
+        return sub.study.accession
+    else:
+        # Use prefix of original file name after stripping file extension
+        source_file = sub.info.get("metadata")
+        return re.sub("\.\w+$", "", os.path.basename(source_file), flags=re.IGNORECASE)

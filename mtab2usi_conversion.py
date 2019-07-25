@@ -8,7 +8,7 @@ import argparse
 import os
 
 from utils.common_utils import create_logger, file_exists
-from utils.converter_utils import get_sdrf_path
+from utils.converter_utils import get_sdrf_path, guess_submission_type
 from converter.dm2json import datamodel2json_conversion
 from converter.magetab2dm import data_objects_from_magetab
 
@@ -36,9 +36,11 @@ def main():
     # Get path to SDRF file
     sdrf_file_path = get_sdrf_path(idf_file, logger)
 
-    # Read in MAGE-TAB and convert to common data model
+    # Get submission type
+    submission_type, idf_data = guess_submission_type(idf_file, sdrf_file_path, logger)
 
-    sub = data_objects_from_magetab(idf_file, sdrf_file_path)
+    # Read in MAGE-TAB and convert to common data model
+    sub = data_objects_from_magetab(idf_file, sdrf_file_path, submission_type)
 
     # Dump data in common data model as USI-JSON files
     datamodel2json_conversion(sub, current_dir, logger)

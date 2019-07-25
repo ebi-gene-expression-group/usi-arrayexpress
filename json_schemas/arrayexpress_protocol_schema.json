@@ -5,7 +5,6 @@
   "version": "1.0.0",
   "author": "arrayexpress",
   "type": "object",
-  "additionalProperties": false,
   "required": [
     "alias",
     "description"

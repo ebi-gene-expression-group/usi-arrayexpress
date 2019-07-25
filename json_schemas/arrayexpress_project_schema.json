@@ -10,7 +10,6 @@
     "releaseDate",
     "contacts"
   ],
-  "additionalProperties": false,
   "properties": {
     "alias": {
       "description": "A unique identifier of the project",
@@ -47,10 +46,8 @@
             "description": "A list of the manuscript authors",
             "type": "string"
           },
-          "status": {
-            "description": "The state in the publication process",
-            "type": "string",
-            "enum": ["published", "submitted", "in preparation"]
+          "publicationStatus": {
+            "description": "The state in the publication process"
           },
           "pubmedId": {
             "description": "The accession number of the publication in the NCBI PubMed database",

@@ -8,9 +8,9 @@
   "required": [
     "alias",
     "files",
-    "assayDataRefs"
+    "assayDataRefs",
+    "protocolUses"
   ],
-  "additionalProperties": false,
   "properties": {
     "alias": {
       "description": "A unique identifier for the data object.",
@@ -73,8 +73,7 @@
       "items": {
           "type": "object",
           "properties": {
-              "protocolRef": { "$ref": "#/definitions/submittableRef" },
-              "attributes": { "$ref": "#/definitions/attributes" }
+              "protocolRef": { "$ref": "#/definitions/submittableRef" }
         }
       }
     }

@@ -7,8 +7,10 @@ import sys
 
 from datetime import datetime
 
+from utils.converter_utils import get_term_from_url, get_ontology_from_term
 
-def create_logger(working_dir, process_name, object_name, log_level=20, logger_name=__name__):
+
+def create_logger(working_dir, process_name, object_name, log_level=20, logger_name=""):
 
     # Need to give getLogger file_path (name) argument - so that it creates a unique logger for a given file_path
     log_file_name = "{}_{}_{}.log".format(process_name, object_name, datetime.now().strftime('%Y-%m-%d'))
@@ -34,6 +36,59 @@ def create_logger(working_dir, process_name, object_name, log_level=20, logger_n
     return logger
 
 
+def query_ols(api_url, param, logger):
+    """Basic function to query OLS API"""
+
+    base_url = "https://www.ebi.ac.uk/ols/api/"
+    url = base_url + api_url
+    data = download_json(logger, url, param)
+    return data
+
+
+def url_encode_for_ols(term_url):
+    """For OLS API query special characters in term URLs need to be double-encoded,
+    e.g. http%253A%252F%252Fwww.ebi.ac.uk%252Fefo%252FEFO_0000001
+    """
+    return urllib.parse.quote(urllib.parse.quote(term_url, safe=""))
+
+
+def get_ontology_source_file(ontology_acronym):
+    """Look up OLS to find the source file for a given ontology"""
+
+    api_url = "ontologies/{}".format(ontology_acronym)
+    data = query_ols(api_url, {}, logging.getLogger())
+    if data:
+        try:
+            source_file = data["config"]["fileLocation"]
+            return source_file
+        except KeyError:
+            logging.error("Failed to receive valid response from OLS searching for {}.".format(ontology_acronym))
+
+
+def get_ontology_from_term_url(term_url):
+    """Return the ontology for a given ontology term URL
+
+    First try finding the term in EFO, if it is not there,
+    use the first bit of the term accession
+
+    :param term_url: URL for an ontology term in OLS
+    :return: the name of the ontology that the term comes from
+    """
+
+    # Try first to look up term in EFO
+    url_encoded = url_encode_for_ols(term_url)
+    api_url = "ontologies/efo/terms/{}".format(url_encoded)
+    data = query_ols(api_url, {}, logging.getLogger())
+    if data:
+        try:
+            return data.get("ontology_prefix")
+        except KeyError:
+            logging.error("Failed to receive valid response from OLS searching for {}.".format(term_url))
+    # If we haven't found anything in EFO, generate the prefix of the term accession
+    else:
+        return get_ontology_from_term(get_term_from_url(term_url))
+
+
 def get_term_descendants(ontology, term_url, logger):
     """
     Use OLS API to retrieve all child terms (descendants) of a given term URL
@@ -48,13 +103,11 @@ def get_term_descendants(ontology, term_url, logger):
     logger.propagate = True
     efo_children = set()
 
-    base_url = "https://www.ebi.ac.uk/ols/api/ontologies"
-
-    url_encoded = urllib.parse.quote(urllib.parse.quote(term_url, safe=""))
+    url_encoded = url_encode_for_ols(term_url)
     param = {'size': 200}
-    api_url = "{}/{}/terms/{}/descendants".format(base_url, ontology, url_encoded)
+    api_url = "ontologies/{}/terms/{}/descendants".format(ontology, url_encoded)
 
-    data = download_json(logger, api_url, param)
+    data = query_ols(api_url, param, logger)
 
     if data:
         try:
@@ -63,6 +116,40 @@ def get_term_descendants(ontology, term_url, logger):
             return efo_children
         except KeyError:
             logger.error("Failed to receive valid response from {}.".format(api_url))
+
+
+def get_term_parent(ontology, term):
+    """Return the label of the parent term of a given ontology (EFO) term."""
+
+    term_url = ols_lookup(ontology, term)
+    url_encoded = url_encode_for_ols(term_url)
+    print(term_url)
+    api_url = "ontologies/{}/terms/{}/parents".format(ontology, url_encoded)
+    data = query_ols(api_url, {}, logging.getLogger())
+    if data:
+        try:
+            for d in data["_embedded"]["terms"]:
+                # Return the first hit
+                return d["label"]
+        except KeyError:
+            logger.error("Failed to receive valid response from {}.".format(api_url))
+
+
+def ols_lookup(ontology, term):
+    """Get ontology term URL for a given term label."""
+
+    # Just in case we already have a url
+    term_encoded = url_encode_for_ols(term)
+    api_url = "search?q={{{}}}&ontology={}".format(term_encoded, ontology)
+    print(api_url)
+    data = query_ols(api_url, {}, logging.getLogger())
+    if data:
+        try:
+            for d in data["response"]["docs"]:
+                # Return the first hit
+                return d["iri"]
+        except KeyError:
+            logging.error("Failed to receive valid response from OLS searching for {}.".format(term))
 
 
 def get_ena_library_terms_via_usi(logger):

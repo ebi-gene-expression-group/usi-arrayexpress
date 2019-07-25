@@ -10,7 +10,6 @@
     "files",
     "assayRefs"
   ],
-  "additionalProperties": false,
   "properties": {
     "alias": {
       "description": "A unique identifier for the data object.",
@@ -52,11 +51,24 @@
       "properties": {
         "data_type": {
           "description": "The type of data file.",
-          "type": "string",
-          "enum": [
-            "raw",
-            "raw matrix"
-          ]
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+                "value"
+              ],
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": [
+                  "raw",
+                  "raw matrix"
+                ]
+              }
+            }
+          }
         }
       }
     },
@@ -73,8 +85,7 @@
       "items": {
           "type": "object",
           "properties": {
-              "protocolRef": { "$ref": "#/definitions/submittableRef" },
-              "attributes": { "$ref": "#/definitions/attributes" }
+              "protocolRef": { "$ref": "#/definitions/submittableRef" }
         }
       }
     }
