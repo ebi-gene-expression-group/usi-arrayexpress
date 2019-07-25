@@ -54,11 +54,13 @@ class JSONConverter:
         samples = [Sample(**self.convert_submittable(s, "sample")) for s in samples_json]
 
         # To pick the right assay sub-type we need to know the submission type
-        submission_type = getattr(study, "submission_type")
-
-        # Try to guess the experiment type from the experiment type
         if not submission_type:
-            submission_type = guess_submission_type_from_study(study)
+            submission_type = study.submission_type
+            # Try to guess the experiment type from the experiment type
+            if not submission_type:
+                submission_type = guess_submission_type_from_study(study)
+                if not submission_type:
+                    raise Exception("Cannot identify submission type.")
 
         assays = []
         if submission_type == "microarray":
