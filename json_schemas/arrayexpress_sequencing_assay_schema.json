@@ -11,7 +11,6 @@
             "protocolUses",
             "sampleUses"
         ],
-    "additionalProperties": false,
     "properties": {
         "alias": {
             "description": "A unique identifier for the sequencing assay.",
@@ -50,20 +49,33 @@
                 },
                 "nominal_length": {},
                 "nominal_sdev": {},
-                "platform_type":{},
+                "platform_type": {},
                 "instrument_model": {},
                 "technology_type": {
                     "description": "The type of technology used, sequencing or microarray assay.",
-                    "type": "string",
-                    "enum": [
-                        "sequencing assay"
-                    ]
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": ["value"],
+                        "properties": {
+                            "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "enum": [
+                                    "sequencing assay"
+                                ]
+                            }
+                        }
+                    }
                 }
             },
             "patternProperties": {
                 "^.*$": {
                     "type": "array",
                     "minItems": 1,
+                    "maxItems": 1,
                     "items": {
                         "properties": {
                             "value": {
@@ -134,6 +146,7 @@
                 "^.*$": {
                     "type": "array",
                     "minItems": 1,
+                    "maxItems": 1,
                     "items": {
                         "properties": {
                             "value": { "type": "string", "minLength": 1 },

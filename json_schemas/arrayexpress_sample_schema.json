@@ -9,7 +9,6 @@
     "alias",
     "taxonId"
   ],
-  "additionalProperties": false,
   "properties": {
     "id": {
       "description": "UUID for the sample issued by the submission system.",
@@ -52,17 +51,24 @@
       "properties": {
         "material_type": {
           "description": "The type of source material.",
-          "type": "string",
-          "enum": [
-            "whole organism",
-            "organism part",
-            "cell",
-            "RNA",
-            "DNA"
-          ]
-        },
-        "organism": {
-          "description": "The genus and species of the organism. Should be the latin species name, e.g. Homo sapiens."
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": [
+                  "whole organism",
+                  "organism part",
+                  "cell",
+                  "RNA",
+                  "DNA"
+                ]
+              }
+            }
+          }
         }
       },
       "patternProperties": {

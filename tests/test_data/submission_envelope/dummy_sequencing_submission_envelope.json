@@ -7,10 +7,9 @@
         },
         "team": {
             "name": "test-team",
-            "description": null,
             "profile": {}
         },
-        "submissionDate": null
+        "submissionDate": "2019-07-25"
     },
     "uploadedFiles": [],
     "analyses": [],
@@ -29,72 +28,54 @@
             "attributes": {
                 "platform_type": [
                     {
-                        "value": "ILLUMINA",
-                        "units": null,
-                        "terms": []
+                        "value": "ILLUMINA"
                     }
                 ],
                 "instrument_model": [
                     {
-                        "value": "Illumina Genome Analyzer",
-                        "units": null,
-                        "terms": []
+                        "value": "Illumina Genome Analyzer"
                     }
                 ],
                 "library_layout": [
                     {
-                        "value": "SINGLE",
-                        "units": null,
-                        "terms": []
+                        "value": "SINGLE"
                     }
                 ],
                 "design_description": [
                     {
-                        "value": "Design Description",
-                        "units": null,
-                        "terms": []
+                        "value": "Design Description"
                     }
                 ],
                 "library_name": [
                     {
-                        "value": "Example Library",
-                        "units": null,
-                        "terms": []
+                        "value": "Example Library"
                     }
                 ],
                 "library_selection": [
                     {
-                        "value": "RANDOM",
-                        "units": null,
-                        "terms": []
+                        "value": "RANDOM"
                     }
                 ],
                 "library_source": [
                     {
-                        "value": "GENOMIC",
-                        "units": null,
-                        "terms": []
+                        "value": "GENOMIC"
                     }
                 ],
                 "library_strategy": [
                     {
-                        "value": "WGS",
-                        "units": null,
-                        "terms": []
+                        "value": "WGS"
                     }
-                ]
+                ],
+                "technology_type": [{"value": "sequencing assay"}]
             },
             "studyRef": {
                 "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
-                "accession": null,
-                "team": null
+                "team": "test-team"
             },
             "sampleUses": [
                 {
                     "sampleRef": {
-                        "alias": null,
-                        "accession": "SAMEA1652233",
-                        "team": null
+                        "accession": "SAMEA1652233"
                     },
                     "attributes": {}
                 }
@@ -105,7 +86,7 @@
     "assayData": [
         {
             "id": "98295591-2da1-4d28-a988-0ec97c925f95",
-            "accession": null,
+            "accession": "ERR1234567",
             "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
             "team": {
                 "name": "test-team",
@@ -124,7 +105,6 @@
             "assayRefs": [
                 {
                     "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
-                    "accession": null,
                     "team": "test-team"
                 }
             ],
@@ -206,15 +186,14 @@
               ],
               "time": [
                 {
-                  "value": 12,
+                  "value": "12",
                   "units": "hour"
                 }
               ]
             },
             "sampleRelationships": [],
             "taxonId": 9606,
-            "taxon": "Homo sapiens",
-            "releaseDate": null
+            "taxon": "Homo sapiens"
         }
     ],
     "sampleGroups": [],
@@ -229,35 +208,29 @@
                 "profile": {}
             },
             "title": "Study Title",
-            "description": null,
+            "description": "Same as project description",
+            "studyType": "FunctionalGenomics",
             "attributes": {
                 "experimental_factor": [
                     {
-                        "value": "cell type",
-                        "units": null,
-                        "terms": []
+                        "value": "cell type"
                     }
                 ],
-                "study_type": [
+                "submission_type": [
                     {
-                        "value": "sequencing",
-                        "units": null,
-                        "terms": []
+                        "value": "sequencing"
                     }
                 ],
                 "experiment_type": [
                     {
-                        "value": "RNA-seq of coding RNA",
-                        "units": null,
-                        "terms": []
+                        "value": "RNA-seq of coding RNA"
                     }
                 ]
             },
             "protocolRefs": [],
             "projectRef": {
-                "alias": null,
-                "accession": null,
-                "team": null
+                "alias": "test_project",
+                "team": "test-team"
             },
             "releaseDate": null
         }

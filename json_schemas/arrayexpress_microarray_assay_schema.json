@@ -11,7 +11,6 @@
     "protocolUses",
     "sampleUses"
   ],
-  "additionalProperties": false,
   "properties": {
     "alias": {
       "description": "A unique identifier for the microarray assay.",

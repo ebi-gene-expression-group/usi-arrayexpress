@@ -17,7 +17,7 @@
     {
       "id": "fce2442f-3e9d-4db9-8f67-fa3e1036f1c3",
       "accession": null,
-      "alias": "raw_data",
+      "alias": "processed_data",
       "team": {
         "name": "my-test-team",
         "description": null,
@@ -25,14 +25,14 @@
       },
       "files": [
         {
-          "name": "proecessed_data.txt",
-          "checksum": null,
-          "checksumMethod": null,
-          "type": null,
-          "unencryptedChecksum": null,
-          "label": null
+          "name": "proecessed_data.txt"
         }
       ],
+      "protocolUses": [
+        {"protocolRef": {
+          "alias": "Protocol 5",
+          "team": "my-test-team"
+        }}],
       "assayDataRefs": [
         {
           "alias": "raw_data",
@@ -40,7 +40,7 @@
         }
       ],
       "attributes": {
-        "data_type": "raw matrix"
+        "data_type": "processed matrix"
       }
     }
   ],
@@ -60,7 +60,7 @@
         ],
         "technology_type": [
           {
-            "value": "microarray assay"
+            "value": "array assay"
           }
         ]
       },
@@ -107,7 +107,8 @@
           {
             "value": "A-MEXP-2072"
           }
-        ]
+        ],
+        "technology_type": [{"value": "array assay"}]
       },
       "studyRef": {
         "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
@@ -150,7 +151,8 @@
           {
             "value": "A-MEXP-2072"
           }
-        ]
+        ],
+        "technology_type": [{"value": "array assay"}]
       },
       "studyRef": {
         "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
@@ -193,7 +195,8 @@
           {
             "value": "A-MEXP-2072"
           }
-        ]
+        ],
+        "technology_type": [{"value": "array assay"}]
       },
       "studyRef": {
         "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
@@ -236,7 +239,8 @@
           {
             "value": "A-MEXP-2072"
           }
-        ]
+        ],
+        "technology_type": [{"value": "array assay"}]
       },
       "studyRef": {
         "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
@@ -279,7 +283,8 @@
           {
             "value": "A-MEXP-2072"
           }
-        ]
+        ],
+        "technology_type": [{"value": "array assay"}]
       },
       "studyRef": {
         "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
@@ -323,12 +328,7 @@
       },
       "files": [
         {
-          "name": "raw_data.txt",
-          "checksum": null,
-          "checksumMethod": null,
-          "type": null,
-          "unencryptedChecksum": null,
-          "label": null
+          "name": "raw_data.txt"
         }
       ],
       "assayRefs": [
@@ -393,7 +393,7 @@
           "articleTitle": "A glorious discovery",
           "authors": "A. Tester, D. Eveloper, R.E. Searcher",
           "pubmedId": "12345678",
-          "publicationStatus": "InPreparation"
+          "publicationStatus": "in preparation"
         }
       ]
     }
@@ -546,6 +546,7 @@
       },
       "title": "My first ArrayExpress experiment submitted via JSON (one matrix file)",
       "description": "This is amazing, I can't believe it. Also how did this work so fast?",
+      "studyType": "FunctionalGenomics",
       "attributes": {
 
         "experimental_factor": [
@@ -573,8 +574,7 @@
             "value": "transcription profiling by array"
           }
         ],
-        "date_of_experiment": "2019-05-17"
-
+        "date_of_experiment": [{"value": "2019-05-17"}]
       },
       "protocolRefs": [
         {
@@ -600,7 +600,6 @@
       ],
       "projectRef": {
         "alias": "Project 1",
-        "accession": null,
         "team": "my-test-team"
       }
     }

@@ -10,7 +10,6 @@
     "releaseDate",
     "contacts"
   ],
-  "additionalProperties": false,
   "properties": {
     "alias": {
       "description": "A unique identifier of the project",
@@ -48,9 +47,7 @@
             "type": "string"
           },
           "publicationStatus": {
-            "description": "The state in the publication process",
-            "type": "string",
-            "enum": ["published", "submitted", "in preparation"]
+            "description": "The state in the publication process"
           },
           "pubmedId": {
             "description": "The accession number of the publication in the NCBI PubMed database",
