@@ -6,6 +6,7 @@ and runs metadata conversion from USI-JSON to MAGE-TAB format.
 """
 
 import argparse
+import sys
 from os import path
 
 from converter import json2dm, dm2magetab
@@ -43,7 +44,11 @@ def main():
     json_logger = create_logger(path.dirname(json_file), process_name, path.basename(json_file),
                                 logger_name="JSON")
     # Validate the submission JSON against the full ArrayExpress submission schema
-    validate_submission_json(json_file, logger=json_logger)
+    try:
+        validate_submission_json(json_file, logger=json_logger)
+    except Exception as e:
+        print("ERROR: Cannot read or validate the JSON input\n{}".format(e))
+        sys.exit()
 
     json_data = read_json_file(json_file)
     #sub = json2dm.data_objects_from_json(json_data, json_file)

@@ -22,10 +22,11 @@ def read_json_file(filename):
             data = json.load(fh, encoding="utf-8")
             return data
     except IOError as err:
-        print("Cannot import file: %s" % err)
-    except ValueError as j_err:
-        print("Cannot read JSON file: %s" % j_err)
-        raise
+        raise Exception("Cannot import file {}: {}".format(filename, err))
+    except json.decoder.JSONDecodeError as json_error:
+        raise Exception("There is an problem decoding the content of {}: {}".format(filename, json_error))
+    except ValueError as file_err:
+        raise Exception("Cannot read JSON file {}: {}".format(filename, file_err))
 
 
 def usi_object_file_name(object_type, study_info):

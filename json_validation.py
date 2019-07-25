@@ -29,14 +29,17 @@ def main():
     json_file = args.json
     file_exists(json_file)
 
-    if args.schema:
-        schema_file = args.schema
-        file_exists(schema_file)
-        # Validate the JSON against the provided schema
-        validate_submission_json(json_file, schema_file=schema_file)
-    else:
-        # Validate the JSON against the full ArrayExpress submission schema
-        validate_submission_json(json_file)
+    try:
+        if args.schema:
+            schema_file = args.schema
+            file_exists(schema_file)
+            # Validate the JSON against the provided schema
+            validate_submission_json(json_file, schema_file=schema_file)
+        else:
+            # Validate the JSON against the full ArrayExpress submission schema
+            validate_submission_json(json_file)
+    except Exception as e:
+        print("ERROR: Cannot read or validate the JSON input\n{}".format(e))
 
 
 if __name__ == '__main__':
