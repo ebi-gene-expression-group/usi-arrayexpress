@@ -40,7 +40,7 @@
         }
       ],
       "attributes": {
-        "data_type": "processed matrix"
+        "data_type": [{"value": "processed matrix"}]
       }
     }
   ],

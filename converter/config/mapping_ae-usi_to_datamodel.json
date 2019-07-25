@@ -212,7 +212,7 @@
             "date_of_experiment"
           ],
           "from_type": "string",
-          "method": "import_string"
+          "method": "get_string_from_attribute"
         }
       }
     },
@@ -237,7 +237,7 @@
         }
       }
     },
-    "study_type": {
+    "submission_type": {
       "description": "submission type: microarray, sequencing, singlecell",
       "type": "string",
       "import": {
@@ -776,7 +776,7 @@
             "attributes",
             "data_type"
           ],
-          "method": "import_string"
+          "method": "get_string_from_attribute"
         }
       }
     },
@@ -1033,7 +1033,7 @@
             "attributes",
             "ftp_location"
           ],
-          "method": "import_string"
+          "method": "get_string_from_attribute"
         }
       }
     }
