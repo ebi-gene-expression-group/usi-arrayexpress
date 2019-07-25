@@ -34,7 +34,7 @@ class Study(AccessionedSubmittable):
         self.experimental_design = kwargs.get("experimental_design", [])
         self.experiment_type = kwargs.get("experiment_type", [])
         self.date_of_experiment = kwargs.get("date_of_experiment")
-        self.study_type = kwargs.get("study_type")
+        self.submission_type = kwargs.get("submission_type")
         self.secondary_accession = kwargs.get("secondary_accession", [])
         self.related_experiment = kwargs.get("related_experiment", [])
         self.comments = kwargs.get("comments", {})
@@ -44,7 +44,7 @@ class Study(AccessionedSubmittable):
                "description={self.description}, protocolrefs={self.protocolrefs}, projectref={self.projectref}, " \
                "experimental_factor={self.experimental_factor}, experimental_design={self.experimental_design}, " \
                "experiment_type={self.experiment_type}, date_of_experiment={self.date_of_experiment}, " \
-               "study_type={self.study_type}, secondary_accession={self.secondary_accession}, " \
+               "submission_type={self.submission_type}, secondary_accession={self.secondary_accession}, " \
                "related_experiment={self.related_experiment}, comments={self.comments})".format(self=self)
 
     @classmethod
