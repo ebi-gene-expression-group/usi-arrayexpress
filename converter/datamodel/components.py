@@ -5,10 +5,12 @@ class DataFile:
         self.checksum = kwargs.get("checksum")
         self.checksum_method = kwargs.get("checksum_method")
         self.ftp_location = kwargs.get("ftp_location")
+        self.read = kwargs.get("read")
 
     def __repr__(self):
         return "{self.__class__.__name__}(name={self.name}, checksum={self.checksum}, " \
-               "checksum_method={self.checksum_method}, ftp_location={self.ftp_location})".format(self=self)
+               "checksum_method={self.checksum_method}, ftp_location={self.ftp_location}, " \
+               "read={self.read})".format(self=self)
 
 
 class Contact:
