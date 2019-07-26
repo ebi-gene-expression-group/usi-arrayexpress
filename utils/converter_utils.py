@@ -350,7 +350,7 @@ def read_idf_file(idf_file):
     return idf_dict
 
 
-def dict_to_vertcial_table(input_dict, filename, logger, sep='\t'):
+def dict_to_vertical_table(input_dict, filename, logger, sep='\t'):
     """Take a dictionary (can be ordered) and print the contents in a vertical table:
      The keys are in the first column, with the values in the rest of the row."""
 

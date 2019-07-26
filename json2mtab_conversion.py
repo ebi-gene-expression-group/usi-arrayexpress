@@ -12,7 +12,7 @@ from os import path
 from converter import json2dm, dm2magetab
 from validator.json_schema_validation import validate_submission_json
 from utils.common_utils import file_exists, create_logger
-from utils.converter_utils import read_json_file, dict_to_vertcial_table, new_file_prefix
+from utils.converter_utils import read_json_file, dict_to_vertical_table, new_file_prefix
 
 
 def parse_args():
@@ -77,7 +77,7 @@ def main():
         new_sdrf_file = path.join(path.dirname(json_file), prefix + ".sdrf.txt")
 
     # Write out a new IDF file
-    dict_to_vertcial_table(idf, new_idf_file, logger)
+    dict_to_vertical_table(idf, new_idf_file, logger)
 
     # Rename the columns to the new header list, created by applying a function
     # to "de-uniquify" the header fields, and write new SDRF file
