@@ -20,6 +20,11 @@ class Assay(DependentSubmittable):
         return "{self.__class__.__name__}(alias={self.alias}, technology_type={self.technology_type}, " \
                "protocolrefs={self.protocolrefs}, sampleref={self.sampleref})".format(self=self)
 
+    def get_assay_attributes(self):
+        """A list of all attributes that are specific to the assay object (not in the general assay class)"""
+        exclude = ('alias', 'accession', 'protocolrefs', 'technology_type', 'sampleref')
+        return [at for at in self.get_all_attributes() if at not in exclude]
+
 
 class MicroarrayAssay(Assay):
     """
@@ -170,3 +175,11 @@ class SingleCellAssay(SeqAssay):
         self.sample_barcode_size = kwargs.get("sample_barcode_size")
         self.sample_barcode_offset = kwargs.get("sample_barcode_offset")
 
+    def get_singlecell_attributes(self, invert=False):
+        """A list of single-cell specific attributes that are not in the parent sequencing assay class,
+        with invert=True returns the sequencing assay attributes."""
+        dummy_assay = SeqAssay()
+        exclude = dummy_assay.get_all_attributes()
+        if invert:
+            return dummy_assay.get_assay_attributes()
+        return [at for at in self.get_all_attributes() if at not in exclude]
