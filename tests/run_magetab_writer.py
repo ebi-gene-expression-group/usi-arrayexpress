@@ -62,7 +62,7 @@ def main():
     logger.debug("Generating IDF file")
     idf = generate_idf(sub)
     # Write out a new IDF file
-    utils.converter_utils.dict_to_vertcial_table(idf, new_idf_file, logger)
+    utils.converter_utils.dict_to_vertical_table(idf, new_idf_file, logger)
 
     # Generate SDRF: Output is a pandas dataframe
     logger.debug("Generating SDRF file")
