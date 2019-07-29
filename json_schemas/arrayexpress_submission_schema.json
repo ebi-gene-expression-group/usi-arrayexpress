@@ -102,14 +102,18 @@
             "$ref": "arrayexpress_microarray_assay_schema.json"
           },
           {
-            "$ref": "arrayexpress_sequencing_assay_schema.json"
-          },
-          {
-            "$ref": "arrayexpress_singlecell_assay_schema.json"
+            "anyOf": [
+              {
+                "$ref": "arrayexpress_sequencing_assay_schema.json"
+              },
+              {
+                "$ref": "arrayexpress_singlecell_assay_schema.json"
+              }
+            ]
           }
-          ]
-        }
-      },
+        ]
+      }
+    },
     "assayData": {
       "type": "array",
       "items": {

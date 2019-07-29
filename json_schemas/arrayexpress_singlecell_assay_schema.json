@@ -224,6 +224,7 @@
                                 "type": "string",
                                 "minLength": 1,
                                 "enum": [
+                                    "none",
                                     "ERCC",
                                     "ERCC mix1",
                                     "ERCC mix2",
