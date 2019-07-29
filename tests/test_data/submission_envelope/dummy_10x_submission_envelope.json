@@ -1,6 +1,6 @@
 {
     "submission": {
-        "id": "c8b641a7-a31c-42fd-8cac-cb64f1f44dd2",
+        "id": "4e9d09e2-67cd-4c44-a287-36518ec4ae87",
         "submitter": {
 	        "email": "test@email.com",
             "name": "Test User"
@@ -9,21 +9,21 @@
             "name": "test-team",
             "profile": {}
         },
-        "submissionDate": "2019-07-25"
+        "submissionDate": "2019-07-29"
     },
     "uploadedFiles": [],
     "analyses": [],
     "assays": [
         {
             "id": "913b2806-3dba-4392-8f35-986844466d9f",
-            "accession": "ERX4444444",
-            "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+            "accession": "ERX3456789",
+            "alias": "Assay 1",
             "team": {
                 "name": "test-team",
                 "description": null,
                 "profile": {}
             },
-            "title": "Assay Title ",
+            "title": "My 10x library",
             "description": "Test assay",
             "attributes": {
                 "platform_type": [
@@ -33,12 +33,12 @@
                 ],
                 "instrument_model": [
                     {
-                        "value": "Illumina Genome Analyzer"
+                        "value": "HiSeq 2500"
                     }
                 ],
                 "library_layout": [
                     {
-                        "value": "SINGLE"
+                        "value": "PAIRED"
                     }
                 ],
                 "design_description": [
@@ -58,18 +58,27 @@
                 ],
                 "library_source": [
                     {
-                        "value": "GENOMIC"
+                        "value": "TRANSCRIPTOMIC SINGLE CELL"
                     }
                 ],
                 "library_strategy": [
                     {
-                        "value": "WGS"
+                        "value": "RNA-Seq"
                     }
                 ],
-                "technology_type": [{"value": "sequencing assay"}]
+                "technology_type": [{"value": "sequencing assay"}],
+                "library_construction": [{"value": "10xV2"}],
+                "single_cell_isolation": [{"value": "10x"}],
+                "end_bias": [{"value": "3 prime tag"}],
+                "spike_in": [{"value": "sdkf"}],
+                "umi_barcode_read": [{"value": "none"}],
+                "umi_barcode_offset": [{"value": "none"}],
+                "umi_barcode_size": [{"value": "none"}],
+                "library_strand": [{"value": "not applicable"}],
+                "input_molecule": [{"value": "polyA RNA"}]
             },
             "studyRef": {
-                "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+                "alias": "Study 1",
                 "team": "test-team"
             },
             "sampleUses": [
@@ -80,14 +89,33 @@
                     "attributes": {}
                 }
             ],
-            "protocolUses": []
+            "protocolUses": [
+              {
+                "protocolRef": {
+                  "alias": "Protocol 1",
+                  "team": "test-team"
+                },
+                "protocolRef": {
+                  "alias": "Protocol 2",
+                  "team": "test-team"
+                },
+                "protocolRef": {
+                  "alias": "Protocol 3",
+                  "team": "test-team"
+                },
+                "protocolRef": {
+                  "alias": "Protocol 4",
+                  "team": "test-team"
+                }
+              }
+            ]
         }
     ],
     "assayData": [
         {
             "id": "98295591-2da1-4d28-a988-0ec97c925f95",
             "accession": "ERR1234567",
-            "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+            "alias": "Lane 1",
             "team": {
                 "name": "test-team",
                 "description": null,
@@ -104,18 +132,37 @@
             },
             "assayRefs": [
                 {
-                    "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+                    "alias": "Assay 1",
                     "team": "test-team"
                 }
             ],
             "files": [
                 {
-                    "name": "0eb3de83-9ed9-4374-b18a-66f78e42d038_test.fastq.gz",
+                    "name": "Sample1_R1.fastq.gz",
                     "checksum": "2debfdcf79f03e4a65a667d21ef9de14",
                     "checksumMethod": "MD5",
                     "type": "fastq",
                     "unencryptedChecksum": null,
-                    "label": null
+                    "label": null,
+                    "read": "read1"
+                },
+                {
+                    "name": "Sample1_R2.fastq.gz",
+                    "checksum": "7718c27486d90c9f5fd8a615b2c25114",
+                    "checksumMethod": "MD5",
+                    "type": "fastq",
+                    "unencryptedChecksum": null,
+                    "label": null,
+                    "read": "read2"
+                },
+                {
+                    "name": "Sample1_I1.fastq.gz",
+                    "checksum": "d9dadc556fbad658f67158ba9045c8dc",
+                    "checksumMethod": "MD5",
+                    "type": "fastq",
+                    "unencryptedChecksum": null,
+                    "label": null,
+                    "read": "index1"
                 }
             ]
         }
@@ -126,9 +173,9 @@
     "projects": [
       {
         "id": "",
-        "alias": "test_project",
-      "title": "A test case for a sequencing experiment with one data file",
-      "description": "This is just a test experiment, too.",
+        "alias": "Project 1",
+      "title": "A test case for a 10x sequencing experiment",
+      "description": "Testing 10x data file encoding",
       "contacts": [
         {
           "firstName": "R",
@@ -159,6 +206,12 @@
           "authors": "A. Tester, D. Eveloper, R.E. Searcher",
           "pubmedId": "12345678",
           "publicationStatus": "InPreparation"
+        },
+        {
+          "articleTitle": "Yet another glorious discovery",
+          "authors": "A. Tester, D. Eveloper, R.E. Searcher",
+          "pubmedId": "98765432",
+          "publicationStatus": "submitted"
         }
       ]
     }
@@ -167,14 +220,14 @@
         {
             "id": "9589cf5b-89a8-4ee8-8be3-898b648e5b62",
             "accession": "SAMEA1652233",
-            "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+            "alias": "Sample 1",
             "team": {
                 "name": "test-team",
                 "description": null,
                 "profile": {}
             },
-            "title": "Sample title",
-            "description": "Sample description",
+            "title": "My single cell sample",
+            "description": "This is a bunch of cells sorted and then sequenced",
             "attributes": {
               "cell type": [
                 {
@@ -200,8 +253,8 @@
     "studies": [
         {
             "id": "e2acafb4-7acc-46c5-b75b-a975b4ce38dd",
-            "accession": "E-DUMY-1",
-            "alias": "40209f99-4346-4a59-aa64-9e2fe2d4a221",
+            "accession": "E-DUMY-10",
+            "alias": "Study 1",
             "team": {
                 "name": "test-team",
                 "description": null,
@@ -218,18 +271,48 @@
                 ],
                 "submission_type": [
                     {
-                        "value": "sequencing"
+                        "value": "singlecell"
                     }
                 ],
                 "experiment_type": [
                     {
-                        "value": "RNA-seq of coding RNA"
+                        "value": "RNA-seq of coding RNA from single cells"
                     }
                 ]
             },
-            "protocolRefs": [],
+            "protocolRefs": [
+              {
+                  "alias": "Protocol 1",
+                  "team": "test-team"
+
+              },
+              {
+
+                  "alias": "Protocol 2",
+                  "team": "test-team"
+
+              },
+              {
+
+                  "alias": "Protocol 3",
+                  "team": "test-team"
+
+              },
+              {
+
+                  "alias": "Protocol 4",
+                  "team": "test-team"
+
+              },
+              {
+
+                  "alias": "Protocol 5",
+                  "team": "test-team"
+
+              }
+            ],
             "projectRef": {
-                "alias": "test_project",
+                "alias": "Project 1",
                 "team": "test-team"
             },
             "releaseDate": null
