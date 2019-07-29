@@ -21,6 +21,10 @@
             "description": "More extensive free-form description.",
             "type": "string"
         },
+        "accession": {
+            "description": "ENA Experiment (ERX) accession",
+            "type": "string"
+        },
         "attributes": {
             "description": "Attributes for describing a sequencing assay. CAN WE REFERENCE ENA's SCHEMA HERE? WHAT ELSE IS MANDATORY FOR ENA?",
             "type": "object",
@@ -33,7 +37,6 @@
                 "instrument_model",
                 "technology_type"
             ],
-            "additionalProperties": true,
             "properties": {
                 "library_layout": {
                     "description": "The layout of the sequencing library, SINGLE or PAIRED."
@@ -47,10 +50,18 @@
                 "library_selection": {
                     "description": "The selection strategy of the faction of nucleic acid that was sequenced."
                 },
-                "nominal_length": {},
-                "nominal_sdev": {},
-                "platform_type": {},
-                "instrument_model": {},
+                "nominal_length": {
+                     "description": "The expected size of the insert (the fragment sequenced, e.g. as selected by size fractionation) in base pairs. No decimals or ranges (e.g. 100-200) allowed, and it cannot be zero."
+                },
+                "nominal_sdev": {
+                     "description": "The standard deviation of the nominal length. Decimals are allowed (e.g. 56.4) but no ranges (e.g. 34.5-42.6)."
+                },
+                "platform_type": {
+                    "description": "See ENA's schema"
+                },
+                "instrument_model": {
+                    "description": "See ENA's schema"
+                },
                 "technology_type": {
                     "description": "The type of technology used, sequencing or microarray assay.",
                     "type": "array",

@@ -145,6 +145,7 @@ class SeqAssay(Assay):
 
 
 class SingleCellAssay(SeqAssay):
+    """Assay attributes specific to single-cell sequencing assays"""
 
     def __init__(self, **kwargs):
         SeqAssay.__init__(self, **kwargs)
@@ -162,8 +163,10 @@ class SingleCellAssay(SeqAssay):
         self.cell_barcode_read = kwargs.get("cell_barcode_read")
         self.cell_barcode_size = kwargs.get("cell_barcode_size")
         self.cell_barcode_offset = kwargs.get("cell_barcode_offset")
+        self.cDNA_read = kwargs.get("cDNA_read")
+        self.cDNA_read_size = kwargs.get("cDNA_read_size")
+        self.cDNA_read_offset = kwargs.get("cDNA_read_offset")
         self.sample_barcode_read = kwargs.get("sample_barcode_read")
         self.sample_barcode_size = kwargs.get("sample_barcode_size")
         self.sample_barcode_offset = kwargs.get("sample_barcode_offset")
-
 

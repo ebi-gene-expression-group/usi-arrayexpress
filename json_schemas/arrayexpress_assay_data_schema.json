@@ -37,6 +37,30 @@
           "checksum_method": {
             "description": "The method type of the checksum calculation.",
             "type": "string"
+          },
+          "attributes": {
+            "description": "The sequencing read type. Required for multiplexed single cell raw data files.",
+            "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                    "value"
+                  ],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "enum": [
+                      "read1",
+                      "read2",
+                      "index1",
+                      "index2"
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
