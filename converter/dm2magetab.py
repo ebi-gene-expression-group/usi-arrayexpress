@@ -1,6 +1,7 @@
 """Module to convert metadata in the submission data model to MAGE-TAB files."""
 
 import pandas as pd
+import re
 
 from collections import OrderedDict, defaultdict
 
@@ -116,14 +117,16 @@ def generate_sdrf(sub):
                 extract_values = [("Extract Name", assay.alias)]
                 if assay.accession:
                     extract_values.append(("Comment[ENA_EXPERIMENT]", assay.accession))
-                assay_attributes = [at for at in assay.get_all_attributes() if at not in ('alias', 'accession',
-                                                                                          'technology_type',
-                                                                                          'sampleref',
-                                                                                          'protocolrefs')]
-                for aa in assay_attributes:
+                for aa in assay.get_assay_attributes():
                     attribute_value = getattr(assay, aa)
+                    print(aa, attribute_value)
                     if attribute_value:
-                        extract_values.append(("Comment[{}]".format(aa.upper()), attribute_value))
+                        # Historical formatting of sequencing and single cell attributes
+                        if submission_type == "singlecell" and aa not in assay.get_singlecell_attributes():
+                            extract_values.append(("Comment[{}]".format(aa.upper()), attribute_value))
+                        else:
+                            extract_values.append(("Comment[{}]".format(re.sub("_", " ", aa)), attribute_value))
+
                 row2 = row[:] + [protocol_refs[1], OrderedDict(extract_values)]
 
             # Get all assay data objects that belong to this assay
