@@ -114,8 +114,9 @@ class SeqAssay(Assay):
 
         # Get library attributes from extract comments
         comments = extract_attributes.get("comments")
-        lib_attrib_cv = get_controlled_vocabulary("sdrf_comments_ena").keys()
-        lib_attribs = {a.lower(): comments[a] for a in lib_attrib_cv if comments.get(a)}
+        lib_attrib_cv = get_controlled_vocabulary("sdrf_comments_ena")
+        lib_attrib_cv.update(get_controlled_vocabulary("sdrf_comments_singlecell"))
+        lib_attribs = {t: comments[a] for a, t in lib_attrib_cv.items() if comments.get(a)}
 
         # Get technology type(s) from assay attributes
         technology_type = remove_duplicates([a.get("technology_type", "") for a in assay_attributes])
