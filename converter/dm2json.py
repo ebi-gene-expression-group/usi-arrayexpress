@@ -85,14 +85,13 @@ def generate_usi_sample_object(sample):
 def generate_usi_assay_object(assay, study_info):
 
     assay_object = OrderedDict()
-
+    assay_object['alias'] = assay.alias
     try:
-        assay_object['alias'] = assay.accession
+        assay_object['accession'] = assay.accession
     except AttributeError:
-        assay_object['alias'] = assay.alias
+        pass
 
-    attributes = assay.get_all_attributes()
-    assay_attributes = [a for a in attributes if a not in ('alias', 'protocolrefs', 'sampleref', 'accession')]
+    assay_attributes = assay.get_attributes_with_values()
     assay_object['attributes'] = OrderedDict()
     for category in assay_attributes:
         assay_object['attributes'][category] = generate_usi_attribute_entry(getattr(assay, category))
@@ -118,6 +117,10 @@ def generate_usi_data_object(assay_data, sub_info):
     ad_object = OrderedDict()
 
     ad_object["alias"] = assay_data.alias
+    try:
+        ad_object['accession'] = assay_data.accession
+    except AttributeError:
+        pass
 
     ad_object["files"] = []
     files = assay_data.files

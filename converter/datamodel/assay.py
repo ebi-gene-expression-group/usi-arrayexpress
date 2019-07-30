@@ -25,6 +25,11 @@ class Assay(DependentSubmittable):
         exclude = ('alias', 'accession', 'protocolrefs', 'technology_type', 'sampleref')
         return [at for at in self.get_all_attributes() if at not in exclude]
 
+    def get_attributes_with_values(self):
+        """A list of all assay attributes that have values"""
+        exclude = ('alias', 'accession', 'protocolrefs', 'sampleref')
+        return [at for at in self.get_all_attributes() if getattr(self, at) and at not in exclude]
+
 
 class MicroarrayAssay(Assay):
     """
