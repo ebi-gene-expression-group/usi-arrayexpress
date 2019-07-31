@@ -24,6 +24,14 @@ def parse_args():
                         help="Path to the directory with SDRF and data files")
     parser.add_argument('-v', '--verbose', action='store_const', const=10, default=20,
                         help="Option to output detailed logging (debug level).")
+    group = parser.add_mutually_exclusive_group(required=False)
+    group.add_argument('-sc', '--singlecell', action='store_const', const="singlecell", dest='submission_type',
+                       help="Force submission type to be 'singlecell'")
+    group.add_argument('-seq', '--sequencing', action='store_const', const="sequencing", dest='submission_type',
+                       help="Force submission type to be 'sequencing'")
+    group.add_argument('-ma', '--microarray', action='store_const', const="microarray", dest='submission_type',
+                       help="Force submission type to be 'microarray'")
+
     args = parser.parse_args()
 
     return args
@@ -34,6 +42,7 @@ def main():
 
     args = parse_args()
     idf_file, data_dir, logging_level = args.idf, args.data_dir, args.verbose
+    submission_type = args.submission_type
 
     # Exit if IDF file doesn't exist
     file_exists(idf_file)
@@ -48,10 +57,16 @@ def main():
     # Read IDF/SDRF and get submission type
     idf_dict = read_idf_file(idf_file)
     sdrf_data, header, header_dict = read_sdrf_file(sdrf_file_path)
-    submission_type = guess_submission_type_from_sdrf(sdrf_data, header, header_dict)
+
+    # Set submission type
     if not submission_type:
-        submission_type = guess_submission_type_from_idf(idf_dict)
-    logger.info("Found experiment type: {}".format(submission_type))
+        submission_type = guess_submission_type_from_sdrf(sdrf_data, header, header_dict)
+        if not submission_type:
+            submission_type = guess_submission_type_from_idf(idf_dict)
+        logger.info("Detected submission type: {}".format(submission_type))
+    else:
+        logger.info("Setting submission type to \"{}\"".format(submission_type))
+
     # Logger for prevalidation (create new to show different styling)
     mtab_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="MAGE-TAB", log_level=logging_level)
 
