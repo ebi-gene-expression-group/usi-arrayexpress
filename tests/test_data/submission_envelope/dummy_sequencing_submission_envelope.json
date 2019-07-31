@@ -80,7 +80,14 @@
                     "attributes": {}
                 }
             ],
-            "protocolUses": []
+            "protocolUses": [
+              {
+                "protocolRef": {
+                  "alias": "Protocol 1",
+                  "team": "test-team"
+                }
+              }
+            ]
         }
     ],
     "assayData": [

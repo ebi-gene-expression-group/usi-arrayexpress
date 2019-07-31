@@ -90,21 +90,21 @@
                 }
             ],
             "protocolUses": [
+              {"protocolRef": {
+                "alias": "Protocol 4",
+                "team": "my-test-team"
+              }},
               {
                 "protocolRef": {
                   "alias": "Protocol 1",
-                  "team": "test-team"
+                  "team": "test-team"}
                 },
-                "protocolRef": {
+                {"protocolRef": {
                   "alias": "Protocol 2",
                   "team": "test-team"
-                },
-                "protocolRef": {
+                }},
+                {"protocolRef": {
                   "alias": "Protocol 3",
-                  "team": "test-team"
-                },
-                "protocolRef": {
-                  "alias": "Protocol 4",
                   "team": "test-team"
                 }
               }
