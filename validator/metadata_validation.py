@@ -1,6 +1,7 @@
 import re
 
 from converter.datamodel.submission import Submission
+from converter.datamodel.assay import SingleCellAssay
 from utils import converter_utils
 from utils.converter_utils import ontology_term, is_accession
 from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi, get_ena_instrument_terms_via_usi
@@ -405,6 +406,40 @@ def run_assay_checks(sub: Submission, logger):
                 if value and value not in cv:
                     logger.error("Value \"{}\" for {} does not match against ENA's controlled vocabulary.".format(value, term))
                     codes.append("ASSA-E11")
+
+    return codes
+
+
+def run_singlecell_checks(sub: Submission, logger):
+
+    codes = []
+
+    # Assay checks
+    for a in sub.assay:
+        if not isinstance(a, SingleCellAssay):
+            logger.warn("Assay \"{}\" is not a single-cell assay, skipping assay checks.")
+            continue
+        # Check that sc assays have library construction
+        sc_protocol = a.library_construction
+        if not sc_protocol:
+            logger.error("Single-cell assay \"{}\" has no library construction specified.".format(a.alias))
+            codes.append("CELL-01")
+        else:
+            # Check that library_construction is from controlled vocabulary
+            allowed_protocols = ontology_term("singlecell_library_construction")
+            if sc_protocol.lower() not in allowed_protocols:
+                logger.error("Library construction \"{}\" for \"{}\" is not an allowed term.".
+                             format(sc_protocol, a.alias))
+                codes.append("CELL-02")
+        # Check that sc assays have spike_in
+        if not a.spike_in:
+            logger.error("Single-cell assay \"{}\" has no spike in specified.".format(a.alias))
+            codes.append("CELL-03")
+        # Check that spike_in_dilution is in the correct format
+        if a.spike_in_dilution:
+            if not re.match("^1\:[0-9]+$", a.spike_in_dilution):
+                logger.error("Spike in dilution for \"{}\" does not match expected pattern.".format(a.alias))
+                codes.append("CELL-04")
 
     return codes
 
