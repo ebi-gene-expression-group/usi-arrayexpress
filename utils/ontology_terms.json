@@ -170,5 +170,31 @@
     "uri": "http://www.ebi.ac.uk/efo/EFO_0001742",
     "ontology": "EFO",
     "label": "publication status"
-  }
+  },
+  "singlecell_library_construction": [
+    "smart-seq",
+    "smart-seq2",
+    "smart-like",
+    "scrb-seq",
+    "mars-seq",
+    "cel-seq",
+    "cel-seq2",
+    "strt-seq",
+    "10xv1",
+    "10xv2",
+    "10xv3",
+    "drop-seq",
+    "other"
+  ],
+  "singlecell_isolation": [
+    "facs",
+    "fluidigm c1",
+    "10x",
+    "drop-seq",
+    "indrop",
+    "mouth pipette",
+    "cell picking",
+    "laser-capture microdissection",
+    "other"
+  ]
 }
