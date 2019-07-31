@@ -98,8 +98,6 @@ def generate_sdrf(sub):
             # Reformat protocol REFs for edges between nodes
             all_protocols.update((sub.get_protocol(pref) for pref in assay.protocolrefs))
             protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
-            print(assay)
-            print(protocol_refs)
 
             if submission_type == "microarray":
                 # Take Extract Name from Sample name

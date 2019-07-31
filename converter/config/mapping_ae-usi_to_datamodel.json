@@ -388,9 +388,9 @@
       "type": "string",
       "import": {
         "ae": {
-          "path": ["attributes", "description"],
-          "from_type": "attribute_object",
-          "method": "generate_attribute_from_json"
+          "path": ["description"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
