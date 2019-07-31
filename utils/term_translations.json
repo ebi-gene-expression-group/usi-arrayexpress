@@ -163,11 +163,7 @@
     "LIBRARY_STRAND": "",
     "NOMINAL_LENGTH": "",
     "NOMINAL_SDEV": "",
-    "ORIENTATION": "",
-    "single cell isolation": "",
-    "library preparation": "",
-    "end bias": "",
-    "input molecule": ""
+    "ORIENTATION": ""
   },
   "sdrf_comments_ena": {
     "LIBRARY_LAYOUT": "library_layout",
@@ -179,5 +175,25 @@
     "NOMINAL_SDEV": "nominal_sdev",
     "ORIENTATION": "orientation"
   },
-  "sdrf_comments_singlecell": {}
+  "sdrf_comments_singlecell": {
+    "single cell isolation": "single_cell_isolation",
+    "library construction": "library_construction",
+    "input molecule": "input_molecule",
+    "end bias": "end_bias",
+    "primer": "primer",
+    "spike in": "spike_in",
+    "spike in dilution": "spike_in_dilution",
+    "umi barcode read": "umi_barcode_read",
+    "umi barcode size": "umi_barcode_size",
+    "umi barcode offset": "umi_barcode_offset",
+    "cell barcode read": "cell_barcode_read",
+    "cell barcode size": "cell_barcode_size",
+    "cell barcode offset": "cell_barcode_offset",
+    "cdna read": "cDNA_read",
+    "cdna read offset": "cDNA_read_offset",
+    "cdna read size": "cDNA_read_size",
+    "sample barcode read": "sample_barcode_read",
+    "sample barcode size": "sample_barcode_size",
+    "sample barcode offset": "sample_barcode_offset"
+  }
 }

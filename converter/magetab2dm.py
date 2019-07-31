@@ -567,8 +567,10 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
             for assay_name, assay_attributes in assays.items():
                 if extract_name in assay_attributes["extract_ref"]:
                     linked_assays.append(assay_attributes)
-
-            new_assay = SeqAssay.from_magetab(extract_attributes, linked_assays, protocols)
+            if submission_type == "singlecell":
+                new_assay = SingleCellAssay.from_magetab(extract_attributes, linked_assays, protocols)
+            else:
+                new_assay = SeqAssay.from_magetab(extract_attributes, linked_assays, protocols)
             assay_objects.append(new_assay)
 
     # Assay data

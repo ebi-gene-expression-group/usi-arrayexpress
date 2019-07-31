@@ -314,7 +314,7 @@ def run_assay_checks(sub: Submission, logger):
     is_sequencing = False
 
     # Get controlled terms from ENA's assay schema
-    if exptype == "sequencing":
+    if exptype in ("sequencing", "singlecell"):
         library_terms = get_ena_library_terms_via_usi(logger)
         instrument_models = get_ena_instrument_terms_via_usi(logger)
         is_sequencing = True

@@ -36,7 +36,9 @@ class JSONConverter:
         """
         Converter that takes a JSON as input and converts it to a Submission class object
         based on the specifications in the mapping file
-        :param envelope_json:
+        :param envelope_json: Input JSON with all submittable objects
+        :param submission_type: microarray, sequencing or singlecell
+        :param source_file_name: name of the original metadata file
         :return: Submission object
         """
         # We only take the first project in the list
@@ -66,9 +68,11 @@ class JSONConverter:
         if submission_type == "microarray":
             assays = [MicroarrayAssay(**self.convert_submittable(a, "microarray_assay"))
                       for a in envelope_json.get("assays", [])]
-
-        elif submission_type in ["singlecell", "sequencing"]:
+        elif submission_type == "sequencing":
             assays = [SeqAssay(**self.convert_submittable(a, "sequencing_assay"))
+                      for a in envelope_json.get("assays", [])]
+        elif submission_type == "singlecell":
+            assays = [SingleCellAssay(**self.convert_submittable(a, "singlecell_assay"))
                       for a in envelope_json.get("assays", [])]
 
         assay_data = [AssayData(**self.convert_submittable(ad, "assay_data"))

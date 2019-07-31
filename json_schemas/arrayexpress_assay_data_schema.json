@@ -39,15 +39,19 @@
             "type": "string"
           },
           "attributes": {
-            "description": "The sequencing read type. Required for multiplexed single cell raw data files.",
-            "type": "array",
+            "description": "Attributes for describing a data file",
+            "type": "object",
+            "properties": {
+              "read": {
+              "description": "The type of sequencing read. Required for multiplexed single cell raw data files.",
+              "type": "array",
               "minItems": 1,
               "maxItems": 1,
               "items": {
                 "type": "object",
                 "required": [
-                    "value"
-                  ],
+                  "value"
+                ],
                 "properties": {
                   "value": {
                     "type": "string",
@@ -60,6 +64,7 @@
                   }
                 }
               }
+            }
             }
           }
         }

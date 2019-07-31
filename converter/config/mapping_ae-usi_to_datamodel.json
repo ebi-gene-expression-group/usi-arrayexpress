@@ -388,9 +388,9 @@
       "type": "string",
       "import": {
         "ae": {
-          "path": ["attributes", "description"],
-          "from_type": "attribute_object",
-          "method": "generate_attribute_from_json"
+          "path": ["description"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
@@ -510,7 +510,14 @@
       }
     },
     "accession": {
-      "description": "not applicable for microarray"
+      "description": "ENA experiment accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["accession"],
+          "method": "import_string"
+        }
+      }
     },
     "technology_type": {
       "description": "array assay or sequencing assay",
@@ -555,7 +562,6 @@
         }
       }
     },
-
     "library_layout": {
       "description": "The layout of the sequencing library, SINGLE or PAIRED.",
       "type": "string",
@@ -652,6 +658,349 @@
       "import": {
         "ae": {
           "path": ["attributes", "library_strand"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    }
+  },
+  "singlecell_assay": {
+    "alias": {
+      "description": "unique name of the assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "alias"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
+    "accession": {
+      "description": "ENA experiment accession",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["accession"],
+          "method": "import_string"
+        }
+      }
+    },
+    "technology_type": {
+      "description": "array assay or sequencing assay",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "attributes",
+            "technology_type"
+          ],
+          "from_type": "string",
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "protocolrefs": {
+      "description": "protocol accessions/name used to generate assay data",
+      "type": "array",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "protocolUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_usage"
+        }
+      }
+    },
+    "sampleref": {
+      "description": "sample accession/name",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "sampleUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_usage"
+        }
+      }
+    },
+    "library_layout": {
+      "description": "The layout of the sequencing library, SINGLE or PAIRED.",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_layout"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_source": {
+      "description": "The source material of the sequencing library, e.g. TRANSCRIPTOMIC.",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_source"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_strategy": {
+      "description": "The type of sequencing approach, e.g. RNA-Seq.",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_strategy"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_selection": {
+      "description": "The selection strategy of the faction of nucleic acid that was sequenced.",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_selection"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "nominal_length": {
+      "description": "Nominal length, i.e. length of the insert",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "nominal_length"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "nominal_sdev": {
+      "description": "standard deviation of the nominal length",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "nominal_sdev"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "orientation": {
+      "description": "for paired-end, the orientation of the two reads in the sequence file",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "orientation"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "platform_type": {
+      "description": "manufacturer of the sequencing machine",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "platform_type"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "instrument_model": {
+      "description": "sequencer model",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "instrument_model"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_strand": {
+      "description": "the strand that is being sequenced in directional RNA-seq",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_strand"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "single_cell_isolation": {
+      "description": "The method used for selection of single cells, to allow individual cell barcoding",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "single_cell_isolation"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "library_construction": {
+      "description": "The protocol that was followed to generate single-cell libraries",
+        "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "library_construction"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "input_molecule": {
+      "description": "The type or fraction of nucleic acid that was captured in the library",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "input_molecule"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "end_bias": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "end_bias"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "primer": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "primer"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "spike_in": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "spike_in"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "spike_in_dilution": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "spike_in_dilution"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "umi_barcode_read": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "umi_barcode_read"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "umi_barcode_size": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "umi_barcode_size"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "umi_barcode_offset": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "umi_barcode_offset"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "cell_barcode_read": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "cell_barcode_read"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "cell_barcode_size": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "cell_barcode_size"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "cell_barcode_offset": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "cell_barcode_offset"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "cDNA_read": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "cDNA_read"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "cDNA_read_offset": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "cDNA_read_offset"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "cDNA_read_size": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "cDNA_read_size"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "sample_barcode_read": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "sample_barcode_read"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "sample_barcode_size": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "sample_barcode_size"],
+          "method": "get_string_from_attribute"
+        }
+      }
+    },
+    "sample_barcode_offset": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["attributes", "sample_barcode_offset"],
           "method": "get_string_from_attribute"
         }
       }
@@ -1036,116 +1385,13 @@
           "method": "get_string_from_attribute"
         }
       }
-    }
-  },
-  "lib_attribs": {
-    "library_layout" : {
-      "description": "paired or single-end sequencing",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "string",
-          "path": ["library_layout"],
-          "method": "get_string_from_attribute"
-        }
-      }
     },
-    "library_selection": {
-      "description": "type of nucleic acid enrichment",
+    "read": {
+      "description": "The type of read for multiplexed single cell sequence files: read1/2 or index1/2",
       "type": "string",
       "import": {
         "ae": {
-          "from_type": "string",
-          "path": ["library_selection"],
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "library_strategy": {
-      "description": "sequencing approach",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "string",
-          "path": ["library_strategy"],
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "library_source": {
-      "description": "type of nucleic acid input",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "string",
-          "path": ["library_source"],
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "orientation": {
-      "description": "orientation of the reads in the paired fastq",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "string",
-          "path": ["orientation"],
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "nominal_length": {
-      "description": "length of the insert in the sequenced fragments (paired-end only)",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "integer",
-          "path": ["nominal_length"],
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "nominal_sdev": {
-      "description": "standard deviation of the insert size (paired-end only)",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "integer",
-          "path": ["nominal_sdev"],
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "platform_type": {
-      "description": "manufacturer of the sequencing equipment",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "string",
-          "path": ["platform_type"],
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "instrument_model": {
-      "description": "model of the sequencing machine",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "string",
-          "path": ["instrument_model"],
-          "method": "get_string_from_attribute"
-        }
-      }
-    },
-    "library_strand": {
-      "description": "first or second strand (for directional sequencing)",
-      "type": "string",
-      "import": {
-        "ae": {
-          "from_type": "string",
-          "path": ["library_strand"],
-          "method": "get_string_from_attribute"
+          "path": ["attributes", "read"]
         }
       }
     }

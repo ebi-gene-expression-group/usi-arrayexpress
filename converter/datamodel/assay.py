@@ -20,6 +20,16 @@ class Assay(DependentSubmittable):
         return "{self.__class__.__name__}(alias={self.alias}, technology_type={self.technology_type}, " \
                "protocolrefs={self.protocolrefs}, sampleref={self.sampleref})".format(self=self)
 
+    def get_assay_attributes(self):
+        """A list of all attributes that are specific to the assay object (not in the general assay class)"""
+        exclude = ('alias', 'accession', 'protocolrefs', 'technology_type', 'sampleref')
+        return [at for at in self.get_all_attributes() if at not in exclude]
+
+    def get_attributes_with_values(self):
+        """A list of all assay attributes that have values"""
+        exclude = ('alias', 'accession', 'protocolrefs', 'sampleref')
+        return [at for at in self.get_all_attributes() if getattr(self, at) and at not in exclude]
+
 
 class MicroarrayAssay(Assay):
     """
@@ -104,8 +114,9 @@ class SeqAssay(Assay):
 
         # Get library attributes from extract comments
         comments = extract_attributes.get("comments")
-        lib_attrib_cv = get_controlled_vocabulary("sdrf_comments_ena").keys()
-        lib_attribs = {a.lower(): comments[a] for a in lib_attrib_cv if comments.get(a)}
+        lib_attrib_cv = get_controlled_vocabulary("sdrf_comments_ena")
+        lib_attrib_cv.update(get_controlled_vocabulary("sdrf_comments_singlecell"))
+        lib_attribs = {t: comments[a] for a, t in lib_attrib_cv.items() if comments.get(a)}
 
         # Get technology type(s) from assay attributes
         technology_type = remove_duplicates([a.get("technology_type", "") for a in assay_attributes])
@@ -170,3 +181,11 @@ class SingleCellAssay(SeqAssay):
         self.sample_barcode_size = kwargs.get("sample_barcode_size")
         self.sample_barcode_offset = kwargs.get("sample_barcode_offset")
 
+    def get_singlecell_attributes(self, invert=False):
+        """A list of single-cell specific attributes that are not in the parent sequencing assay class,
+        with invert=True returns the sequencing assay attributes."""
+        dummy_assay = SeqAssay()
+        exclude = dummy_assay.get_all_attributes()
+        if invert:
+            return dummy_assay.get_assay_attributes()
+        return [at for at in self.get_all_attributes() if at not in exclude]
