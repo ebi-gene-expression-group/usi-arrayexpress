@@ -140,8 +140,10 @@
       "MNase-seq",
       "MRE-seq",
       "RIP-seq",
+      "Ribo-seq",
       "RNA-seq of coding RNA",
-      "RNA-seq of non coding RNA"
+      "RNA-seq of non coding RNA",
+      "RNA-seq of total RNA"
       ],
     "singlecell": [
       "RNA-seq of coding RNA from single cells",
