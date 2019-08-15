@@ -123,6 +123,32 @@ def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger, 
                 len(samples), len(le)))
 
 
+def cross_magetab_validation(sdrf_list, header, header_dict, idf_dict, submission_type, logger, atlas=False):
+
+    # Factor values must match
+
+    # REF values have to be defined in the IDF
+    sdrf_ref_values = set()
+    for header in header_dict:
+        if re.search(r"ref$", header):
+            for index in header_dict[header]:
+                # Skipping indexes that are followed by "Term Source REF"
+                if index+1 in header_dict.get("termsourceref", []):
+                    continue
+                ref_values = {row[index] for row in sdrf_list}
+                for ref in ref_values:
+                    sdrf_ref_values.add(ref)
+                    if header == "protocolref" and ref not in idf_dict["protocolname"]:
+                        logger.error("Protocol REF \"{}\" is not defined in the IDF.".format(ref))
+                    elif header == "termsourceref" and ref not in idf_dict["termsourcename"]:
+                        logger.error("Term Source REF \"{}\" is not defined in the IDF.".format(ref))
+
+    # Warn about defined but unused REFs
+    for ref_value in idf_dict.get("protocolname", []):
+        if ref_value and ref_value not in sdrf_ref_values:
+            logger.warn("Protocol \"{}\" is defined in the IDF but not used.".format(ref_value))
+
+
 def present_exactly_once(item, term_list):
     return term_list.count(item) == 1
 
