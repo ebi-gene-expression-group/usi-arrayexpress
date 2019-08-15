@@ -135,7 +135,7 @@ def run_sample_checks(sub: Submission, logger):
     # Check that factors defined in study are found in sample attributes
     undefined_factors = [f for f in factors if f not in characteristics]
     if len(undefined_factors) > 0:
-        logger.error("The following factors are declared but not annotated: {}".format(", ".join(undefined_factors)))
+        logger.error("The following experimental variables are declared but not annotated: {}".format(", ".join(undefined_factors)))
         codes.append("SAMP-E05")
 
     # Check that factor values vary

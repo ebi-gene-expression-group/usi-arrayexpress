@@ -126,6 +126,14 @@ def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger, 
 def cross_magetab_validation(sdrf_list, header, header_dict, idf_dict, submission_type, logger, atlas=False):
 
     # Factor values must match
+    sdrf_factors = [get_value(header[i]) for i in header_dict.get("factorvalue", [])]
+    idf_factors = idf_dict.get("experimentalfactorname", [])
+    for factor in sdrf_factors:
+        if factor and factor not in idf_factors:
+            logger.error("Factor Value \"{}\" is not defined in the IDF.".format(factor))
+    for factor in idf_factors:
+        if factor and factor not in sdrf_factors:
+            logger.error("Factor Value \"{}\" is not found in the SDRF.".format(factor))
 
     # REF values have to be defined in the IDF
     sdrf_ref_values = set()
