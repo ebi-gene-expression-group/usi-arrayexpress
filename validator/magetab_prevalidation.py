@@ -25,10 +25,10 @@ def idf_prevalidation(idf_dict, submission_type, logger, atlas=False):
             logger.error("Cannot parse IDF field \"{}\".".format(idf_key))
 
     # Check fields that can only contain one value
-    max1 = ("mage-tabversion", "investigationtitle", "dateofexperiment", "publicreleasedate", "experimentdescription")
+    max1 = ("MAGE-TAB Version", "Investigation Title", "Date Of Experiment", "Public Release Date", "Experiment Description", "SDRF File")
     for field in max1:
-        if idf_dict.get(field) and len([x for x in idf_dict[field] if x]) > 1:
-            logger.error("IDF field \"{}\" contains more than one value. This is not allowed".format(field))
+        if idf_dict.get(get_name(field)) and len([x for x in idf_dict[get_name(field)] if x]) > 1:
+            logger.error("IDF field \"{}\" contains more than one value. This is not allowed.".format(field))
 
     # Single cell IDF checks
     if atlas and submission_type == "singlecell":
