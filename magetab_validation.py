@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 This script takes an IDF file as input and runs validation of the metadata in the common datamodel.
@@ -14,6 +14,7 @@ from converter.magetab2dm import data_objects_from_magetab
 
 import validator.magetab_prevalidation as pre
 import validator.metadata_validation as mv
+import validator.atlas_validation as av
 
 
 def parse_args():
@@ -31,6 +32,8 @@ def parse_args():
                        help="Force submission type to be 'sequencing'")
     group.add_argument('-ma', '--microarray', action='store_const', const="microarray", dest='submission_type',
                        help="Force submission type to be 'microarray'")
+    parser.add_argument('-a', '--atlas', action='store_true',
+                        help="Run checks for Expression Atlas loading")
 
     args = parser.parse_args()
 
@@ -71,8 +74,9 @@ def main():
     mtab_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="MAGE-TAB", log_level=logging_level)
 
     # Perform prevalidation checks on MAGE-TAB format
-    pre.idf_prevalidation(idf_dict, mtab_logger)
+    pre.idf_prevalidation(idf_dict, submission_type, mtab_logger)
     pre.sdrf_prevalidation(sdrf_data, header, header_dict, submission_type, mtab_logger)
+    pre.cross_magetab_validation(sdrf_data, header, header_dict, idf_dict, submission_type, mtab_logger)
 
     # Read in MAGE-TAB and convert to common data model
     sub = data_objects_from_magetab(idf_file, sdrf_file_path, submission_type)
@@ -92,7 +96,10 @@ def main():
     error_codes.extend(mv.run_file_checks(sub, metadata_logger))
     if submission_type == "singlecell":
         error_codes.extend(mv.run_singlecell_checks(sub, metadata_logger))
-
+    if args.atlas:
+        atlas_checker = av.AtlasMAGETABChecker(idf_file, sdrf_file_path, submission_type)
+        print(atlas_checker.sdrf_dict)
+        print(atlas_checker.idf_dict)
     if error_codes:
         logger.info("Validation finished with the following error codes: \n{}".format("\n".join(set(error_codes))))
     else:

@@ -8,7 +8,7 @@ import re
 from utils.converter_utils import get_name, get_value, get_controlled_vocabulary
 
 
-def idf_prevalidation(idf_dict, logger):
+def idf_prevalidation(idf_dict, submission_type, logger, atlas=False):
     """Check that all IDF fields and comments are from the allowed list and can be parsed properly.
 
     In IDF the field name need to be spelled exactly like defined in the MAGE-TAB spec
@@ -30,8 +30,16 @@ def idf_prevalidation(idf_dict, logger):
         if idf_dict.get(field) and len([x for x in idf_dict[field] if x]) > 1:
             logger.error("IDF field \"{}\" contains more than one value. This is not allowed".format(field))
 
+    # Single cell IDF checks
+    if atlas and submission_type == "singlecell":
+        required_comments = get_controlled_vocabulary("required_singlecell_idf_comments", "atlas")
+        print(required_comments)
+        for comment in required_comments:
+            if comment not in idf_dict:
+                logger.error("Comment \"{}\" not found in IDF. Required for Single Cell Atlas.".format(comment))
 
-def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
+
+def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger, atlas=False):
     """Perform basic checks on the SDRF, making sure that all expected nodes and protocols are present,
     and that the basic assumptions about the relationships between samples and extracts are correct.
     """
@@ -82,7 +90,7 @@ def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
     characteristics = [get_value(x).lower() for x in header if re.match("characteristics", x, flags=re.IGNORECASE)]
     duplicated_categories = [c for c in characteristics if not present_exactly_once(c, characteristics)]
     if duplicated_categories:
-        logger.error("The following characteristics categories is present more than once: {}".format(
+        logger.error("The following characteristics categories are present more than once: {}".format(
             ", ".join(duplicated_categories)))
 
     # Protocols should be between all major nodes

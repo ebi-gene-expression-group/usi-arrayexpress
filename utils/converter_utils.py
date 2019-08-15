@@ -61,6 +61,8 @@ def get_controlled_vocabulary(category, resource="translations"):
         resource_path = "ontology_terms.json"
     elif resource == "magetab":
         resource_path = "magetab_fields.json"
+    elif resource == "atlas":
+        resource_path = "atlas_validation_config.json"
     else:
         resource_path = "term_translations.json"
     all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
@@ -323,7 +325,8 @@ def read_idf_file(idf_file):
         for row in idf_raw:
             idf_row = row.rstrip('\n').split('\t')
             # Skip empty lines or lines full of just empty spaces/tabs
-            if len(''.join(idf_row).strip()) == 0:
+            characters = ''.join(idf_row).strip()
+            if len(characters) == 0 or characters.startswith('#'):
                 continue
             if re.search(r"^\[SDRF\]", idf_row[0]):
                 # idf_file is a combined idf/sdrf file - stop when you get to the beginning of sdrf section
