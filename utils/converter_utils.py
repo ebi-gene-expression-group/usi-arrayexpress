@@ -353,6 +353,25 @@ def read_idf_file(idf_file):
     return idf_dict
 
 
+def simple_idf_parser(idf_file):
+    """Return an OrderedDict with IDF headers as keys and list of all values per key"""
+
+    with codecs.open(idf_file, encoding='utf-8') as fi:
+        idf_raw = fi.readlines()
+        idf_dict = OrderedDict()
+        for row in idf_raw:
+            idf_row = row.rstrip('\n').split('\t')
+            # Skip empty lines and comments
+            characters = ''.join(idf_row).strip()
+            if not (len(characters) == 0 or characters.startswith('#')):
+                row_label = idf_row.pop(0)
+                if row_label in idf_dict:
+                    idf_dict[row_label].extend(idf_row)
+                else:
+                    idf_dict[row_label] = idf_row
+    return idf_dict
+
+
 def dict_to_vertical_table(input_dict, filename, logger, sep='\t'):
     """Take a dictionary (can be ordered) and print the contents in a vertical table:
      The keys are in the first column, with the values in the rest of the row."""
