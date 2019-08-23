@@ -188,10 +188,28 @@ def download_json(logger, url, parameters=None):
         return json.loads(r.text)
 
 
-def file_exists(input_file):
+def file_exists(input_file, logger=None):
     if not os.path.exists(input_file):
-        print("Invalid input. File does not exist: {}".format(input_file))
+        log_message = "Invalid input. File does not exist: {}".format(input_file)
+        if logger:
+            logger.error(log_message)
+        else:
+            print(log_message)
         sys.exit()
+
+
+def is_valid_url(url):
+    """Check if a given URL exists without downloading the page/file
+
+    For HTTP and HTTPS URLs, urllib.requests returns a http.client.HTTPResponse object,
+    for FTP URLs it returns a urllib.response.addinfourl object
+    """
+    try:
+        r = urllib.request.urlopen(url)
+        if r:
+            return True
+    except urllib.error.URLError:
+        return False
 
 
 if __name__ == '__main__':
