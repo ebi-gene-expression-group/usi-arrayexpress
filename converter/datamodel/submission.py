@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from utils.common_utils import get_ontology_source_file
+from utils.api_utils import get_ontology_source_file
 
 
 class Submission:

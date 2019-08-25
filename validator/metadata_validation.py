@@ -4,7 +4,7 @@ from converter.datamodel.submission import Submission
 from converter.datamodel.assay import SingleCellAssay
 from utils import converter_utils
 from utils.converter_utils import ontology_term, is_accession
-from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi, get_ena_instrument_terms_via_usi
+from utils.api_utils import get_term_descendants, get_ena_library_terms_via_usi, get_ena_instrument_terms_via_usi
 
 
 REGEX_DATE_FORMAT = re.compile("([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))")

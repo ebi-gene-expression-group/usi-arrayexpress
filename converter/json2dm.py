@@ -11,7 +11,7 @@ from converter.datamodel.data import AssayData, Analysis
 from converter.datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
 from converter.datamodel.components import Attribute, Unit
 from utils.converter_utils import guess_submission_type_from_study, get_term_from_url
-from utils.common_utils import get_ontology_from_term_url, get_term_parent
+from utils.api_utils import get_ontology_from_term_url, get_term_parent
 
 
 class JSONConverter:

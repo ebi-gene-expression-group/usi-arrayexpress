@@ -8,6 +8,7 @@ import re
 
 from collections import OrderedDict, defaultdict
 
+from utils.common_utils import file_exists
 from utils.eutils import esearch
 
 
@@ -213,8 +214,8 @@ def get_sdrf_path(idf_file_path, logger, data_dir=None):
                 else:
                     sdrf_file_path = os.path.join(current_dir, sdrf_file_name)
     logger.debug("Generated SDRF file path: {}".format(sdrf_file_path))
-    if not os.path.exists(sdrf_file_path):
-        logger.error("SDRF file {} does not exist".format(sdrf_file_path))
+    # Check if file exists and exit if not
+    file_exists(sdrf_file_path)
 
     return sdrf_file_path
 

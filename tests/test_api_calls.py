@@ -2,10 +2,10 @@ import unittest
 import os
 
 from utils.converter_utils import get_taxon
-from utils.common_utils import create_logger, \
-    get_term_descendants, \
+from utils.api_utils import get_term_descendants, \
     get_ena_library_terms_via_usi, \
     get_ena_instrument_terms_via_usi
+from utils.common_utils import create_logger
 
 
 class TestTaxonRetrieval(unittest.TestCase):

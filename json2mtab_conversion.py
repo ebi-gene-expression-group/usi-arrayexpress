@@ -11,7 +11,7 @@ from os import path
 
 from converter import json2dm, dm2magetab
 from validator.json_schema_validation import validate_submission_json
-from utils.common_utils import file_exists, create_logger
+from utils.common_utils import create_logger, file_exists
 from utils.converter_utils import read_json_file, dict_to_vertical_table, new_file_prefix
 
 
