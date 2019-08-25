@@ -1,10 +1,16 @@
 {
-  "singlecell_library_contruction": [
-    "10xV2",
-    "drop-seq",
-    "smart-seq2",
-    "smart-like"
-  ],
+  "singlecell_library_contruction": {
+    "droplet": [
+      "10xV2",
+      "drop-seq"
+    ],
+    "all": [
+      "10xV2",
+      "drop-seq",
+      "smart-seq2",
+      "smart-like"
+    ]
+  },
   "singlecell_experiment_type": [
     "baseline",
     "differential",
@@ -34,7 +40,15 @@
     "library_source",
     "library_strand",
     "fastq_uri",
+    "library construction",
     "single cell isolation"
+  ],
+  "required_droplet_sdrf_fields": [
+    "read1 file",
+    "read2 file",
+    "cdna read",
+    "cell barcode read",
+    "umi barcode read"
   ],
   "required_idf_fields": [
     "Experimental Factor Name",

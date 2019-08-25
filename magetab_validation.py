@@ -34,7 +34,8 @@ def parse_args():
                        help="Force submission type to be 'microarray'")
     parser.add_argument('-a', '--atlas', action='store_true',
                         help="Run checks for Expression Atlas loading")
-
+    parser.add_argument('-x', '--skip-file-checks', action='store_true',
+                        help="Skip file and URI checks")
     args = parser.parse_args()
 
     return args
@@ -101,7 +102,9 @@ def main():
     if args.atlas:
         atlas_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="ATLAS",
                                      log_level=logging_level)
-        av.run_all_atlas_checks(idf_dict, sdrf_data, header, header_dict, submission_type, atlas_logger)
+        atlas_checker = av.AtlasMAGETABChecker(idf_file, sdrf_file_path, submission_type,
+                                               skip_file_checks=args.skip_file_checks)
+        atlas_checker.check_all(atlas_logger)
 
     if error_codes:
         pass

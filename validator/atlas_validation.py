@@ -1,10 +1,10 @@
 """Module with validation checks to test for eligibility for Expression Atlas and Single Cell Expression Atlas"""
-
+import logging
 import re
 
 import pandas
 
-from utils.converter_utils import simple_idf_parser, get_controlled_vocabulary, get_name, get_value
+from utils.converter_utils import simple_idf_parser, get_controlled_vocabulary, get_name, get_value, read_sdrf_file
 from utils.common_utils import create_logger, is_valid_url
 
 
@@ -32,7 +32,8 @@ def run_general_atlas_checks(idf, sdrf, sdrf_header, header_dict, submission_typ
     sdrf_comment_values = [get_value(sdrf_header[i]).lower() for i in header_dict.get('comment', [])]
     sdrf_charactistics_values = [get_value(sdrf_header[i]).lower()
                                  for i in header_dict.get('characteristics', [])]
-    sdrf_values = sdrf_comment_values + sdrf_charactistics_values
+    sdrf_factor_values = [get_value(sdrf_header[i]).lower() for i in header_dict.get('factorvalue', [])]
+    sdrf_values = sdrf_comment_values + sdrf_charactistics_values + sdrf_factor_values
 
     # Required IDF fields
     required_idf_fields = get_controlled_vocabulary("required_idf_fields", "atlas")
@@ -42,8 +43,9 @@ def run_general_atlas_checks(idf, sdrf, sdrf_header, header_dict, submission_typ
 
     # No duplications between comments and characteristics
     duplicates = set(sdrf_comment_values).intersection(sdrf_charactistics_values)
+    duplicates.update(set(sdrf_comment_values).intersection(sdrf_factor_values))
     for c in duplicates:
-        logger.error("Column name \"{}\" appears as comment and characteristics.".format(c))
+        logger.error("Column name \"{}\" appears as Comment and Characteristics/Factor Value.".format(c))
 
     # Sequencing experiments must have RUN or ENA_RUN comment column
     if submission_type in ("sequencing", "singlecell"):
@@ -92,28 +94,32 @@ def run_all_atlas_checks(idf, sdrf, sdrf_header, header_dict, submission_type, l
 
 
 class AtlasMAGETABChecker:
-    def __init__(self, idf_file, sdrf_file, submission_type):
+    def __init__(self, idf_file, sdrf_file, submission_type, skip_file_checks=False):
         self.idf_file = idf_file
         self.sdrf_file = sdrf_file
         self.submission_type = submission_type
+        self.skip_file_checks = skip_file_checks
 
         try:
-            self.sdrf = pandas.read_csv(sdrf_file, sep='\t', encoding='utf-8', comment='#')
+            self.sdrf, self.sdrf_header, self.header_dict = read_sdrf_file(sdrf_file)
             self.idf = simple_idf_parser(idf_file)
-            # Make list of headers with field names removed
-            # (includes stuff like "Derived ArrayExpress FTP file].1")
-            self.sdrf_values = [get_value(h).lower() for h in self.sdrf.columns]
-            self.idf_values = [get_value(h).lower() for h in self.idf]
-            for h in self.sdrf_values:
-                print(h)
         except Exception as e:
             raise Exception("Failed to open MAGE-TAB files: {}".format(e))
 
+        self.sdrf_comment_values = [self.normalise_header(self.sdrf_header[i])
+                                    for i in self.header_dict.get('comment', [])]
+        self.sdrf_charactistics_values = [self.normalise_header(self.sdrf_header[i])
+                                          for i in self.header_dict.get('characteristics', [])]
+        self.sdrf_factor_values = [self.normalise_header(self.sdrf_header[i])
+                                   for i in self.header_dict.get('factorvalue', [])]
+        self.sdrf_values = self.sdrf_comment_values + self.sdrf_charactistics_values + self.sdrf_factor_values
+        self.idf_values = [self.normalise_header(field) for field in self.idf]
+        print(self.idf_values)
 
     def run_general_checks(self, logger):
 
         # Warn about technical replicates
-        sdrf_fields = map(get_name, self.sdrf.columns)
+        #sdrf_fields = map(get_name, self.sdrf.columns)
         #if 'sourcename' in sdrf_fields:
         #    sample_number = self.sdrf['Source Name'].value_count()
         #    if 'arraydatafile' in sdrf_fields:
@@ -127,7 +133,7 @@ class AtlasMAGETABChecker:
 
         #if files_per_sample >3 for 10x
 
-        print(self.idf_values)
+
         # Required IDF fields
         required_idf_fields = get_controlled_vocabulary("required_idf_fields", "atlas")
         for field in required_idf_fields:
@@ -135,12 +141,10 @@ class AtlasMAGETABChecker:
                 logger.error("No {} found in IDF.".format(field))
 
         # No duplications between comments and characteristics
-        unique = set()
-        for i, c in enumerate(self.sdrf_values):
-            if c not in unique:
-                unique.add(c)
-            elif get_name(self.sdrf.columns[i]) != "factorvalue":
-                logger.error("Column name \"{}\" appears more than once.".format(c, self.sdrf.columns[i]))
+        duplicates = set(self.sdrf_comment_values).intersection(self.sdrf_charactistics_values)
+        duplicates.update(set(self.sdrf_comment_values).intersection(self.sdrf_factor_values))
+        for c in duplicates:
+            logger.error("Column name \"{}\" appears as Comment and Characteristics/Factor Value.".format(c))
 
         # Sequencing experiments must have RUN or ENA_RUN comment column
         if self.submission_type in ("sequencing", "singlecell"):
@@ -148,14 +152,19 @@ class AtlasMAGETABChecker:
                 logger.error("No ENA_RUN or RUN column found in SDRF.")
 
         # FASTQ_URIs must be valid
-        file_uris = self.sdrf.filter(regex=re.compile("fastq_uri", re.IGNORECASE), axis=1)
-        logger.info("Checking FASTQ URIs. This may take a while... (Skip this next time with -x option)")
-        for row in file_uris.itertuples():
-            for url in row:
-                # only run the check on internet URLs, for internal files we use just the filename
-                if re.match(re.compile("^ftp|^http", re.IGNORECASE), str(url)):
-                    if not is_valid_url(url):
-                        logger.error("FASTQ_URI {} is not valid.".format(url))
+        if not self.skip_file_checks:
+            uri_index = [i for i, c in enumerate(self.sdrf_header)
+                         if re.search("fastq_uri", c, flags=re.IGNORECASE)]
+            logger.info("Checking FASTQ URIs. This may take a while... (Skip this check with -x option)")
+            for row in self.sdrf:
+                for i in uri_index:
+                    url = row[i]
+                    # only run the check on internet URLs, for internal files we use just the filename
+                    if re.match(re.compile("^ftp|^http", re.IGNORECASE), str(url)):
+                        if not is_valid_url(url):
+                            logger.error("FASTQ_URI {} is not valid.".format(url))
+
+
 
 
     def run_singlecell_checks(self, logger):
@@ -173,17 +182,33 @@ class AtlasMAGETABChecker:
             if field.lower() not in self.sdrf_values:
                 logger.error("Required SDRF field \"{}\" not found.".format(field))
 
+        # Valid library construction terms
+        library_construction_terms = get_controlled_vocabulary("singlecell_library_contruction", "atlas")
+        sc_protocol_index = None
+        for i, c in enumerate(self.sdrf_header):
+            if re.search("library construction", self.normalise_header(c), flags=re.IGNORECASE):
+                sc_protocol_index = i
+                break
+        sc_protocol_values = {row[sc_protocol_index] for row in self.sdrf}
+        print(sc_protocol_values)
+        if len(sc_protocol_values) > 1:
+            logger.warn("Experiment contains more than 1 single cell library construction protocol.")
+        for protocol in sc_protocol_values:
+            if protocol not in library_construction_terms.get("all", []):
+                logger.error("Library construction protocol is not supported for Expression Atlas.".format(protocol))
+
     def check_all(self, logger):
         """Trigger all applicable checks"""
 
         if not logger:
-            logger = create_logger()
+            logger = logging.getLogger()
 
         self.run_general_checks(logger)
         if self.submission_type == "singlecell":
             self.run_singlecell_checks(logger)
 
-    def _normalise_header(self, field_name):
+    @staticmethod
+    def normalise_header(field_name):
         """Strip field names such as Comment and make everything lowercase without spaces"""
         return get_value(field_name).lower()
 
