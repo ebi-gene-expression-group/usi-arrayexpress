@@ -8,7 +8,7 @@ import re
 from utils.converter_utils import get_name, get_value, get_controlled_vocabulary
 
 
-def idf_prevalidation(idf_dict, submission_type, logger, atlas=False):
+def idf_prevalidation(idf_dict, submission_type, logger):
     """Check that all IDF fields and comments are from the allowed list and can be parsed properly.
 
     In IDF the field name need to be spelled exactly like defined in the MAGE-TAB spec
@@ -25,21 +25,14 @@ def idf_prevalidation(idf_dict, submission_type, logger, atlas=False):
             logger.error("Cannot parse IDF field \"{}\".".format(idf_key))
 
     # Check fields that can only contain one value
-    max1 = ("MAGE-TAB Version", "Investigation Title", "Date Of Experiment", "Public Release Date", "Experiment Description", "SDRF File")
+    max1 = ("MAGE-TAB Version", "Investigation Title", "Date Of Experiment",
+            "Public Release Date", "Experiment Description", "SDRF File")
     for field in max1:
         if idf_dict.get(get_name(field)) and len([x for x in idf_dict[get_name(field)] if x]) > 1:
             logger.error("IDF field \"{}\" contains more than one value. This is not allowed.".format(field))
 
-    # Single cell IDF checks
-    if atlas and submission_type == "singlecell":
-        required_comments = get_controlled_vocabulary("required_singlecell_idf_comments", "atlas")
-        print(required_comments)
-        for comment in required_comments:
-            if comment not in idf_dict:
-                logger.error("Comment \"{}\" not found in IDF. Required for Single Cell Atlas.".format(comment))
 
-
-def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger, atlas=False):
+def sdrf_prevalidation(sdrf_list, header, header_dict, submission_type, logger):
     """Perform basic checks on the SDRF, making sure that all expected nodes and protocols are present,
     and that the basic assumptions about the relationships between samples and extracts are correct.
     """

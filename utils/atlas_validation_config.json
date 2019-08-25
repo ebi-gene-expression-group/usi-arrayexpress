@@ -1,0 +1,43 @@
+{
+  "singlecell_library_contruction": [
+    "10xV2",
+    "drop-seq",
+    "smart-seq2",
+    "smart-like"
+  ],
+  "singlecell_experiment_type": [
+    "baseline",
+    "differential",
+    "trajectory"
+  ],
+  "required_singlecell_ae_experiment_type": [
+    "RNA-seq of coding RNA from single cells"
+  ],
+  "required_bulk_ae_experiment_type": [
+    "transcription profiling by array",
+    "RNA-seq of coding RNA",
+    "RNA-seq of non coding RNA",
+    "RNA-seq of total RNA",
+    "proteomic profiling by mass spectrometer"
+  ],
+  "required_singlecell_idf_comments": [
+    "EACurator",
+    "EAAdditionalAttributes",
+    "EAExpectedClusters",
+    "EAExperimentType",
+    "AEExperimentType"
+  ],
+  "required_singlecell_sdrf_fields": [
+    "material type",
+    "library_layout",
+    "library_selection",
+    "library_source",
+    "library_strand",
+    "fastq_uri",
+    "single cell isolation"
+  ],
+  "required_idf_fields": [
+    "Experimental Factor Name",
+    "Protocol Name"
+  ]
+}

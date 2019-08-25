@@ -96,12 +96,16 @@ def main():
     error_codes.extend(mv.run_file_checks(sub, metadata_logger))
     if submission_type == "singlecell":
         error_codes.extend(mv.run_singlecell_checks(sub, metadata_logger))
+
+    # Atlas checks
     if args.atlas:
-        atlas_checker = av.AtlasMAGETABChecker(idf_file, sdrf_file_path, submission_type)
-        print(atlas_checker.sdrf_dict)
-        print(atlas_checker.idf_dict)
+        atlas_logger = create_logger(current_dir, process_name, idf_file_name, logger_name="ATLAS",
+                                     log_level=logging_level)
+        av.run_all_atlas_checks(idf_dict, sdrf_data, header, header_dict, submission_type, atlas_logger)
+
     if error_codes:
-        logger.info("Validation finished with the following error codes: \n{}".format("\n".join(set(error_codes))))
+        pass
+        # logger.info("Validation finished with the following error codes: \n{}".format("\n".join(set(error_codes))))
     else:
         logger.info("Validation was successful!")
 
