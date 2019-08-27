@@ -143,7 +143,7 @@ def run_sample_checks(sub: Submission, logger):
     for f in factors:
         if f not in undefined_factors:
             # Get all values for a given factor
-            factor_values = [s.attributes[f].value.rstrip() for s in samples]
+            factor_values = [s.attributes[f].value.rstrip() for s in samples if f in s.attributes]
             # Filter duplicated values to get the number of unique entries
             unique_factor_values[f.lower()] = converter_utils.remove_duplicates(factor_values)
     non_factors = [f_name for f_name, values in unique_factor_values.items() if len(values) < 2]
@@ -442,16 +442,16 @@ def run_singlecell_checks(sub: Submission, logger):
                 codes.append("CELL-E04")
         # Warnings about non-critical single cell attributes
         if not a.single_cell_isolation:
-            logger.warn("Single-cell assay \"{}\" has no single cell isolation specified.").format(a.alias)
+            logger.warn("Single-cell assay \"{}\" has no single cell isolation specified.".format(a.alias))
             codes.append("CELL-W05")
         if not a.end_bias:
-            logger.warn("Single-cell assay \"{}\" has no end bias specified.").format(a.alias)
+            logger.warn("Single-cell assay \"{}\" has no end bias specified.".format(a.alias))
             codes.append("CELL-W06")
         if not a.input_molecule:
-            logger.warn("Single-cell assay \"{}\" has no input molecule specified.").format(a.alias)
+            logger.warn("Single-cell assay \"{}\" has no input molecule specified.".format(a.alias))
             codes.append("CELL-W07")
         if not a.primer:
-            logger.warn("Single-cell assay \"{}\" has no primer specified.").format(a.alias)
+            logger.warn("Single-cell assay \"{}\" has no primer specified.".format(a.alias))
             codes.append("CELL-W08")
 
     return codes

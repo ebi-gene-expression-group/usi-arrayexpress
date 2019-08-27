@@ -4,7 +4,7 @@ import re
 
 from utils.common_utils import is_valid_url
 from utils.converter_utils import simple_idf_parser, get_controlled_vocabulary, \
-                                  get_name, get_value, read_sdrf_file
+                                  get_name, get_value, read_sdrf_file, get_taxon
 
 
 
@@ -100,12 +100,14 @@ class AtlasMAGETABChecker:
         self.submission_type = submission_type
         self.skip_file_checks = skip_file_checks
 
+        # Read in IDF/SDRF files
         try:
             self.sdrf, self.sdrf_header, self.header_dict = read_sdrf_file(sdrf_file)
             self.idf = simple_idf_parser(idf_file)
         except Exception as e:
             raise Exception("Failed to open MAGE-TAB files: {}".format(e))
 
+        # Get metadata fields
         self.sdrf_comment_values = [self.normalise_header(self.sdrf_header[i])
                                     for i in self.header_dict.get('comment', [])]
         self.sdrf_charactistics_values = [self.normalise_header(self.sdrf_header[i])
@@ -132,6 +134,8 @@ class AtlasMAGETABChecker:
 
         #if files_per_sample >3 for 10x
 
+        # Technical replicate group values must only contain characters and numbers
+
 
         # Required IDF fields
         required_idf_fields = get_controlled_vocabulary("required_idf_fields", "atlas")
@@ -145,10 +149,25 @@ class AtlasMAGETABChecker:
         for c in duplicates:
             logger.error("Column name \"{}\" appears as Comment and Characteristics/Factor Value.".format(c))
 
+        # Only 1 species allowed
+        for i, field in enumerate(self.sdrf_header):
+            if re.search("organism", get_value(field), re.IGNORECASE):
+                organisms = {row[i] for row in self.sdrf}
+                if len(organisms) > 1:
+                    logger.error("Experiment contains more than 1 organisms.")
+                # Organism must be found in NCBI taxonomy
+                for o in organisms:
+                    taxon_id = get_taxon(o)
+                    if not taxon_id:
+                        logger.error("Organism \"{}\" is not found in NCBI taxonomy.".format(o))
+                break
+
         # Sequencing experiments must have RUN or ENA_RUN comment column
         if self.submission_type in ("sequencing", "singlecell"):
             if not ("run" in self.sdrf_values or "ena_run" in self.sdrf_values):
                 logger.error("No ENA_RUN or RUN column found in SDRF.")
+
+            # Paired-end libraries need two files
 
         # FASTQ_URIs must be valid
         if not self.skip_file_checks:
@@ -163,9 +182,6 @@ class AtlasMAGETABChecker:
                         if not is_valid_url(url):
                             logger.error("FASTQ_URI {} is not valid.".format(url))
 
-        
-
-
 
     def run_singlecell_checks(self, logger):
         """Check requirements for loading an experiment into Single Cell Expression Atlas"""
@@ -175,26 +191,6 @@ class AtlasMAGETABChecker:
         for comment in required_comments:
             if comment.lower() not in self.idf_values:
                 logger.error("Comment \"{}\" not found in IDF. Required for Single Cell Atlas.".format(comment))
-
-        # Required SDRF fields
-        required_sdrf_names = get_controlled_vocabulary("required_singlecell_sdrf_fields", "atlas")
-        for field in required_sdrf_names:
-            if not (field.lower() in self.sdrf_values or get_name(field) in self.header_dict):
-                logger.error("Required SDRF field \"{}\" not found.".format(field))
-
-        # Valid library construction terms
-        library_construction_terms = get_controlled_vocabulary("singlecell_library_construction", "atlas")
-        for i, c in enumerate(self.sdrf_header):
-            if re.search("library construction", self.normalise_header(c), flags=re.IGNORECASE):
-                sc_protocol_values = {row[i] for row in self.sdrf}
-                print(sc_protocol_values)
-                if len(sc_protocol_values) > 1:
-                    logger.warn("Experiment contains more than 1 single cell library construction protocol.")
-                for protocol in sc_protocol_values:
-                    if protocol not in library_construction_terms.get("all", []):
-                        logger.error("Library construction protocol is not supported for Expression Atlas."
-                                     .format(protocol))
-                break
 
         # Atlas IDF comment value checks
         for k, attribs in self.idf.items():
@@ -206,6 +202,43 @@ class AtlasMAGETABChecker:
                 for number in attribs:
                     if number and not re.match("^\d+$", number):
                         logger.error("Expected clusters value \"{}\" is not numerical.".format(number))
+
+        # Required SDRF fields
+        required_sdrf_names = get_controlled_vocabulary("required_singlecell_sdrf_fields", "atlas")
+        for field in required_sdrf_names:
+            if not (field.lower() in self.sdrf_values or get_name(field) in self.header_dict):
+                logger.error("Required SDRF field \"{}\" not found.".format(field))
+
+        # Valid SDRF value terms
+        library_construction_terms = get_controlled_vocabulary("singlecell_library_construction", "atlas")
+        sc_protocol_values = {}
+        for i, c in enumerate(self.sdrf_header):
+            # Check for supported library construction terms
+            if re.search(r"library construction", self.normalise_header(c), flags=re.IGNORECASE):
+                sc_protocol_values = {row[i] for row in self.sdrf}
+                print(sc_protocol_values)
+                if len(sc_protocol_values) > 1:
+                    logger.warn("Experiment contains more than 1 single cell library construction protocol.")
+                for protocol in sc_protocol_values:
+                    if protocol.lower() not in library_construction_terms.get("all", []):
+                        logger.error("Library construction protocol is not supported for Expression Atlas."
+                                     .format(protocol))
+            # Not all rows should be "not OK"
+            elif re.search(r"single cell (well)? quality", self.normalise_header(c), flags=re.IGNORECASE):
+                well_quality_values = {row[i] for row in self.sdrf}
+                print(well_quality_values)
+                if len(well_quality_values) == 1 and "not OK" in well_quality_values:
+                    logger.error("Single cell quality values are all \"not OK\".")
+
+
+        # SDRF terms required for droplet experiments
+        for protocol in sc_protocol_values:
+            if protocol.lower() in library_construction_terms.get("droplet"):
+                droplet_terms = get_controlled_vocabulary("required_droplet_sdrf_fields", "atlas")
+                for dt in droplet_terms:
+                    if dt not in self.sdrf_values:
+                        logger.error("Required SDRF droplet field \"{}\" not found.".format(dt))
+                break
 
 
     def check_all(self, logger):
@@ -221,6 +254,6 @@ class AtlasMAGETABChecker:
     @staticmethod
     def normalise_header(field_name):
         """Strip field names such as Comment and make everything lowercase without spaces"""
-        return get_value(field_name).lower()
+        return get_value(field_name).lower().strip()
 
 
