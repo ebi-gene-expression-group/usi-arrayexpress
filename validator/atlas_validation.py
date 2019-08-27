@@ -1,6 +1,7 @@
 """Module with validation checks to test for eligibility for Expression Atlas and Single Cell Expression Atlas"""
 import logging
 import re
+from collections import defaultdict
 
 from utils.common_utils import is_valid_url
 from utils.converter_utils import simple_idf_parser, get_controlled_vocabulary, \
@@ -117,9 +118,12 @@ class AtlasMAGETABChecker:
         self.sdrf_values = self.sdrf_comment_values + self.sdrf_charactistics_values + self.sdrf_factor_values
         self.idf_values = [self.normalise_header(field) for field in self.idf]
 
+        self.sample2datafile = self.map_samples_to_files()
+
     def run_general_checks(self, logger):
 
         # Warn about technical replicates
+
         #sdrf_fields = map(get_name, self.sdrf.columns)
         #if 'sourcename' in sdrf_fields:
         #    sample_number = self.sdrf['Source Name'].value_count()
@@ -134,7 +138,7 @@ class AtlasMAGETABChecker:
 
         #if files_per_sample >3 for 10x
 
-        # Technical replicate group values must only contain characters and numbers
+
 
 
         # Required IDF fields
@@ -149,6 +153,7 @@ class AtlasMAGETABChecker:
         for c in duplicates:
             logger.error("Column name \"{}\" appears as Comment and Characteristics/Factor Value.".format(c))
 
+        # Species checks
         # Only 1 species allowed
         for i, field in enumerate(self.sdrf_header):
             if re.search("organism", get_value(field), re.IGNORECASE):
@@ -209,7 +214,7 @@ class AtlasMAGETABChecker:
             if not (field.lower() in self.sdrf_values or get_name(field) in self.header_dict):
                 logger.error("Required SDRF field \"{}\" not found.".format(field))
 
-        # Valid SDRF value terms
+        # Valid SDRF values
         library_construction_terms = get_controlled_vocabulary("singlecell_library_construction", "atlas")
         sc_protocol_values = {}
         for i, c in enumerate(self.sdrf_header):
@@ -229,7 +234,12 @@ class AtlasMAGETABChecker:
                 print(well_quality_values)
                 if len(well_quality_values) == 1 and "not OK" in well_quality_values:
                     logger.error("Single cell quality values are all \"not OK\".")
-
+            # Technical replicate group values must only contain letters and numbers
+            elif re.search(r"technical replicate group", self.normalise_header(c), flags=re.IGNORECASE):
+                wrong_values = {row[i] for row in self.sdrf if not re.match(r"^[A-Za-z0-9]*$", row[i])}
+                if len(wrong_values) > 0:
+                    logger.error("Technical replicate group values can only contain letters and numbers: "
+                                 .format(", ".join([str(v) for v in wrong_values])))
 
         # SDRF terms required for droplet experiments
         for protocol in sc_protocol_values:
@@ -240,12 +250,8 @@ class AtlasMAGETABChecker:
                         logger.error("Required SDRF droplet field \"{}\" not found.".format(dt))
                 break
 
-
-    def check_all(self, logger):
+    def check_all(self, logger=logging.getLogger()):
         """Trigger all applicable checks"""
-
-        if not logger:
-            logger = logging.getLogger()
 
         self.run_general_checks(logger)
         if self.submission_type == "singlecell":
@@ -256,4 +262,22 @@ class AtlasMAGETABChecker:
         """Strip field names such as Comment and make everything lowercase without spaces"""
         return get_value(field_name).lower().strip()
 
-
+    def map_samples_to_files(self):
+        """Make a dictionary with the mapping of samples to their associated raw data files"""
+        # Compare source name values against files
+        sample2datafile = defaultdict(list)
+        # Find source name and data file index
+        sample_node = "sourcename"
+        if self.submission_type == "microarray":
+            data_node = "arraydatafile"
+        else:
+            data_node = "scanname"
+        # The fist columns for each node (expecting only one raw data column)
+        sample_index = next(iter(self.header_dict.get(sample_node, [])), None)
+        data_index = next(iter(self.header_dict.get(data_node, [])), None)
+        # Collect all data files for each sample
+        if sample_index is not None and data_index is not None:
+            for row in self.sdrf:
+                sample2datafile[row[sample_index]].append(row[data_index])
+        print(sample2datafile)
+        return sample2datafile
