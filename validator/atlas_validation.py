@@ -2,10 +2,10 @@
 import logging
 import re
 
-import pandas
+from utils.common_utils import is_valid_url
+from utils.converter_utils import simple_idf_parser, get_controlled_vocabulary, \
+                                  get_name, get_value, read_sdrf_file
 
-from utils.converter_utils import simple_idf_parser, get_controlled_vocabulary, get_name, get_value, read_sdrf_file
-from utils.common_utils import create_logger, is_valid_url
 
 
 def run_singlecell_atlas_checks(idf, sdrf, header_dict, logger):
@@ -114,7 +114,6 @@ class AtlasMAGETABChecker:
                                    for i in self.header_dict.get('factorvalue', [])]
         self.sdrf_values = self.sdrf_comment_values + self.sdrf_charactistics_values + self.sdrf_factor_values
         self.idf_values = [self.normalise_header(field) for field in self.idf]
-        print(self.idf_values)
 
     def run_general_checks(self, logger):
 
@@ -164,6 +163,7 @@ class AtlasMAGETABChecker:
                         if not is_valid_url(url):
                             logger.error("FASTQ_URI {} is not valid.".format(url))
 
+        
 
 
 
@@ -179,23 +179,34 @@ class AtlasMAGETABChecker:
         # Required SDRF fields
         required_sdrf_names = get_controlled_vocabulary("required_singlecell_sdrf_fields", "atlas")
         for field in required_sdrf_names:
-            if field.lower() not in self.sdrf_values:
+            if not (field.lower() in self.sdrf_values or get_name(field) in self.header_dict):
                 logger.error("Required SDRF field \"{}\" not found.".format(field))
 
         # Valid library construction terms
-        library_construction_terms = get_controlled_vocabulary("singlecell_library_contruction", "atlas")
-        sc_protocol_index = None
+        library_construction_terms = get_controlled_vocabulary("singlecell_library_construction", "atlas")
         for i, c in enumerate(self.sdrf_header):
             if re.search("library construction", self.normalise_header(c), flags=re.IGNORECASE):
-                sc_protocol_index = i
+                sc_protocol_values = {row[i] for row in self.sdrf}
+                print(sc_protocol_values)
+                if len(sc_protocol_values) > 1:
+                    logger.warn("Experiment contains more than 1 single cell library construction protocol.")
+                for protocol in sc_protocol_values:
+                    if protocol not in library_construction_terms.get("all", []):
+                        logger.error("Library construction protocol is not supported for Expression Atlas."
+                                     .format(protocol))
                 break
-        sc_protocol_values = {row[sc_protocol_index] for row in self.sdrf}
-        print(sc_protocol_values)
-        if len(sc_protocol_values) > 1:
-            logger.warn("Experiment contains more than 1 single cell library construction protocol.")
-        for protocol in sc_protocol_values:
-            if protocol not in library_construction_terms.get("all", []):
-                logger.error("Library construction protocol is not supported for Expression Atlas.".format(protocol))
+
+        # Atlas IDF comment value checks
+        for k, attribs in self.idf.items():
+            if re.search("EAAdditionalAttributes", k, flags=re.IGNORECASE):
+                for attrib in attribs:
+                    if attrib and attrib not in self.sdrf_values:
+                        logger.error("Additional attribute \"{}\" not found in SDRF.".format(attrib))
+            elif re.search("EAExpectedClusters", k, flags=re.IGNORECASE):
+                for number in attribs:
+                    if number and not re.match("^\d+$", number):
+                        logger.error("Expected clusters value \"{}\" is not numerical.".format(number))
+
 
     def check_all(self, logger):
         """Trigger all applicable checks"""

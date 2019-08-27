@@ -139,9 +139,9 @@ def cross_magetab_validation(sdrf_list, header, header_dict, idf_dict, submissio
                 ref_values = {row[index] for row in sdrf_list}
                 for ref in ref_values:
                     sdrf_ref_values.add(ref)
-                    if header == "protocolref" and ref not in idf_dict["protocolname"]:
+                    if header == "protocolref" and ref not in idf_dict.get("protocolname", []):
                         logger.error("Protocol REF \"{}\" is not defined in the IDF.".format(ref))
-                    elif header == "termsourceref" and ref not in idf_dict["termsourcename"]:
+                    elif header == "termsourceref" and ref not in idf_dict.get("termsourcename", []):
                         logger.error("Term Source REF \"{}\" is not defined in the IDF.".format(ref))
 
     # Warn about defined but unused REFs
