@@ -129,7 +129,7 @@ class AtlasMAGETABChecker:
                     logger.warn("Experiment is likely to contain technical replicates"
                                 "Please add \"Comment[technical replicate group]\".")
                     break
-                elif len(self.sample2datafile[s]) > 1:
+                elif not s.endswith("PAIRED") and len(self.sample2datafile[s]) > 1:
                         logger.warn("Experiment is likely to contain technical replicates. "
                                     "Please add \"Comment[technical replicate group]\".")
                         break
@@ -194,12 +194,16 @@ class AtlasMAGETABChecker:
         for k, attribs in self.idf.items():
             if re.search("EAAdditionalAttributes", k, flags=re.IGNORECASE):
                 for attrib in attribs:
-                    if attrib and attrib not in self.sdrf_values:
+                    if attrib and attrib.strip() not in self.sdrf_values:
                         logger.error("Additional attribute \"{}\" not found in SDRF.".format(attrib))
             elif re.search("EAExpectedClusters", k, flags=re.IGNORECASE):
                 for number in attribs:
                     if number and not re.match("^\d+$", number):
                         logger.error("Expected clusters value \"{}\" is not numerical.".format(number))
+            elif re.search("EAExperimentType", k, flags=re.IGNORECASE):
+                for attrib in attribs:
+                    if attrib and attrib.strip() not in get_controlled_vocabulary("singlecell_experiment_type", "atlas"):
+                        logger.error("Unknown EAExperimentType: \"{}\"".format(attrib))
 
         # Required SDRF fields
         required_sdrf_names = get_controlled_vocabulary("required_singlecell_sdrf_fields", "atlas")
