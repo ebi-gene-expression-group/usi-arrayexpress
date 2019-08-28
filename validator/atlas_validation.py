@@ -123,23 +123,16 @@ class AtlasMAGETABChecker:
     def run_general_checks(self, logger):
 
         # Warn about technical replicates
-
-        #sdrf_fields = map(get_name, self.sdrf.columns)
-        #if 'sourcename' in sdrf_fields:
-        #    sample_number = self.sdrf['Source Name'].value_count()
-        #    if 'arraydatafile' in sdrf_fields:
-        #        pass
-        #    elif 'scanname' in sdrf_fields:
-        #        pass
-
-        #if files per sample >1 for se
-
-        #if files_per_sample >2 for pe
-
-        #if files_per_sample >3 for 10x
-
-
-
+        if "technical replicate group" not in self.sdrf_comment_values:
+            for s in self.sample2datafile:
+                if s.endswith("PAIRED") and len(self.sample2datafile[s]) > 2:
+                    logger.warn("Experiment is likely to contain technical replicates"
+                                "Please add \"Comment[technical replicate group]\".")
+                    break
+                elif len(self.sample2datafile[s]) > 1:
+                        logger.warn("Experiment is likely to contain technical replicates. "
+                                    "Please add \"Comment[technical replicate group]\".")
+                        break
 
         # Required IDF fields
         required_idf_fields = get_controlled_vocabulary("required_idf_fields", "atlas")
@@ -236,10 +229,14 @@ class AtlasMAGETABChecker:
                     logger.error("Single cell quality values are all \"not OK\".")
             # Technical replicate group values must only contain letters and numbers
             elif re.search(r"technical replicate group", self.normalise_header(c), flags=re.IGNORECASE):
-                wrong_values = {row[i] for row in self.sdrf if not re.match(r"^[A-Za-z0-9]*$", row[i])}
+                tech_rep_values = {row[i] for row in self.sdrf}
+                wrong_values = {v for v in tech_rep_values if not re.match(r"^[A-Za-z0-9]*$", v)}
                 if len(wrong_values) > 0:
                     logger.error("Technical replicate group values can only contain letters and numbers: "
                                  .format(", ".join([str(v) for v in wrong_values])))
+                # Technical replicate group column should not be empty
+                if len(tech_rep_values) == 1 and "" in tech_rep_values:
+                    logger.error("Technical replicate group values are all empty.")
 
         # SDRF terms required for droplet experiments
         for protocol in sc_protocol_values:
@@ -272,12 +269,19 @@ class AtlasMAGETABChecker:
             data_node = "arraydatafile"
         else:
             data_node = "scanname"
+        layout_comment = "library_layout"
         # The fist columns for each node (expecting only one raw data column)
         sample_index = next(iter(self.header_dict.get(sample_node, [])), None)
         data_index = next(iter(self.header_dict.get(data_node, [])), None)
+        layout_index = next(iter([i for i, x in enumerate(self.sdrf_header)
+                                  if re.search(layout_comment, x, flags=re.IGNORECASE)]), None)
         # Collect all data files for each sample
         if sample_index is not None and data_index is not None:
             for row in self.sdrf:
-                sample2datafile[row[sample_index]].append(row[data_index])
-        print(sample2datafile)
+                if layout_index is not None:
+                    name = str(row[sample_index])+"~"+str(row[layout_index])
+                    sample2datafile[name].append(row[data_index])
+                else:
+                    sample2datafile[row[sample_index]].append(row[data_index])
+
         return sample2datafile
