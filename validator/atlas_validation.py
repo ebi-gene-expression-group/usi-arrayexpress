@@ -53,7 +53,7 @@ class AtlasMAGETABChecker:
         required_idf_fields = get_controlled_vocabulary("required_idf_fields", "atlas")
         for field in required_idf_fields:
             if field.lower() not in self.idf_values:
-                logger.error("No {} found in IDF.".format(field))
+                logger.error("No \"{}\" found in IDF.".format(field))
 
         # No duplications between comments and characteristics
         duplicates = set(self.sdrf_comment_values).intersection(self.sdrf_charactistics_values)
@@ -62,12 +62,12 @@ class AtlasMAGETABChecker:
             logger.error("Column name \"{}\" appears as Comment and Characteristics/Factor Value.".format(c))
 
         # Species checks
-        # Only 1 species allowed
         for i, field in enumerate(self.sdrf_header):
             if re.search("organism", get_value(field), re.IGNORECASE):
                 organisms = {row[i] for row in self.sdrf}
+                # Only 1 species allowed
                 if len(organisms) > 1:
-                    logger.error("Experiment contains more than 1 organisms.")
+                    logger.error("Experiment contains more than 1 organism.")
                 # Organism must be found in NCBI taxonomy
                 for o in organisms:
                     taxon_id = get_taxon(o)
@@ -79,8 +79,6 @@ class AtlasMAGETABChecker:
         if self.submission_type in ("sequencing", "singlecell"):
             if not ("run" in self.sdrf_values or "ena_run" in self.sdrf_values):
                 logger.error("No ENA_RUN or RUN column found in SDRF.")
-
-            # Paired-end libraries need two files
 
         # FASTQ_URIs must be valid
         if not self.skip_file_checks:
