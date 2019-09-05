@@ -16,7 +16,7 @@ Add usi-arrayexpress directory to PYTHONPATH environment variable
 
 ## Converter
 
-The converter functionality so far can read in MAGE-TAB files and generate a set of USI JSON files. This workflow can be tested with the mtab2usi_conversion.py script, e.g. 
+The converter functionality can read in MAGE-TAB files and generate a set of USI JSON files. This workflow can be tested with the mtab2usi_conversion.py script, e.g. 
 ```
 python mtab2usi_conversion.py tests/test_data/E-MTAB-4250.idf.txt
 ```
@@ -47,4 +47,13 @@ python json_validation.py tests/test_data/simple_data.json -s tests/test_data/si
  ```
  python magetab_validation.py tests/test_data/E-MTAB-4250.idf.txt
  ```
+  
+  ### Single-cell Expression Atlas MAGE-TAB validator
+  
+  A separate MAGE-TAB pre-validation module is running checks that guarantee that the experiment can be processed for [Single Cell Expression Atlas](https://www.ebi.ac.uk/gxa/sc/home). It reads metadata directly from the MAGE-TAB (not from the data model) since the specific format of the IDF/SDRF are important for correct analysis. 
+  The checks can be invoked using the MAGE-TAB validation script
+  ```
+  python magetab_validation.py tests/test_data/E-MTAB-7704.idf.txt -a 
+  ```
+ 
   
