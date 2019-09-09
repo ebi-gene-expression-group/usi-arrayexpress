@@ -90,7 +90,7 @@ class AtlasMAGETABChecker:
                     url = row[i]
                     # only run the check on internet URLs, for internal files we use just the filename
                     if re.match(re.compile("^ftp|^http", re.IGNORECASE), str(url)):
-                        if not is_valid_url(url):
+                        if not is_valid_url(url, logger):
                             logger.error("FASTQ_URI {} is not valid.".format(url))
 
     def run_singlecell_checks(self, logger):

@@ -41,7 +41,7 @@ def file_exists(input_file, logger=None):
         sys.exit()
 
 
-def is_valid_url(url):
+def is_valid_url(url, logger=None):
     """Check if a given URL exists without downloading the page/file
 
     For HTTP and HTTPS URLs, urllib.requests returns a http.client.HTTPResponse object,
@@ -49,6 +49,7 @@ def is_valid_url(url):
     """
     try:
         r = urllib.request.urlopen(url)
+        logger.debug("Checking {}... Done.".format(url))
         if r:
             return True
     except urllib.error.URLError:

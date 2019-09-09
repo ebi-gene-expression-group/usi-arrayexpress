@@ -68,7 +68,9 @@
     "GEOReleaseDate": "",
     "GEOLastUpdateDate": "",
     "TemplateType": "",
-    "AEAnonymousReview": ""
+    "AEAnonymousReview": "",
+    "ExpressionAtlasAccession": "",
+    "ArrayExpressSubmissionDate": ""
   },
   "node_terms": {
     "Source Name": "",
