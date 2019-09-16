@@ -1503,12 +1503,12 @@
         }
       }
     },
-    "read": {
+    "read_type": {
       "description": "The type of read for multiplexed single cell sequence files: read1/2 or index1/2",
       "type": "string",
       "import": {
         "ae": {
-          "path": ["attributes", "read"]
+          "path": ["attributes", "read_type"]
         }
       }
     }
