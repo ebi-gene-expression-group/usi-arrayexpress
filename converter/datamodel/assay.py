@@ -22,12 +22,12 @@ class Assay(DependentSubmittable):
 
     def get_assay_attributes(self):
         """A list of all attributes that are specific to the assay object (not in the general assay class)"""
-        exclude = ('alias', 'accession', 'protocolrefs', 'technology_type', 'sampleref')
+        exclude = ('id', 'alias', 'accession', 'protocolrefs', 'technology_type', 'sampleref')
         return [at for at in self.get_all_attributes() if at not in exclude]
 
     def get_attributes_with_values(self):
         """A list of all assay attributes that have values"""
-        exclude = ('alias', 'accession', 'protocolrefs', 'sampleref')
+        exclude = ('id', 'alias', 'accession', 'protocolrefs', 'sampleref')
         return [at for at in self.get_all_attributes() if getattr(self, at) and at not in exclude]
 
 
