@@ -465,6 +465,12 @@
                             }
                         }
                     }
+                },
+                "hca_bundle_uuid": {
+                    "description": "The UUID of the Human Cell Atlas assay bundle"
+                },
+                "hca_bundle_version": {
+                    "description": "The version of the Human Cell Atlas (HCA) assay bundle"
                 }
             },
             "patternProperties": {

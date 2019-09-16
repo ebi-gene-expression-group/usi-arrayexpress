@@ -180,6 +180,8 @@ class SingleCellAssay(SeqAssay):
         self.sample_barcode_read = kwargs.get("sample_barcode_read")
         self.sample_barcode_size = kwargs.get("sample_barcode_size")
         self.sample_barcode_offset = kwargs.get("sample_barcode_offset")
+        self.hca_bundle_uuid = kwargs.get("hca_bundle_uuid")
+        self.hca_bundle_version = kwargs.get("hca_bundle_version")
 
     def get_singlecell_attributes(self, invert=False):
         """A list of single-cell specific attributes that are not in the parent sequencing assay class,

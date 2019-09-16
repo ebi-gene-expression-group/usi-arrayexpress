@@ -1004,6 +1004,14 @@
           "method": "get_string_from_attribute"
         }
       }
+    },
+    "hca_bundle_uuid": {
+      "type": "string",
+      "import": {}
+    },
+    "hca_bundle_version": {
+      "type": "string",
+      "import": {}
     }
   },
   "assay_data": {
