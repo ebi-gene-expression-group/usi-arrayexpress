@@ -4,6 +4,7 @@ class Submittable:
     """Base class for all main object types"""
     def __init__(self, **kwargs):
         self.alias = kwargs.get("alias")
+        self.id = kwargs.get("id")
 
     def get_all_attributes(self):
         """Return a list of all attributes"""
