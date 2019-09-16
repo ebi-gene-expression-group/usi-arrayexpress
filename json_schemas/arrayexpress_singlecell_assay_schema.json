@@ -33,6 +33,7 @@
                 "library_source",
                 "library_strategy",
                 "library_selection",
+                "library_strand",
                 "platform_type",
                 "instrument_model",
                 "technology_type",
@@ -58,11 +59,35 @@
                 "nominal_sdev": {
                     "description": "The standard deviation of the nominal length. Decimals are allowed (e.g. 56.4) but no ranges (e.g. 34.5-42.6)."
                 },
+                "orientation": {
+                    "description": "The orientation of the two reads. 5'-3'-3'-5' for forward-reverse pairs (most common case), 5'-3'-5'-3' forward-forward pairs."
+                },
                 "platform_type": {
                     "description": "See ENA's schema"
                 },
                 "instrument_model": {
                     "description": "See ENA's schema"
+                },
+                "library_strand": {
+                    "description": "Whether the 1st or 2nd cDNA strand was sequenced. Choose 'not applicable' if the library was unstranded.",
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": ["value"],
+                        "properties": {
+                            "value": {
+                                "type": "string",
+                                "minLength": 1,
+                                "enum": [
+                                    "first strand",
+                                    "second strand",
+                                    "not applicable"
+                                ]
+                            }
+                        }
+                    }
                 },
                 "technology_type": {
                     "description": "The type of technology used, sequencing or microarray assay.",
