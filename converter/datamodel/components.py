@@ -24,11 +24,12 @@ class Contact:
         self.roles = kwargs.get("roles", [])
         self.middleInitials = kwargs.get("middleInitials")
         self.fax = kwargs.get("fax")
+        self.orcidId = kwargs.get("orcidId")
 
     def __repr__(self):
         return "{self.__class__.__name__}(firstName={self.firstName}, lastName={self.lastName}, email{self.email}, " \
                "affiliation={self.affiliation}, address={self.address}, phone={self.phone}, roles={self.roles}, " \
-               "middleInitials={self.middleInitials}, fax={self.fax})".format(self=self)
+               "middleInitials={self.middleInitials}, fax={self.fax}, orcidId={self.orcidId})".format(self=self)
 
 
 class Publication:

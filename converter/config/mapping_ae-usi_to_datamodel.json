@@ -252,6 +252,12 @@
         }
       }
     },
+    "secondary_accession": {
+      "description": "The accession number for the same study in another archive"
+    },
+    "related_experiment": {
+      "description": "Accession numbers of other studies that are related to the current submission, e.g. for multi-omics studies"
+    },
     "comments": {}
   },
   "protocol": {
@@ -1342,6 +1348,10 @@
           "method": "import_string"
         }
       }
+    },
+    "orcidId": {
+      "type": "string",
+      "import": {}
     }
   },
   "data_file": {
