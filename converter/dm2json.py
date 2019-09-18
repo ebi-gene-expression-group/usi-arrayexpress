@@ -239,7 +239,7 @@ def generate_usi_ref_object(alias, sub_info, accession=None):
     return ref_object
 
 
-def datamodel2json_conversion(submission, working_dir, logger, envelope=False):
+def datamodel2json_conversion(submission, working_dir, logger, write_envelope=False):
     """
     Take metadata in common datamodel and write JSON files
 
@@ -263,14 +263,14 @@ def datamodel2json_conversion(submission, working_dir, logger, envelope=False):
     if submission.analysis:
         envelope["analyses"] = [generate_usi_analysis_object(a, submission.info) for a in submission.analysis]
 
-    if not envelope:
+    if not write_envelope:
         # Write individual JSON files
         for submittable_type, objects in envelope.items():
             if objects:
-                logger.info("Writing JSON file for {}.".format(submittable_type))
+                logger.info("Writing JSON file for {} to {}.".format(submittable_type, working_dir))
                 write_json_file(working_dir, objects, submittable_type, submission.info)
 
     # Write submission envelope with all USI objects
-    logger.info("Writing JSON envelope file.")
+    logger.info("Writing JSON envelope file to {}.".format(working_dir))
     write_json_file(working_dir, envelope, "envelope", submission.info)
 
