@@ -53,7 +53,7 @@ def main():
     sub = data_objects_from_magetab(idf_file, sdrf_file_path, submission_type)
 
     # Dump data in common data model as USI-JSON files
-    datamodel2json_conversion(sub, outdir, logger, envelope=args.envelope)
+    datamodel2json_conversion(sub, outdir, logger, write_envelope=args.envelope)
 
 
 if __name__ == '__main__':
