@@ -239,7 +239,7 @@ def generate_usi_ref_object(alias, sub_info, accession=None):
     return ref_object
 
 
-def datamodel2json_conversion(submission, working_dir, logger):
+def datamodel2json_conversion(submission, working_dir, logger, envelope=False):
     """
     Take metadata in common datamodel and write JSON files
 
