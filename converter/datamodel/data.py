@@ -80,8 +80,8 @@ class Analysis(DataSubmittable):
     def __init__(self, **kwargs):
         DataSubmittable.__init__(self, **kwargs)
         self.samplerefs = kwargs.get("sampleref")
-        self.assayrefs = kwargs.get("assayrefs")
-        self.assaydatarefs = kwargs.get("assaydatarefs")
+        self.assayrefs = kwargs.get("assayrefs", [])
+        self.assaydatarefs = kwargs.get("assaydatarefs", [])
 
     def __repr__(self):
         return "{self.__class__.__name__}(alias={self.alias}, files={self.files}, " \

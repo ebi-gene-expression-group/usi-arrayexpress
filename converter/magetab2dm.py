@@ -623,6 +623,8 @@ def datafile_from_magetab(file_attributes):
     comments = file_attributes.get("comments", {})
     if "ArrayExpress FTP file" in comments:
         ftp_location = comments.get("ArrayExpress FTP file")
+    elif "ArrayExpress Data Matrix FTP file" in comments:
+        ftp_location = comments.get("ArrayExpress Data Matrix FTP file")
     elif "FASTQ_URI" in comments:
         ftp_location = comments.get("FASTQ_URI")
     elif "Derived ArrayExpress FTP file" in comments:

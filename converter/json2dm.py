@@ -31,6 +31,7 @@ class JSONConverter:
         """
         self.mapping = mapping
         self.import_key = import_key
+        self.unit_types = {}  # Will be used to store already discovered unit types
 
     def convert_usi_sub(self, envelope_json, submission_type=None, source_file_name=None):
         """
@@ -152,8 +153,7 @@ class JSONConverter:
     def import_lib_attribs(self, element, translation={}):
         return self.convert_submittable(element, "lib_attribs")
 
-    @staticmethod
-    def generate_attribute_from_json(element, translation={}):
+    def generate_attribute_from_json(self, element, translation={}):
         """
         Convert a USI-JSON formatted attribute to a datamodel.Attribute object
         :param element: the USI-JSON attribute object
@@ -176,7 +176,7 @@ class JSONConverter:
         unit_value = element.get("units")
         if unit_value:
             # Generate unit type as this is not a field in USI's unit model, also remove "derived" from the label
-            unit_type = re.sub("\\s*derived\\s*", "", get_term_parent("efo", unit_value), 1)
+            unit_type = self.get_unit_type(unit_value)
             # USI does not support ontology annotations for unit terms, initialising with None
             unit = Unit(value=unit_value,
                         unit_type=unit_type,
@@ -187,6 +187,14 @@ class JSONConverter:
                          unit=unit,
                          term_accession=term_accession,
                          term_source=term_source)
+
+    def get_unit_type(self, unit_value):
+        if unit_value not in self.unit_types:
+            unit_type = re.sub("\\s*derived\\s*", "", get_term_parent("efo", unit_value), 1)
+            self.unit_types[unit_value] = unit_type
+            return unit_type
+        else:
+            return self.unit_types[unit_value]
 
     @staticmethod
     def get_reference_value_from_json(element, translation={}):

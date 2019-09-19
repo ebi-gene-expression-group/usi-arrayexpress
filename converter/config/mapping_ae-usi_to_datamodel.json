@@ -1496,10 +1496,9 @@
         "ae": {
           "from_type": "string",
           "path": [
-            "attributes",
             "ftp_location"
           ],
-          "method": "get_string_from_attribute"
+          "method": "import_string"
         }
       }
     },
