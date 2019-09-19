@@ -246,6 +246,7 @@ def datamodel2json_conversion(submission, working_dir, logger, write_envelope=Fa
     :param submission: object, Submission class object that holds metadata of the whole experiment
     :param working_dir: string, directory to write files to
     :param logger: object, log handler
+    :param write_envelope: boolean, flag to package objects into one submission envelope JSON file
     :return: None
     """
 
@@ -269,8 +270,8 @@ def datamodel2json_conversion(submission, working_dir, logger, write_envelope=Fa
             if objects:
                 logger.info("Writing JSON file for {} to {}.".format(submittable_type, working_dir))
                 write_json_file(working_dir, objects, submittable_type, submission.info)
-
-    # Write submission envelope with all USI objects
-    logger.info("Writing JSON envelope file to {}.".format(working_dir))
-    write_json_file(working_dir, envelope, "envelope", submission.info)
+    else:
+        # Write submission envelope with all USI objects
+        logger.info("Writing JSON envelope file to {}.".format(working_dir))
+        write_json_file(working_dir, envelope, "envelope", submission.info)
 
