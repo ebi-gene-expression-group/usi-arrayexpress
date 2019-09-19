@@ -5,7 +5,7 @@ This script takes an IDF file as input and runs metadata conversion from MAGE-TA
 """
 
 import argparse
-import os
+from os.path import isdir, split
 
 from utils.common_utils import create_logger, file_exists
 from utils.converter_utils import get_sdrf_path, guess_submission_type
@@ -17,20 +17,30 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('idf',
                         help="name of MAGE-TAB IDF file")
+    parser.add_argument('-o', '--outdir',
+                        help="Path where to write the JSON file(s)")
+    parser.add_argument('-e', '--envelope', action='store_true',
+                        help="Option to output only one submission envelope type JSON file")
 
     args = parser.parse_args()
 
-    return args.idf
+    return args
 
 
 def main():
     process_name = "mtab2usi_conversion"
 
-    idf_file = parse_args()
+    args = parse_args()
+    idf_file = args.idf
     file_exists(idf_file)
 
+    # Output directory
+    current_dir, idf_file_name = split(idf_file)
+    outdir = current_dir
+    if args.outdir and isdir(args.outdir):
+        outdir = args.outdir
+
     # Create logger
-    current_dir, idf_file_name = os.path.split(idf_file)
     logger = create_logger(current_dir, process_name, idf_file_name)
 
     # Get path to SDRF file
@@ -43,7 +53,7 @@ def main():
     sub = data_objects_from_magetab(idf_file, sdrf_file_path, submission_type)
 
     # Dump data in common data model as USI-JSON files
-    datamodel2json_conversion(sub, current_dir, logger)
+    datamodel2json_conversion(sub, outdir, logger, write_envelope=args.envelope)
 
 
 if __name__ == '__main__':
