@@ -239,30 +239,39 @@ def generate_usi_ref_object(alias, sub_info, accession=None):
     return ref_object
 
 
-def datamodel2json_conversion(submission, working_dir, logger):
+def datamodel2json_conversion(submission, working_dir, logger, write_envelope=False):
     """
     Take metadata in common datamodel and write JSON files
 
     :param submission: object, Submission class object that holds metadata of the whole experiment
     :param working_dir: string, directory to write files to
     :param logger: object, log handler
+    :param write_envelope: boolean, flag to package objects into one submission envelope JSON file
     :return: None
     """
 
     # Dict to store USI objects to write to file:
-    json_objects = {
-        "project": generate_usi_project_object(submission.project),
-        "study": generate_usi_study_object(submission.study, submission.info),
-        "protocol": [generate_usi_protocol_object(p) for p in submission.protocol],
-        "sample": [generate_usi_sample_object(s) for s in submission.sample],
-        "assay": [generate_usi_assay_object(a, submission.info) for a in submission.assay],
-        "assay_data": [generate_usi_data_object(ad, submission.info) for ad in submission.assay_data]
+    envelope = {
+        "submission": {},
+        "projects": [generate_usi_project_object(submission.project)],
+        "studies": [generate_usi_study_object(submission.study, submission.info)],
+        "protocols": [generate_usi_protocol_object(p) for p in submission.protocol],
+        "samples": [generate_usi_sample_object(s) for s in submission.sample],
+        "assays": [generate_usi_assay_object(a, submission.info) for a in submission.assay],
+        "assayData": [generate_usi_data_object(ad, submission.info) for ad in submission.assay_data]
     }
     # Analysis is optional
     if submission.analysis:
-        json_objects["analysis"] = [generate_usi_analysis_object(a, submission.info) for a in submission.analysis]
+        envelope["analyses"] = [generate_usi_analysis_object(a, submission.info) for a in submission.analysis]
 
-    # Write individual JSON files
-    for submittable_type, objects in json_objects.items():
-        logger.info("Writing JSON file for {}.".format(submittable_type))
-        write_json_file(working_dir, objects, submittable_type, submission.info)
+    if not write_envelope:
+        # Write individual JSON files
+        for submittable_type, objects in envelope.items():
+            if objects:
+                logger.info("Writing JSON file for {} to {}.".format(submittable_type, working_dir))
+                write_json_file(working_dir, objects, submittable_type, submission.info)
+    else:
+        # Write submission envelope with all USI objects
+        logger.info("Writing JSON envelope file to {}.".format(working_dir))
+        write_json_file(working_dir, envelope, "envelope", submission.info)
+
