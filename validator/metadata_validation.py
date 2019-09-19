@@ -12,6 +12,23 @@ REGEX_DOI_FORMAT = re.compile("^10\.\d{4,9}\/\S+$")
 REGEX_FILE_NAME = re.compile(r"^[A-Za-z0-9._-]+$")
 
 
+class MetadataError:
+    """A class to hold all information about a metadata error instance"""
+    def __init__(self, **kwargs):
+        self.message = kwargs.get("message")
+        self.level = kwargs.get("level")
+        self.object_name = kwargs.get("object_name")
+        self.object_id = kwargs.get("object_id")
+        self.code = kwargs.get("code")
+
+    def as_dict(self):
+        return {"message": self.message,
+                "level": self.level,
+                "code": self.code,
+                "object_id": self.object_id,
+                "object_name": self.object_name}
+
+
 def run_protocol_checks(sub: Submission, logger):
     """Run checks on protocol objects and return list of error codes."""
 
@@ -30,54 +47,69 @@ def run_protocol_checks(sub: Submission, logger):
     found_exclusive = False
 
     if not protocols:
-        logger.error("Experiment has no protocols. At least one expected.")
-        codes.append("PROT-E01")
+        message = "Experiment has no protocols. At least one expected."
+        logger.error(message)
+        codes.append(MetadataError(level="ERROR", code="PROT-01", message=message,
+                                   object_id=sub.info.get("alias")))
         return codes
     for p in protocols:
         if p.alias:
             # Protocol names should be unique.
             if p.alias in names:
-                logger.error("Protocol name \"{}\" is not unique.".format(p.alias))
-                codes.append("PROT-E04")
+                message = "Protocol name \"{}\" is not unique.".format(p.alias)
+                logger.error(message)
+                codes.append(MetadataError(level="ERROR", code="PROT-04", message=message,
+                                           object_id=p.id, object_name=p.alias))
             names.add(p.alias)
         # Protocol must have a name
         else:
-            logger.error("Protocol found with no name. Not checking it further.")
-            codes.append("PROT-E02")
+            message = "Protocol found with no name. Not checking it further."
+            logger.error(message)
+            codes.append(MetadataError(level="ERROR", code="PROT-02", message=message, object_id=p.id))
             continue
         if p.description:
             # Protocol description should be longer than 50 characters
             if len(p.description) < 50:
-                logger.warning("Protocol \"{}\" is shorter than 50 characters.".format(p.alias))
-                codes.append("PROT-W01")
+                message = "Protocol \"{}\" is shorter than 50 characters.".format(p.alias)
+                logger.warning(message)
+                codes.append(codes.append(MetadataError(level="WARNING", code="PROT-09", message=message,
+                                                        object_id=p.id, object_name=p.alias)))
         # Protocol must have description
         else:
-            logger.error("Protocol \"{}\" has no description.".format(p.alias))
-            codes.append("PROT-E03")
+            message = "Protocol \"{}\" has no description.".format(p.alias)
+            logger.error(message)
+            codes.append(MetadataError(level="ERROR", code="PROT-03", message=message,
+                                       object_id=p.id, object_name=p.alias))
         if p.protocol_type:
             # Protocol type must be from controlled vocabulary (EFO)
             p_types.add(p.protocol_type.value)
             if p.protocol_type.value not in allowed_types:
-                logger.error("Protocol \"{}\" has a type that is not from controlled vocabulary/EFO: "
-                             "\"{}\"".format(p.alias, p.protocol_type.value))
-                codes.append("PROT-E05")
+                message = "Protocol \"{}\" has a type that is not from controlled vocabulary/EFO: " \
+                          "\"{}\"".format(p.alias, p.protocol_type.value)
+                logger.error(message)
+                codes.append(MetadataError(level="ERROR", code="PROT-05", message=message,
+                                           object_id=p.id, object_name=p.alias))
             if p.protocol_type.value in exclusive:
                 found_exclusive = True
         else:
             # Protocol must have a protocol type
-            logger.warn("Protocol \"{}\" has no protocol type.".format(p.alias))
-            codes.append("PROT-E07")
+            message = "Protocol \"{}\" has no protocol type.".format(p.alias)
+            logger.warn(message)
+            codes.append(MetadataError(level="WARNING", code="PROT-07", message=message,
+                                       object_id=p.id, object_name=p.alias))
 
     # Mandatory protocol types (for all experiment types) must be present
     for p_type in mandatory:
         if p_type not in p_types:
-            logger.error("A {} must be included.".format(p_type))
-            codes.append("PROT-E06")
+            message = "A {} must be included.".format(p_type)
+            logger.error(message)
+            codes.append(MetadataError(level="ERROR", code="PROT-06", message=message,
+                                       object_id=sub.info.get("alias")))
 
     # Every experiment must have at least one growth/treatment/sample collection protocol
     if not found_exclusive:
         logger.error("A growth, treatment or sample collection protocol must be included.")
-        codes.append("PROT-E07")
+        codes.append("PROT-08")
 
     return codes
 
