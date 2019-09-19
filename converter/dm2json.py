@@ -72,7 +72,7 @@ def generate_usi_sample_object(sample):
     sample_object['taxonId'] = sample.taxonId
 
     if sample.description:
-        sample_object['description'] = sample
+        sample_object['description'] = sample.description
 
     attributes = OrderedDict()
     for a_name, a_attrib in sample.attributes.items():
@@ -131,7 +131,7 @@ def generate_usi_data_object(assay_data, sub_info):
     ad_object["assayRefs"] = [generate_usi_ref_object(x, sub_info) for x in assay_data.assayrefs]
 
     ad_object["attributes"] = OrderedDict()
-    ad_object["attributes"]["data_type"] = assay_data.data_type
+    ad_object["attributes"]["data_type"] = generate_usi_attribute_entry(assay_data.data_type)
 
     return ad_object
 
@@ -145,7 +145,7 @@ def generate_usi_analysis_object(analysis, sub_info):
     analysis_object["protocolUses"] = [{"protocolRef": generate_usi_ref_object(p, sub_info)} for p in analysis.protocolrefs]
 
     analysis_object["attributes"] = OrderedDict()
-    analysis_object["attributes"]["data_type"] = analysis.data_type
+    analysis_object["attributes"]["data_type"] = generate_usi_attribute_entry(analysis.data_type)
 
     return analysis_object
 
@@ -186,7 +186,7 @@ def generate_usi_attribute_entry(attribute_info):
     attribute_object = list()
     if isinstance(attribute_info, dict):
         # Initialise the dictionary (with the value lookup) as the first item in the list
-        attribute_object.append(OrderedDict([("value", attribute_info.get("value"))]))
+        attribute_object.append({"value": attribute_info.get("value")})
         if attribute_info.get("unit"):
             unit_info = attribute_info.get("unit")
             attribute_object[0]["units"] = unit_info.get("value")
@@ -199,7 +199,7 @@ def generate_usi_attribute_entry(attribute_info):
             term_acc = attribute_info.get("term_accession")
             attribute_object[0]["terms"] = [{"url": get_efo_url(term_acc)}]
     elif isinstance(attribute_info, Attribute):
-        attribute_object.append(OrderedDict([("value", attribute_info.value)]))
+        attribute_object.append({"value": attribute_info.value})
         if attribute_info.unit:
             unit_info = attribute_info.unit
             attribute_object[0]["units"] = unit_info.value
