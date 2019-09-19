@@ -210,7 +210,7 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
         processed_data = [px for px in sub.analysis if assay_data.alias in px.assaydatarefs]
     # Try to get processed data files that belong to the assay object instead
     if not processed_data and assay:
-        processed_data = [px for px in sub.analysis if assay.alias in px.assayrefs]
+        processed_data = [px for px in sub.analysis if assay.alias in px.assayrefs or assay.alias in px.assaydatarefs]
     # Collect file names and turn into tuple list
     processed_data_values = []
     for px in processed_data:
