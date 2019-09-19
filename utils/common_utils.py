@@ -39,6 +39,14 @@ def file_exists(input_file, logger=None):
         else:
             print(log_message)
         sys.exit()
+    return True
+
+
+def dir_exists(dir_name):
+    if not os.path.isdir(dir_name):
+        print("Invalid input. Directory does not exist: {}".format(dir_name))
+        sys.exit()
+    return True
 
 
 def is_valid_url(url, logger=None):

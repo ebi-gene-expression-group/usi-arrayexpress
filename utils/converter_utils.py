@@ -12,7 +12,6 @@ from utils.common_utils import file_exists
 from utils.eutils import esearch
 
 
-USI_JSON_DIRECTORY = "usijson"
 SDRF_FILE_NAME_REGEX = r"^\s*SDRF\s*File"
 DEFAULT_DATA_DIRECTORY = "unpacked"
 
@@ -43,7 +42,7 @@ def usi_object_file_name(object_type, study_info):
 def write_json_file(wd, json_object, object_type, sub_info):
 
     json_file_name = usi_object_file_name(object_type, sub_info)
-    json_file_path = os.path.join(wd, USI_JSON_DIRECTORY, json_file_name)
+    json_file_path = os.path.join(wd, json_file_name)
     os.makedirs(os.path.dirname(json_file_path), exist_ok=True)
     with codecs.open(json_file_path, 'w', encoding='utf-8') as jf:
         json.dump(json_object, jf)

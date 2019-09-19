@@ -96,7 +96,7 @@ def generate_sdrf(sub):
 
         for assay in assays:
             # Reformat protocol REFs for edges between nodes
-            all_protocols.update((sub.get_protocol(pref) for pref in assay.protocolrefs))
+            all_protocols.update((sub.get_protocol(pref) for pref in assay.protocolrefs if sub.get_protocol(pref)))
             protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
 
             if submission_type == "microarray":
@@ -210,7 +210,7 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
         processed_data = [px for px in sub.analysis if assay_data.alias in px.assaydatarefs]
     # Try to get processed data files that belong to the assay object instead
     if not processed_data and assay:
-        processed_data = [px for px in sub.analysis if assay.alias in px.assayrefs]
+        processed_data = [px for px in sub.analysis if assay.alias in px.assayrefs or assay.alias in px.assaydatarefs]
     # Collect file names and turn into tuple list
     processed_data_values = []
     for px in processed_data:
@@ -229,8 +229,9 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
     factor_values = []
     # Look up factor in sample attributes and turn into ordered dict with unit/term columns
     for f in factors:
-        factor_values.extend(
-            flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value"))
+        if f.value in sample.attributes:
+            factor_value = flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value")
+            factor_values.extend(factor_value)
 
     protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
 
