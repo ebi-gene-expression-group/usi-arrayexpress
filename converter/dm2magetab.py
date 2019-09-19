@@ -231,7 +231,7 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
     for f in factors:
         if f.value in sample.attributes:
             factor_value = flatten_sample_attribute(f.value, sample.attributes.get(f.value), "Factor Value")
-        factor_values.extend(factor_value)
+            factor_values.extend(factor_value)
 
     protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
 

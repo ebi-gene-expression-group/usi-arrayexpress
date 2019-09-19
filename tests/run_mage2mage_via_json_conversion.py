@@ -86,7 +86,7 @@ def main():
 
     # Read JSON envelope file
     json_file = os.path.join(outdir, usi_object_file_name("envelope", sub.info))
-    logger.debug("JSON file name: ", json_file)
+    logger.debug("JSON file name: {}".format(json_file))
     json_data = read_json_file(json_file)
 
     # Convert from JSON to data model
