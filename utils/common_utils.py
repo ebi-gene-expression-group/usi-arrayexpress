@@ -192,6 +192,14 @@ def file_exists(input_file):
     if not os.path.exists(input_file):
         print("Invalid input. File does not exist: {}".format(input_file))
         sys.exit()
+    return True
+
+
+def dir_exists(dir_name):
+    if not os.path.isdir(dir_name):
+        print("Invalid input. Directory does not exist: {}".format(dir_name))
+        sys.exit()
+    return True
 
 
 if __name__ == '__main__':
