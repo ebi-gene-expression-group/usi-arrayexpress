@@ -47,7 +47,8 @@
             "type": "object",
             "required": [
               "experiment_type",
-              "experimental_factor"
+              "experimental_factor",
+              "submission_type"
             ],
             "additionalProperties": false,
             "properties": {
@@ -77,6 +78,12 @@
                     }
                   }
                 }
+              },
+              "related_experiment": {
+                "description": "Accession numbers of other studies that are related to the current submission, e.g. for multi-omics studies. These accessions can be from ArrayExpress or other archives such as PRIDE, ENA etc."
+              },
+              "secondary_accession": {
+                "description": "The accession number for the same study in another archive. E.g. ENA study accession for a sequencing ArrayExpress submission."
               },
               "submission_type": {
                 "description": "The type of ArrayExpress submission, microarray, sequencing or single-cell experiment",

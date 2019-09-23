@@ -1,5 +1,16 @@
 {
   "project": {
+    "id": {
+      "description": "UUID of the project submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
     "alias" : {
       "description": "unique project name (auto-generated from MAGE-TAB file name)",
       "type": "string",
@@ -7,7 +18,7 @@
         "ae": {
           "parent": "project",
           "path": ["alias"],
-          "from_type": "sting",
+          "from_type": "string",
           "method": "import_string"
         }
       }
@@ -19,7 +30,7 @@
         "ae": {
           "parent": "project",
           "path": ["accession"],
-          "from_type": "sting",
+          "from_type": "string",
           "method": "import_string"
         }
       }
@@ -31,7 +42,7 @@
         "ae": {
           "parent": "project",
           "path": ["title"],
-          "from_type": "sting",
+          "from_type": "string",
           "method": "import_string"
         }
       }
@@ -43,7 +54,7 @@
         "ae": {
           "parent": "project",
           "path": ["description"],
-          "from_type": "sting",
+          "from_type": "string",
           "method": "import_string"
         }
       }
@@ -55,7 +66,7 @@
         "ae": {
           "parent": "project",
           "path": ["releaseDate"],
-          "from_type": "sting",
+          "from_type": "string",
           "method": "import_string"
         }
       }
@@ -92,6 +103,17 @@
     }
   },
   "study": {
+    "id": {
+      "description": "UUID of the study submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
     "alias": {
       "description": "UUID of the USI submission",
       "type": "string",
@@ -252,9 +274,26 @@
         }
       }
     },
+    "secondary_accession": {
+      "description": "The accession number for the same study in another archive"
+    },
+    "related_experiment": {
+      "description": "Accession numbers of other studies that are related to the current submission, e.g. for multi-omics studies"
+    },
     "comments": {}
   },
   "protocol": {
+    "id": {
+      "description": "UUID of the protocol submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
     "alias": {
       "description": "protocol accession or unique name in experiment",
       "type": "string",
@@ -334,6 +373,17 @@
     }
   },
   "sample": {
+    "id": {
+      "description": "UUID of the sample submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
     "alias": {
       "type": "string",
       "import": {
@@ -406,6 +456,17 @@
     }
   },
   "microarray_assay": {
+    "id": {
+      "description": "UUID of the microarray assay submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
     "alias": {
       "description": "unique name of the assay",
       "type": "string",
@@ -495,6 +556,17 @@
     }
   },
   "sequencing_assay": {
+    "id": {
+      "description": "UUID of the sequencing assay submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
     "alias": {
       "description": "unique name of the assay",
       "type": "string",
@@ -664,6 +736,17 @@
     }
   },
   "singlecell_assay": {
+    "id": {
+      "description": "UUID of the single cell assay submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
     "alias": {
       "description": "unique name of the assay",
       "type": "string",
@@ -1004,9 +1087,28 @@
           "method": "get_string_from_attribute"
         }
       }
+    },
+    "hca_bundle_uuid": {
+      "type": "string",
+      "import": {}
+    },
+    "hca_bundle_version": {
+      "type": "string",
+      "import": {}
     }
   },
   "assay_data": {
+    "id": {
+      "description": "UUID of the assay data submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
      "alias": {
        "description": "unique name in the experiment (Assay Name in SDRF)",
        "type": "string",
@@ -1085,6 +1187,17 @@
     }
   },
   "analysis": {
+    "id": {
+      "description": "UUID of the analysis submittable",
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["id"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
+    },
     "alias": {
       "description": "unique name in the experiment (auto-generated from processed file name in SDRF)",
       "type": "string",
@@ -1334,6 +1447,10 @@
           "method": "import_string"
         }
       }
+    },
+    "orcidId": {
+      "type": "string",
+      "import": {}
     }
   },
   "data_file": {
@@ -1385,12 +1502,12 @@
         }
       }
     },
-    "read": {
+    "read_type": {
       "description": "The type of read for multiplexed single cell sequence files: read1/2 or index1/2",
       "type": "string",
       "import": {
         "ae": {
-          "path": ["attributes", "read"]
+          "path": ["attributes", "read_type"]
         }
       }
     }
