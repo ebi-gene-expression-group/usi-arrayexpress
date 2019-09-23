@@ -33,7 +33,7 @@ class JSONConverter:
         self.import_key = import_key
         self.unit_types = {}  # Will be used to store already discovered unit types
 
-    def convert_usi_sub(self, envelope_json, submission_type=None, source_file_name=None):
+    def convert_submission(self, envelope_json, submission_type=None, source_file_name=None):
         """
         Converter that takes a JSON as input and converts it to a Submission class object
         based on the specifications in the mapping file
@@ -42,20 +42,28 @@ class JSONConverter:
         :param source_file_name: name of the original metadata file
         :return: Submission object
         """
-        # We only take the first project in the list
-        project_json = next(iter(envelope_json.get("projects", [])), {})
+
+        # The submittable section of the mapping describes the top level input mapping,
+        # from here we get the sub-sections of the JSON matching with the main classes
+        submittable_mapping = self.mapping.get("submittables", {})
+
+        # Project
+        project_json = self.import_submittable(envelope_json, submittable_mapping.get("project", {}))
         project = Project(**self.convert_submittable(project_json, "project"))
 
-        # We only take the first study in the list
-        study_json = next(iter(envelope_json.get("studies", [])), {})
+        # Study
+        study_json = self.import_submittable(envelope_json, submittable_mapping.get("study", {}))
         study = Study(**self.convert_submittable(study_json, "study"))
 
-        protocol_json = envelope_json.get("protocols", [])
+        # Protocols
+        protocol_json = self.import_submittable(envelope_json, submittable_mapping.get("protocol", {}))
         protocols = [Protocol(**self.convert_submittable(p, "protocol")) for p in protocol_json]
 
-        samples_json = envelope_json.get("samples", [])
+        # Samples
+        samples_json = self.import_submittable(envelope_json, submittable_mapping.get("sample", {}))
         samples = [Sample(**self.convert_submittable(s, "sample")) for s in samples_json]
 
+        # Assays
         # To pick the right assay sub-type we need to know the submission type
         if not submission_type:
             submission_type = study.submission_type
@@ -65,26 +73,33 @@ class JSONConverter:
                 if not submission_type:
                     raise Exception("Cannot identify submission type.")
 
+        assay_json = self.import_submittable(envelope_json, submittable_mapping.get("assay", {}))
         assays = []
         if submission_type == "microarray":
             assays = [MicroarrayAssay(**self.convert_submittable(a, "microarray_assay"))
-                      for a in envelope_json.get("assays", [])]
+                      for a in assay_json]
         elif submission_type == "sequencing":
             assays = [SeqAssay(**self.convert_submittable(a, "sequencing_assay"))
-                      for a in envelope_json.get("assays", [])]
+                      for a in assay_json]
         elif submission_type == "singlecell":
             assays = [SingleCellAssay(**self.convert_submittable(a, "singlecell_assay"))
-                      for a in envelope_json.get("assays", [])]
+                      for a in assay_json]
 
+        # Assay data
+        ad_json = self.import_submittable(envelope_json, submittable_mapping.get("assay_data", {}))
         assay_data = [AssayData(**self.convert_submittable(ad, "assay_data"))
-                      for ad in envelope_json.get("assayData", [])]
+                      for ad in ad_json]
 
+        # Anaysis
+        analysis_json = self.import_submittable(envelope_json, submittable_mapping.get("analysis", {}))
         analysis = [Analysis(**self.convert_submittable(a, "analysis"))
-                    for a in envelope_json.get("analyses", [])]
+                    for a in analysis_json]
 
+        # Submission info
+        submission_json = self.import_submittable(envelope_json, submittable_mapping.get("submission", {}))
         sub_info = {
-            "team": envelope_json.get("submission", {}).get("team", {}).get("name"),
-            "alias": envelope_json.get("submission", {}).get("id", {}),
+            "team": submission_json.get("submission", {}).get("team", {}).get("name"),
+            "alias": submission_json.get("submission", {}).get("id", {}),
             "submission_type": submission_type,
             "metadata": source_file_name
         }
@@ -103,28 +118,47 @@ class JSONConverter:
 
         # Go through attributes in the config
         for attribute, attribute_info in self.mapping.get(submittable_name, {}).items():
-            # Get information how to convert
-            convert_function = None
-            mapping_info = attribute_info.get("import", {}).get(self.import_key, {})
-            path = mapping_info.get("path", [])
-            method = mapping_info.get("method", "")
-            translation = mapping_info.get("translation", {})
-            if method:
-                convert_function = getattr(self, method)
-            if path and convert_function:
-                target_object = self.interpret_path(path, submittable_object)
-                if isinstance(target_object, list):
-                    if attribute_info.get("type") in ["string", "attribute_object"]:
-                        # Take the first entry
-                        submittable_attributes[attribute] = next(iter([convert_function(o, translation=translation)
-                                                                       for o in target_object]))
-                    else:
-                        submittable_attributes[attribute] = [convert_function(o, translation=translation)
-                                                             for o in target_object]
-                elif target_object:
-                    submittable_attributes[attribute] = convert_function(target_object, translation=translation)
+            target_object, convert_function, translation = self.prepare_for_import(submittable_object, attribute_info)
+            if isinstance(target_object, list):
+                if attribute_info.get("type") in ["string", "attribute_object", "object"]:
+                    # Take the first entry
+                    submittable_attributes[attribute] = next(iter([convert_function(o, translation=translation)
+                                                                   for o in target_object]))
+                elif attribute_info.get("type") in ["array", "list"]:
+                    submittable_attributes[attribute] = [convert_function(o, translation=translation)
+                                                         for o in target_object]
+            elif target_object:
+                submittable_attributes[attribute] = convert_function(target_object, translation=translation)
 
         return submittable_attributes
+
+    def import_submittable(self, envelope_json, submittable_mapping):
+        """A simple import function that does not apply conversion of list objects."""
+        submittable = {}
+        target_object, convert_function, translation = self.prepare_for_import(envelope_json, submittable_mapping)
+        if target_object and convert_function:
+            submittable = convert_function(target_object, translation=translation)
+
+        return submittable
+
+    def prepare_for_import(self, submittable_object, attribute_info):
+        """A helper function that interprets the import/conversion instructions from the mapping config
+        and fetches the target object from the input JSON.
+        :param submittable_object: the input JSON
+        :param attribute_info: the JSON formatted "import" definition
+        """
+        target_object = None
+        convert_function = None
+        mapping_info = attribute_info.get("import", {}).get(self.import_key, {})
+        path = mapping_info.get("path", [])
+        method = mapping_info.get("method", "")
+        translation = mapping_info.get("translation", {})
+        if method:
+            convert_function = getattr(self, method)
+            if path and convert_function:
+                target_object = self.interpret_path(path, submittable_object)
+
+        return target_object, convert_function, translation
 
     def interpret_path(self, path, json_object):
         """
@@ -189,6 +223,9 @@ class JSONConverter:
                          term_source=term_source)
 
     def get_unit_type(self, unit_value):
+        """Look up a unit term in EFO and return the parent term as 'unit type'.
+        Units which have already been looked up previously are stored in the converter's unit_types dictionary,
+        to reduce number of requests being made."""
         if unit_value not in self.unit_types:
             unit_type = re.sub("\\s*derived\\s*", "", get_term_parent("efo", unit_value), 1)
             self.unit_types[unit_value] = unit_type
@@ -224,4 +261,16 @@ class JSONConverter:
 
         return OrderedDict([(category, self.generate_attribute_from_json(attribute[0]))
                             for category, attribute in sample_attributes.items()])
+
+    @staticmethod
+    def get_first_object_from_list(input_json,  translation={}):
+        """Return the first object from a list or an empty dictionary if the list is empty."""
+        return next(iter(input_json), [])
+
+    @staticmethod
+    def import_as_is(input_json, translation={}):
+        """Return the object as is."""
+        return input_json
+
+
 

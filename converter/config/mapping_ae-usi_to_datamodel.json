@@ -1511,8 +1511,71 @@
         }
       }
     }
+  },
+  "submittables": {
+    "project": {
+      "import": {
+        "ae": {
+          "path": ["projects"],
+          "method": "get_first_object_from_list"
+        }
+      }
+    },
+    "study": {
+      "import": {
+        "ae": {
+          "path": ["studies"],
+          "method": "get_first_object_from_list"
+        }
+      }
+    },
+    "protocol": {
+      "import": {
+        "ae": {
+          "path": ["protocols"],
+          "method": "import_as_is"
+        }
+      }
+    },
+    "sample": {
+      "import": {
+        "ae": {
+          "path": ["samples"],
+          "method": "import_as_is"
+        }
+      }
+    },
+    "assay": {
+      "import": {
+        "ae": {
+          "path": ["assays"],
+          "method": "import_as_is"
+        }
+      }
+    },
+    "assay_data": {
+      "import": {
+        "ae": {
+          "path": ["assayData"],
+          "method": "import_as_is"
+        }
+      }
+    },
+    "analysis": {
+      "import": {
+        "ae": {
+          "path": ["analyses"],
+          "method": "import_as_is"
+        }
+      }
+    },
+    "submission": {
+      "import": {
+        "ae": {
+          "path": ["submission"],
+          "method": "import_as_is"
+        }
+      }
+    }
   }
 }
-
-
-

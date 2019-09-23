@@ -93,7 +93,7 @@ def main():
     mapping_file = pkg_resources.resource_string("converter", "config/mapping_ae-usi_to_datamodel.json")
     mapping = json.loads(mapping_file)
     ae_converter = JSONConverter(mapping, import_key="ae")
-    sub2 = ae_converter.convert_usi_sub(json_data, source_file_name=json_file)
+    sub2 = ae_converter.convert_submission(json_data, source_file_name=json_file)
 
     # Run metadata validation again
     error_codes = []
