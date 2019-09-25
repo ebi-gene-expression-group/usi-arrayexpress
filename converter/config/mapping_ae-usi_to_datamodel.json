@@ -334,6 +334,20 @@
         }
       }
     },
+    "projectref": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["projectRef"],
+          "from_type": "ref_object",
+          "method": "get_reference_value_from_json"
+        },
+        "hca": {
+          "path": [],
+          "method": "placeholder"
+        }
+      }
+    },
     "protocolrefs": {
       "description": "protocol accessions/name used in the study",
       "type": "array",
@@ -370,10 +384,12 @@
       }
     },
     "secondary_accession": {
-      "description": "The accession number for the same study in another archive"
+      "description": "The accession number for the same study in another archive",
+      "import":{}
     },
     "related_experiment": {
-      "description": "Accession numbers of other studies that are related to the current submission, e.g. for multi-omics studies"
+      "description": "Accession numbers of other studies that are related to the current submission, e.g. for multi-omics studies",
+      "import":{}
     },
     "comments": {}
   },
