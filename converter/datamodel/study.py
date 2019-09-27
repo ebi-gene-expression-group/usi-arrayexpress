@@ -1,5 +1,5 @@
-import os
-import re
+"""The study class"""
+
 from typing import List
 
 from converter.datamodel.submittable import AccessionedSubmittable
@@ -75,37 +75,3 @@ class Study(AccessionedSubmittable):
                "experiment_type={self.experiment_type}, date_of_experiment={self.date_of_experiment}, " \
                "submission_type={self.submission_type}, secondary_accession={self.secondary_accession}, " \
                "related_experiment={self.related_experiment}, comments={self.comments})".format(self=self)
-
-    @classmethod
-    def from_magetab(cls, study_info):
-        accession = study_info.get("accession")
-        idf_file = os.path.basename(study_info.get("idf_filename", ""))
-        alias = re.sub(r"\.idf\.txt$", "", idf_file)
-        projectref = "project_" + alias
-        title = study_info.get("title")
-        description = study_info.get("description")
-        ef = study_info.get("experimental_factor", [])
-        ef_objects = [Attribute(value=d.get("experimental_factor"),
-                                unit=None,
-                                term_accession=d.get("term_accession"),
-                                term_source=d.get("term_source")) for d in ef]
-        ed = study_info.get("experimental_design", [])
-        ed_objects = [Attribute(value=d.get("experimental_design"),
-                                unit=None,
-                                term_accession=d.get("term_accession"),
-                                term_source=d.get("term_source")) for d in ed]
-        protocolrefs = study_info.get("protocolRefs", [])
-        date_of_experiment = study_info.get("date_of_experiment", None)
-        comments = study_info.get("comments", {})
-        experiment_type = comments.get("experiment_type", [])
-
-        return cls(alias=alias,
-                   accession=accession,
-                   title=title,
-                   description=description,
-                   protocolrefs=protocolrefs,
-                   projectref=projectref,
-                   experimental_factor=ef_objects,
-                   experimental_design=ed_objects,
-                   experiment_type=experiment_type,
-                   date_of_experiment=date_of_experiment)

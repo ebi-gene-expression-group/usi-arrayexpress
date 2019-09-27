@@ -1,5 +1,6 @@
+"""The classes for the different assay types"""
+
 from converter.datamodel.submittable import DependentSubmittable
-from utils.converter_utils import remove_duplicates, get_controlled_vocabulary
 
 
 class Assay(DependentSubmittable):
@@ -48,31 +49,6 @@ class MicroarrayAssay(Assay):
                "protocolrefs={self.protocolrefs}, sampleref={self.sampleref}, " \
                "label={self.label}, array_design={self.array_design})".format(self=self)
 
-    @classmethod
-    def from_magetab(cls, le_attributes, extract_attributes, assay_attributes):
-        """Intialise assay attributes from MAGE-TAB data dicts.
-        The central node for the microarray assay is the Labeled Extract Name."""
-
-        technology_type = remove_duplicates([a.get("technology_type") for a in assay_attributes])
-
-        # Get all protocol refs
-        protocolrefs = []
-        for a in assay_attributes:
-            protocolrefs.extend(a.get("protocol_ref"))
-        protocolrefs.extend(extract_attributes.get("protocol_ref", []))
-        protocolrefs.extend(le_attributes.get("protocol_ref", []))
-        protocolrefs = remove_duplicates(protocolrefs)
-
-        # Get Array design REF, we are only expecting one unique per extract
-        array_design = [a.get("array_design") for a in assay_attributes]
-
-        return cls(alias=le_attributes.get("name"),
-                   technology_type=technology_type[0],
-                   protocolrefs=protocolrefs,
-                   sampleref=extract_attributes.get("sample_ref"),
-                   label=le_attributes.get("label"),
-                   array_design=array_design[0])
-
 
 class SeqAssay(Assay):
     """
@@ -106,53 +82,6 @@ class SeqAssay(Assay):
                "orientation={self.orientation}, nominal_length={self.nominal_length}, " \
                "nominal_sdev={self.nominal_sdev}, platform_type={self.platform_type}, " \
                "instrument_model={self.instrument_model})".format(self=self)
-
-    @classmethod
-    def from_magetab(cls, extract_attributes, assay_attributes, protocols):
-        """Intialise assay attributes from MAGE-TAB data dicts.
-        The central node for the sequencing assay is the Extract Name."""
-
-        # Get library attributes from extract comments
-        comments = extract_attributes.get("comments")
-        lib_attrib_cv = get_controlled_vocabulary("sdrf_comments_ena")
-        lib_attrib_cv.update(get_controlled_vocabulary("sdrf_comments_singlecell"))
-        lib_attribs = {t: comments[a] for a, t in lib_attrib_cv.items() if comments.get(a)}
-
-        # Get technology type(s) from assay attributes
-        technology_type = remove_duplicates([a.get("technology_type", "") for a in assay_attributes])
-        if len(technology_type) > 0:
-            technology_type = technology_type[0]
-
-        # Get accession from ENA Experiment in assay comments
-        accession = remove_duplicates([a.get('comments', {}).get('ENA_EXPERIMENT', "") for a in assay_attributes])
-        if len(accession) == 1:
-            accession = accession[0]
-        #else: report ERROR
-
-        # Get all protocol refs
-        protocolrefs = []
-        for a in assay_attributes:
-            protocolrefs.extend(a.get("protocol_ref"))
-        protocolrefs.extend(extract_attributes.get("protocol_ref", []))
-        protocolrefs = remove_duplicates(protocolrefs)
-
-        # Get platform and instrument from sequencing protocol
-        for p in protocols:
-            if p.get("title") in protocolrefs and p.get("protocol_type") == "nucleic acid sequencing protocol":
-                hardware = p.get("hardware")
-                lib_attribs["instrument_model"] = hardware
-                # TODO: need to look up the platform type from ENA's controlled vocab
-                # Using ILLUMINA as placeholder for now as it fits 90% of cases
-                lib_attribs["platform_type"] = "ILLUMINA"
-                # Expecting only one sequencing protocol per assay
-                break
-
-        return cls(alias=extract_attributes.get("name"),
-                   accession=accession,
-                   technology_type=technology_type,
-                   protocolrefs=protocolrefs,
-                   sampleref=extract_attributes.get("sample_ref"),
-                   **lib_attribs)
 
 
 class SingleCellAssay(SeqAssay):

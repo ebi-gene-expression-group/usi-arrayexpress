@@ -1,8 +1,6 @@
-from collections import OrderedDict
+"""The sample class"""
 
 from converter.datamodel.submittable import AccessionedSubmittable
-from converter.datamodel.components import Attribute, Unit
-from utils.converter_utils import get_taxon
 
 
 class Sample(AccessionedSubmittable):
@@ -30,47 +28,3 @@ class Sample(AccessionedSubmittable):
         return "{self.__class__.__name__}(alias={self.alias}, accession={self.accession}, taxon={self.taxon}, " \
                "taxonId={self.taxonId}, material_type={self.material_type}, description={self.description}, " \
                "attributes={self.attributes})".format(self=self)
-
-    @classmethod
-    def from_magetab(cls, sample_attributes):
-        alias = sample_attributes.get("name")
-        description = sample_attributes.get("description")
-        material_type = sample_attributes.get("material_type")
-
-        comments = sample_attributes.get("comments")
-        accession = comments.get("BioSD_SAMPLE")
-
-        characteristics = sample_attributes.get("characteristics")
-        factors = sample_attributes.get("factors")
-        organism = characteristics.get("organism", {})
-        taxon = organism.get("value")
-        taxonId = get_taxon(taxon)
-
-        # Note this will overwrite the characteristics values if a factor is also a characteristics
-        raw_attributes = characteristics.copy()
-        raw_attributes.update(factors)
-
-        attributes = OrderedDict()
-        for c_name, c_attrib in raw_attributes.items():
-            new_unit = None
-            if "unit" in c_attrib:
-                unit_attrib = c_attrib.get("unit")
-                new_unit = Unit(value=unit_attrib.get("value"),
-                                unit_type=unit_attrib.get("unit_type"),
-                                term_accession=unit_attrib.get("term_accession"),
-                                term_source=unit_attrib.get("term_source"))
-
-            attributes[c_name] = Attribute(value=c_attrib.get("value"),
-                                           unit=new_unit,
-                                           term_accession=c_attrib.get("term_accession"),
-                                           term_source=c_attrib.get("term_source"))
-
-        return cls(alias=alias,
-                   accession=accession,
-                   taxon=taxon,
-                   taxonId=taxonId,
-                   attributes=attributes,
-                   material_type=material_type,
-                   description=description)
-
-

@@ -1,3 +1,5 @@
+"""The submission class"""
+
 from collections import OrderedDict
 from typing import List, Union
 

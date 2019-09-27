@@ -1,6 +1,6 @@
-from converter.datamodel.components import Attribute
+"""The protocol class"""
+
 from converter.datamodel.submittable import AccessionedSubmittable
-from utils.converter_utils import is_accession
 
 
 class Protocol(AccessionedSubmittable):
@@ -37,25 +37,3 @@ class Protocol(AccessionedSubmittable):
             if a in ae_attributes and all_values[a]:
                 found_attributes.append(a)
         return found_attributes
-
-    @classmethod
-    def from_magetab(cls, protocol_dict):
-        alias = protocol_dict.get("title")
-        if is_accession(alias):
-            accession = alias
-        else:
-            accession = None
-        description = protocol_dict.get("description")
-        hardware = protocol_dict.get("hardware")
-        software = protocol_dict.get("software")
-        protocol_type = Attribute(value=protocol_dict.get("protocol_type"),
-                                  unit=None,
-                                  term_accession=protocol_dict.get("term_accession"),
-                                  term_source=protocol_dict.get("term_source"))
-
-        return cls(alias=alias,
-                   accession=accession,
-                   description=description,
-                   protocol_type=protocol_type,
-                   hardware=hardware,
-                   software=software)
