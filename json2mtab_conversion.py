@@ -23,6 +23,8 @@ def parse_args():
                         help="Path where to write the MAGE-TAB files")
     parser.add_argument('-v', '--verbose', action='store_const', const=10, default=20,
                         help="Option to output detailed logging (debug level).")
+    parser.add_argument('-k', '--key', default='ae',
+                        help="The import key used to determine the conversion rules (default is 'ae')")
     args = parser.parse_args()
 
     return args
@@ -58,7 +60,7 @@ def main():
     mapping_file = path.join(wd, "converter", "config", "mapping_ae-usi_to_datamodel.json")
     mapping = read_json_file(mapping_file)
     ae_converter = json2dm.JSONConverter(mapping, import_key="ae")
-    sub = ae_converter.convert_usi_sub(json_data, source_file_name=json_file)
+    sub = ae_converter.convert_submission(json_data, source_file_name=json_file)
 
     # Generate IDF dictionary
     logger.debug("Generating IDF file")

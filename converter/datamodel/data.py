@@ -24,7 +24,7 @@ class AssayData(DataSubmittable):
 
     def __init__(self, **kwargs):
         DataSubmittable.__init__(self, **kwargs)
-        self.assayrefs = kwargs.get("assayrefs")
+        self.assayrefs = kwargs.get("assayrefs", [])
         self.accession = kwargs.get("accession")
 
     def __repr__(self):

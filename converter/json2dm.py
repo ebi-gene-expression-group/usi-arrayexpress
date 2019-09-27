@@ -33,7 +33,7 @@ class JSONConverter:
         self.import_key = import_key
         self.unit_types = {}  # Will be used to store already discovered unit types
 
-    def convert_usi_sub(self, envelope_json, submission_type=None, source_file_name=None):
+    def convert_submission(self, envelope_json, submission_type=None, source_file_name=None):
         """
         Converter that takes a JSON as input and converts it to a Submission class object
         based on the specifications in the mapping file
@@ -189,6 +189,9 @@ class JSONConverter:
                          term_source=term_source)
 
     def get_unit_type(self, unit_value):
+        """Look up a unit term in EFO and return the parent term as 'unit type'.
+        Units which have already been looked up previously are stored in the converter's unit_types dictionary,
+        to reduce number of requests being made."""
         if unit_value not in self.unit_types:
             unit_type = re.sub("\\s*derived\\s*", "", get_term_parent("efo", unit_value), 1)
             self.unit_types[unit_value] = unit_type
@@ -224,4 +227,22 @@ class JSONConverter:
 
         return OrderedDict([(category, self.generate_attribute_from_json(attribute[0]))
                             for category, attribute in sample_attributes.items()])
+
+    def generate_attribute_from_string(self, element, translation={}):
+        return Attribute(value=self.import_string(element, translation))
+
+    def get_list_from_string(self, element, translation={}):
+        return [self.import_string(element, translation)]
+
+    @staticmethod
+    def get_first_object_from_list(input_json,  translation={}):
+        """Return the first object from a list or an empty dictionary if the list is empty."""
+        return next(iter(input_json), [])
+
+    @staticmethod
+    def import_as_is(input_json, translation={}):
+        """Return the object as is."""
+        return input_json
+
+
 
