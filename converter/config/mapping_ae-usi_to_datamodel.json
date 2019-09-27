@@ -16,7 +16,11 @@
       "type": "string",
       "import": {
         "ae": {
-          "parent": "project",
+          "path": ["alias"],
+          "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
           "path": ["alias"],
           "from_type": "string",
           "method": "import_string"
@@ -28,7 +32,11 @@
       "type": "string",
       "import": {
         "ae": {
-          "parent": "project",
+          "path": ["accession"],
+          "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
           "path": ["accession"],
           "from_type": "string",
           "method": "import_string"
@@ -40,7 +48,11 @@
       "type": "string",
       "import": {
         "ae": {
-          "parent": "project",
+          "path": ["title"],
+          "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
           "path": ["title"],
           "from_type": "string",
           "method": "import_string"
@@ -56,6 +68,12 @@
           "path": ["description"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "parent": "project",
+          "path": ["description"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
@@ -64,7 +82,11 @@
       "type": "string",
       "import": {
         "ae": {
-          "parent": "project",
+          "path": ["releaseDate"],
+          "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
           "path": ["releaseDate"],
           "from_type": "string",
           "method": "import_string"
@@ -79,7 +101,11 @@
       },
       "import": {
         "ae": {
-          "parent": "project",
+          "path" : ["publications"],
+          "from_type": "array",
+          "method": "import_publication"
+        },
+        "hca": {
           "path" : ["publications"],
           "from_type": "array",
           "method": "import_publication"
@@ -94,8 +120,12 @@
       },
       "import": {
         "ae": {
-          "parent": "project",
           "path" : ["contacts"],
+          "from_type": "array",
+          "method": "import_contact"
+        },
+        "hca": {
+          "path" : ["contact"],
           "from_type": "array",
           "method": "import_contact"
         }
@@ -115,14 +145,16 @@
       }
     },
     "alias": {
-      "description": "UUID of the USI submission",
+      "description": "Study alias",
       "type": "string",
       "import": {
         "ae": {
-          "parent": "study",
-          "path": [
-            "alias"
-          ],
+          "path": ["alias"],
+          "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
+          "path": ["alias"],
           "from_type": "string",
           "method": "import_string"
         }
@@ -133,21 +165,29 @@
       "type": "string",
       "import": {
         "ae": {
-          "parent": "study",
-          "path": [
-            "accession"
-          ],
+          "path": ["accession"],
+          "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
+          "path": ["accession"],
           "from_type": "string",
           "method": "import_string"
         }
       }
     },
     "title": {
-      "description": "submitter provided study description",
+      "description": "Submitter provided study description",
       "type": "string",
       "import": {
         "ae": {
-          "parent": "study",
+          "path": [
+            "title"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
           "path": [
             "title"
           ],
@@ -161,7 +201,13 @@
       "type": "string",
       "import": {
         "ae": {
-          "parent": "study",
+          "path": [
+            "description"
+          ],
+          "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
           "path": [
             "description"
           ],
@@ -178,7 +224,6 @@
       },
       "import": {
         "ae": {
-          "parent": "study",
           "path": [
             "attributes",
             "experimental_factor"
@@ -196,7 +241,6 @@
       },
       "import": {
         "ae": {
-          "parent": "study",
           "path": [
             "attributes",
             "experimental_design"
@@ -213,13 +257,17 @@
       },
       "import": {
         "ae": {
-          "parent": "study",
           "path": [
             "attributes",
             "experiment_type"
           ],
           "from_type": "attribute_object",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": ["experiment_type"],
+          "from_type": "string",
+          "method": "get_list_from_string"
         }
       }
     },
@@ -228,13 +276,17 @@
       "type": "string",
       "import": {
         "ae": {
-          "parent": "study",
           "path": [
             "attributes",
             "date_of_experiment"
           ],
           "from_type": "string",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": ["date_of_experiment"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
@@ -246,6 +298,11 @@
           "path": ["protocolRefs"],
           "from_type": "array",
           "method": "get_reference_value_from_json"
+        },
+        "hca": {
+          "path": ["protocolrefs"],
+          "from_type": "array",
+          "method": "import_string"
         }
       }
     },
@@ -256,6 +313,11 @@
           "path": ["projectRef"],
           "from_type": "ref_object",
           "method": "get_reference_value_from_json"
+        },
+        "hca": {
+          "path": ["projectref"],
+          "from_type": "array",
+          "method": "import_string"
         }
       }
     },
@@ -264,13 +326,17 @@
       "type": "string",
       "import": {
         "ae": {
-          "parent": "study",
           "path": [
             "attributes",
             "study_type"
           ],
           "from_type": "attribute_object",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": ["submission_type"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
@@ -302,6 +368,11 @@
           "path": ["alias"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": ["alias"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
@@ -324,6 +395,11 @@
           "path": ["description"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": ["description"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
@@ -335,6 +411,11 @@
           "path": ["attributes", "protocol_type"],
           "from_type": "array",
           "method": "generate_attribute_from_json"
+        },
+        "hca": {
+          "path": ["protocol_type"],
+          "from_type": "string",
+          "method": "generate_attribute_from_string"
         }
       }
     },
@@ -346,6 +427,11 @@
           "path": ["attributes", "hardware"],
           "from_type": "string",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": ["hardware"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
@@ -357,6 +443,11 @@
           "path": ["attributes", "software"],
           "from_type": "string",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": ["software"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     },
@@ -368,6 +459,11 @@
           "path": ["attributes", "performer"],
           "from_type": "string",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": ["performer"],
+          "from_type": "string",
+          "method": "import_string"
         }
       }
     }
@@ -1450,7 +1546,14 @@
     },
     "orcidId": {
       "type": "string",
-      "import": {}
+      "import": {
+        "ae": {
+          "parent": "contact",
+          "path": ["orcid"],
+          "from_type": "string",
+          "method": "import_string"
+        }
+      }
     }
   },
   "data_file": {
@@ -1518,6 +1621,10 @@
         "ae": {
           "path": ["projects"],
           "method": "get_first_object_from_list"
+        },
+        "hca": {
+          "path": ["project"],
+          "method": "get_first_object_from_list"
         }
       }
     },
@@ -1525,6 +1632,10 @@
       "import": {
         "ae": {
           "path": ["studies"],
+          "method": "get_first_object_from_list"
+        },
+        "hca": {
+          "path": ["study"],
           "method": "get_first_object_from_list"
         }
       }
@@ -1534,6 +1645,10 @@
         "ae": {
           "path": ["protocols"],
           "method": "import_as_is"
+        },
+        "hca": {
+          "path": ["protocol"],
+          "method": "import_as_is"
         }
       }
     },
@@ -1541,6 +1656,10 @@
       "import": {
         "ae": {
           "path": ["samples"],
+          "method": "import_as_is"
+        },
+        "hca": {
+          "path": ["sample"],
           "method": "import_as_is"
         }
       }
@@ -1550,6 +1669,10 @@
         "ae": {
           "path": ["assays"],
           "method": "import_as_is"
+        },
+        "hca": {
+          "path": ["singlecell_assay"],
+          "method": "import_as_is"
         }
       }
     },
@@ -1557,6 +1680,10 @@
       "import": {
         "ae": {
           "path": ["assayData"],
+          "method": "import_as_is"
+        },
+        "hca": {
+          "path": ["assay_data"],
           "method": "import_as_is"
         }
       }

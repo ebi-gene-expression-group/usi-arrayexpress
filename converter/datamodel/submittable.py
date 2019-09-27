@@ -1,3 +1,4 @@
+"""Definitions of the base classes"""
 
 
 class Submittable:
@@ -25,5 +26,3 @@ class DependentSubmittable(Submittable):
     def __init__(self, **kwargs):
         Submittable.__init__(self, **kwargs)
         self.protocolrefs = kwargs.get("protocolrefs", [])
-
-

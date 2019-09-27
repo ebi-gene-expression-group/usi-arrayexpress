@@ -89,6 +89,7 @@ class JSONConverter:
         ad_json = self.import_submittable(envelope_json, submittable_mapping.get("assay_data", {}))
         assay_data = [AssayData(**self.convert_submittable(ad, "assay_data"))
                       for ad in ad_json]
+        print("My assay data: ", assay_data)
 
         # Anaysis
         analysis_json = self.import_submittable(envelope_json, submittable_mapping.get("analysis", {}))
@@ -261,6 +262,12 @@ class JSONConverter:
 
         return OrderedDict([(category, self.generate_attribute_from_json(attribute[0]))
                             for category, attribute in sample_attributes.items()])
+
+    def generate_attribute_from_string(self, element, translation={}):
+        return Attribute(value=self.import_string(element, translation))
+
+    def get_list_from_string(self, element, translation={}):
+        return [self.import_string(element, translation)]
 
     @staticmethod
     def get_first_object_from_list(input_json,  translation={}):

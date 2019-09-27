@@ -32,7 +32,7 @@ class Project(AccessionedSubmittable):
     @classmethod
     def from_magetab(cls, study_info):
         idf_file = os.path.basename(study_info.get("idf_filename", ""))
-        temp_project_name = re.sub("\.idf\.txt$", "", idf_file)
+        temp_project_name = re.sub(r"\.idf\.txt$", "", idf_file)
         alias = "project_" + temp_project_name
         # The project accession might be the BioStudies accession, which could be saved as IDF comment
         # Placeholder code which returns None for now
@@ -47,7 +47,7 @@ class Project(AccessionedSubmittable):
                      contact_terms["Person Affiliation"]: c.get(contact_terms["Person Affiliation"]),
                      contact_terms["Person Address"]: c.get(contact_terms["Person Address"]),
                      contact_terms["Person Phone"]: c.get(contact_terms["Person Phone"]),
-                     contact_terms["Person Roles"]: re.split("\s*;\s*", c.get(contact_terms["Person Roles"])),
+                     contact_terms["Person Roles"]: re.split(r"\s*;\s*", c.get(contact_terms["Person Roles"])),
                      contact_terms["Person Mid Initials"]: c.get(contact_terms["Person Mid Initials"]),
                      contact_terms["Person Fax"]: c.get(contact_terms["Person Fax"])}
                     for c in contacts_raw]
@@ -56,10 +56,10 @@ class Project(AccessionedSubmittable):
         publications_raw = study_info.get("publications", [])
         pub_terms = get_controlled_vocabulary("publication_terms")
         publications = [{pub_terms["Publication Title"]: pub.get(pub_terms["Publication Title"]),
-                        pub_terms["Publication Author List"]: pub.get(pub_terms["Publication Author List"]),
-                        pub_terms["PubMed ID"]: pub.get(pub_terms["PubMed ID"]),
-                        pub_terms["Publication DOI"]: pub.get(pub_terms["Publication DOI"]),
-                        pub_terms["Publication Status"]: pub.get(pub_terms["Publication Status"])}
+                         pub_terms["Publication Author List"]: pub.get(pub_terms["Publication Author List"]),
+                         pub_terms["PubMed ID"]: pub.get(pub_terms["PubMed ID"]),
+                         pub_terms["Publication DOI"]: pub.get(pub_terms["Publication DOI"]),
+                         pub_terms["Publication Status"]: pub.get(pub_terms["Publication Status"])}
                         for pub in publications_raw]
         title = study_info.get("title")
         description = study_info.get("description")

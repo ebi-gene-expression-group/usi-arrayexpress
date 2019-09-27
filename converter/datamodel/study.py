@@ -51,7 +51,7 @@ class Study(AccessionedSubmittable):
     def from_magetab(cls, study_info):
         accession = study_info.get("accession")
         idf_file = os.path.basename(study_info.get("idf_filename", ""))
-        alias = re.sub("\.idf\.txt$", "", idf_file)
+        alias = re.sub(r"\.idf\.txt$", "", idf_file)
         projectref = "project_" + alias
         title = study_info.get("title")
         description = study_info.get("description")
