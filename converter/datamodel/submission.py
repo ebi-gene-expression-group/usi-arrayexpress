@@ -1,22 +1,38 @@
 from collections import OrderedDict
+from typing import List, Union
 
 from utils.common_utils import get_ontology_source_file
+from converter.datamodel.project import Project
+from converter.datamodel.study import Study
+from converter.datamodel.protocol import Protocol
+from converter.datamodel.sample import Sample
+from converter.datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
+from converter.datamodel.data import AssayData, Analysis
 
 
 class Submission:
-    def __init__(self, info, project, study, protocol, sample, assay, assay_data, analysis):
-        """
-        The submission class holds all objects that make up an ArrayExpress experiment
+    """
+    The submission class holds all objects that make up an ArrayExpress experiment.
 
-        :param info: dictionary, information about the submission (file names, submitter details, etc.)
-        :param project: object, Project class object
-        :param study: object, Study class object
-        :param protocol: list, Protocol class objects
-        :param sample: list, Sample class objects
-        :param assay: list, SeqAssay or MicroarrayAssay class objects
-        :param assay_data: list, AssayData class objects
-        :param analysis: list, Analysis class objects
-        """
+    :param info: dictionary, information about the submission (file names, submitter details, etc.)
+    :param project: object, Project class object
+    :param study: object, Study class object
+    :param protocol: list, Protocol class objects
+    :param sample: list, Sample class objects
+    :param assay: list, SeqAssay or MicroarrayAssay class objects
+    :param assay_data: list, AssayData class objects
+    :param analysis: list, Analysis class objects
+    """
+    info: dict
+    project: Project
+    study: Study
+    protocol: List[Protocol]
+    sample: List[Sample]
+    assay: List[Union[SeqAssay, SingleCellAssay, MicroarrayAssay]]
+    assay_data: List[AssayData]
+    analysis: List[Analysis]
+
+    def __init__(self, info, project, study, protocol, sample, assay, assay_data, analysis):
         self.info = info
         self.project = project
         self.study = study
