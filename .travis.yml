@@ -4,6 +4,7 @@ python: 3.6
 
 install:
   - pip install -r requirements.txt
+  - pip install git+https://github.com/ebi-gene-expression-group/common-datamodel.git@master
 
 before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
