@@ -11,7 +11,7 @@
         }
       }
     },
-    "alias" : {
+    "alias": {
       "description": "unique project name (auto-generated from MAGE-TAB file name)",
       "type": "string",
       "import": {
@@ -19,6 +19,14 @@
           "parent": "project",
           "path": ["alias"],
           "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "project_core",
+            "project_short_name"
+          ],
           "method": "import_string"
         }
       }
@@ -32,6 +40,13 @@
           "path": ["accession"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "biostudies_accessions"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -43,6 +58,14 @@
           "parent": "project",
           "path": ["title"],
           "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "project_core",
+            "project_title"
+          ],
           "method": "import_string"
         }
       }
@@ -56,6 +79,14 @@
           "path": ["description"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "project_core",
+            "project_description"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -67,6 +98,14 @@
           "parent": "project",
           "path": ["releaseDate"],
           "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "provenance",
+            "submission_date"
+          ],
           "method": "import_string"
         }
       }
@@ -80,9 +119,16 @@
       "import": {
         "ae": {
           "parent": "project",
-          "path" : ["publications"],
+          "path": ["publications"],
           "from_type": "array",
           "method": "import_publication"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "publications"
+          ],
+          "method": "import_nested_publications"
         }
       }
     },
@@ -95,9 +141,16 @@
       "import": {
         "ae": {
           "parent": "project",
-          "path" : ["contacts"],
+          "path": ["contacts"],
           "from_type": "array",
           "method": "import_contact"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "contributors"
+          ],
+          "method": "import_nested_contacts"
         }
       }
     }
@@ -125,6 +178,14 @@
           ],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "project_core",
+            "project_short_name"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -138,6 +199,13 @@
             "accession"
           ],
           "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "array_express_accessions"
+          ],
           "method": "import_string"
         }
       }
@@ -153,6 +221,14 @@
           ],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "project_core",
+            "project_title"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -166,6 +242,14 @@
             "description"
           ],
           "from_type": "string",
+          "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "project_core",
+            "project_description"
+          ],
           "method": "import_string"
         }
       }
@@ -209,8 +293,7 @@
     "experiment_type": {
       "description": "experiment type ontology terms",
       "type": "array",
-      "items": {
-      },
+      "items": {},
       "import": {
         "ae": {
           "parent": "study",
@@ -220,6 +303,11 @@
           ],
           "from_type": "attribute_object",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [],
+          "method": "use_translation",
+          "translation": "RNA-seq of coding RNA from single cells"
         }
       }
     },
@@ -235,6 +323,28 @@
           ],
           "from_type": "string",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "project_json",
+            "provenance",
+            "submission_date"
+          ],
+          "method": "import_string"
+        }
+      }
+    },
+    "projectref": {
+      "type": "string",
+      "import": {
+        "ae": {
+          "path": ["projectRef"],
+          "from_type": "ref_object",
+          "method": "get_reference_value_from_json"
+        },
+        "hca": {
+          "path": [],
+          "method": "placeholder"
         }
       }
     },
@@ -246,16 +356,10 @@
           "path": ["protocolRefs"],
           "from_type": "array",
           "method": "get_reference_value_from_json"
-        }
-      }
-    },
-    "projectref": {
-      "type": "string",
-      "import": {
-        "ae": {
-          "path": ["projectRef"],
-          "from_type": "ref_object",
-          "method": "get_reference_value_from_json"
+        },
+        "hca": {
+          "path": [],
+          "method": "placeholder"
         }
       }
     },
@@ -271,14 +375,21 @@
           ],
           "from_type": "attribute_object",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [],
+          "method": "use_translation",
+          "translation": "singlecell"
         }
       }
     },
     "secondary_accession": {
-      "description": "The accession number for the same study in another archive"
+      "description": "The accession number for the same study in another archive",
+      "import":{}
     },
     "related_experiment": {
-      "description": "Accession numbers of other studies that are related to the current submission, e.g. for multi-omics studies"
+      "description": "Accession numbers of other studies that are related to the current submission, e.g. for multi-omics studies",
+      "import":{}
     },
     "comments": {}
   },
@@ -302,10 +413,17 @@
           "path": ["alias"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "protocol_core",
+            "protocol_id"
+          ],
+          "method": "import_string_from_protocol"
         }
       }
     },
-    "accession":{
+    "accession": {
       "description": "ArrayExpress protocol accession",
       "type": "string",
       "import": {
@@ -313,6 +431,13 @@
           "path": ["accession"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "provenance",
+            "document_id"
+          ],
+          "method": "import_string_from_protocol"
         }
       }
     },
@@ -324,6 +449,13 @@
           "path": ["description"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "protocol_core",
+            "protocol_description"
+          ],
+          "method": "import_string_from_protocol"
         }
       }
     },
@@ -335,6 +467,12 @@
           "path": ["attributes", "protocol_type"],
           "from_type": "array",
           "method": "generate_attribute_from_json"
+        },
+        "hca": {
+          "path": [
+            "describedBy"
+          ],
+          "method": "get_protocol_type"
         }
       }
     },
@@ -346,10 +484,17 @@
           "path": ["attributes", "hardware"],
           "from_type": "string",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "instrument_manufacturer_model",
+            "ontology_label"
+          ],
+          "method": "import_string_from_protocol"
         }
       }
     },
-    "software":{
+    "software": {
       "description": "free-text software description",
       "type": "string",
       "import": {
@@ -368,6 +513,13 @@
           "path": ["attributes", "performer"],
           "from_type": "string",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "process_core",
+            "operators"
+          ],
+          "method": "get_protocol_operator"
         }
       }
     }
@@ -391,6 +543,13 @@
           "path": ["alias"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "biomaterial_core",
+            "biomaterial_id"
+          ],
+          "method": "lowest_biological_entity_get"
         }
       }
     },
@@ -401,6 +560,13 @@
           "path": ["accession"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "biomaterial_core",
+            "biomaterial_id"
+          ],
+          "method": "lowest_biological_entity_get"
         }
       }
     },
@@ -411,6 +577,13 @@
           "path": ["taxon"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "genus_species",
+            "ontology_label"
+          ],
+          "method": "lowest_biological_entity_get"
         }
       }
     },
@@ -421,6 +594,13 @@
           "path": ["taxonId"],
           "from_type": "integer",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "biomaterial_core",
+            "ncbi_taxon_id"
+          ],
+          "method": "lowest_biological_entity_get"
         }
       }
     },
@@ -431,6 +611,10 @@
           "path": ["attributes", "material_type"],
           "from_type": "attribute_object",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [],
+          "method": "get_sample_material_type"
         }
       }
     },
@@ -441,6 +625,13 @@
           "path": ["description"],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "biomaterial_core",
+            "biomaterial_description"
+          ],
+          "method": "lowest_biological_entity_get"
         }
       }
     },
@@ -451,6 +642,10 @@
           "path": ["attributes"],
           "from_type": "array",
           "method": "generate_sample_attribute_dict"
+        },
+        "hca": {
+          "path": [],
+          "method": "get_other_biomaterial_attributes"
         }
       }
     }
@@ -758,6 +953,10 @@
           ],
           "from_type": "string",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [],
+          "method": "get_hca_bundle_uuid"
         }
       }
     },
@@ -783,6 +982,11 @@
           ],
           "from_type": "string",
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [],
+          "method": "use_translation",
+          "translation": "sequencing assay"
         }
       }
     },
@@ -797,6 +1001,10 @@
           ],
           "from_type": "array",
           "method": "get_reference_usage"
+        },
+        "hca": {
+          "path": [],
+          "method": "placeholder"
         }
       }
     },
@@ -811,6 +1019,28 @@
           ],
           "from_type": "array",
           "method": "get_reference_usage"
+        },
+        "hca": {
+          "path": [],
+          "method": "placeholder"
+        }
+      }
+    },
+    "studyref": {
+      "description": "study accession/name",
+      "type": "string",
+      "import": {
+        "ae": {
+          "parent": "assay",
+          "path": [
+            "studyUses"
+          ],
+          "from_type": "array",
+          "method": "get_reference_usage"
+        },
+        "hca": {
+          "path": [],
+          "method": "placeholder"
         }
       }
     },
@@ -821,6 +1051,14 @@
         "ae": {
           "path": ["attributes", "library_layout"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": ["sequencing_protocol_json", "paired_end"],
+          "method": "use_translation",
+          "translation": {
+            "True": "PAIRED",
+            "False": "SINGLE"
+          }
         }
       }
     },
@@ -831,6 +1069,11 @@
         "ae": {
           "path": ["attributes", "library_source"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [],
+          "method": "use_translation",
+          "translation": "transcriptomic single cell"
         }
       }
     },
@@ -841,6 +1084,11 @@
         "ae": {
           "path": ["attributes", "library_strategy"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [],
+          "method": "use_translation",
+          "translation": "RNA-Seq"
         }
       }
     },
@@ -851,6 +1099,11 @@
         "ae": {
           "path": ["attributes", "library_selection"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [],
+          "method": "use_translation",
+          "translation": "cDNA"
         }
       }
     },
@@ -861,6 +1114,13 @@
         "ae": {
           "path": ["attributes", "nominal_length"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "nominal_length"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -871,6 +1131,13 @@
         "ae": {
           "path": ["attributes", "nominal_sdev"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "nominal_sdev"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -891,6 +1158,14 @@
         "ae": {
           "path": ["attributes", "platform_type"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "sequencing_protocol_json",
+            "method",
+            "ontology_label"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -901,6 +1176,14 @@
         "ae": {
           "path": ["attributes", "instrument_model"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "sequencing_protocol_json",
+            "instrument_manufacturer_model",
+            "ontology_label"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -911,6 +1194,19 @@
         "ae": {
           "path": ["attributes", "library_strand"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "strand"
+          ],
+          "method": "use_translation",
+          "translation": {
+            "unstranded": "not applicable",
+            "first": "first",
+            "second": "second",
+            "not provided": "not provided"
+          }
         }
       }
     },
@@ -921,16 +1217,39 @@
         "ae": {
           "path": ["attributes", "single_cell_isolation"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "dissociation_protocol_json",
+            "method",
+            "ontology_label"
+          ],
+          "method": "use_translation",
+          "translation": {
+            "fluorescence-activated cell sorting": "FACS",
+            "10X v2 sequencing": "null",
+            "enzymatic dissociation": "enzymatic dissociation",
+            "mechanical dissociation": "mechanical dissociation",
+            "None": "null"
+          }
         }
       }
     },
     "library_construction": {
       "description": "The protocol that was followed to generate single-cell libraries",
-        "type": "string",
+      "type": "string",
       "import": {
         "ae": {
           "path": ["attributes", "library_construction"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "library_construction_method",
+            "ontology_label"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -941,6 +1260,14 @@
         "ae": {
           "path": ["attributes", "input_molecule"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "input_nucleic_acid_molecule",
+            "ontology_label"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -959,6 +1286,13 @@
         "ae": {
           "path": ["attributes", "primer"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "end_bias"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -968,6 +1302,14 @@
         "ae": {
           "path": ["attributes", "spike_in"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "spike_in_kit",
+            "ontology_label"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -977,6 +1319,13 @@
         "ae": {
           "path": ["attributes", "spike_in_dilution"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "spike_in_dilution"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -986,6 +1335,14 @@
         "ae": {
           "path": ["attributes", "umi_barcode_read"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "umi_barcode",
+            "barcode_read"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -995,6 +1352,14 @@
         "ae": {
           "path": ["attributes", "umi_barcode_size"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "umi_barcode",
+            "barcode_length"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -1004,6 +1369,14 @@
         "ae": {
           "path": ["attributes", "umi_barcode_offset"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "umi_barcode",
+            "barcode_offset"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -1013,6 +1386,14 @@
         "ae": {
           "path": ["attributes", "cell_barcode_read"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "cell_barcode",
+            "barcode_read"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -1022,6 +1403,14 @@
         "ae": {
           "path": ["attributes", "cell_barcode_size"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "cell_barcode",
+            "barcode_length"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -1031,6 +1420,14 @@
         "ae": {
           "path": ["attributes", "cell_barcode_offset"],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [
+            "library_preparation_protocol_json",
+            "cell_barcode",
+            "barcode_offset"
+          ],
+          "method": "import_string"
         }
       }
     },
@@ -1109,18 +1506,22 @@
         }
       }
     },
-     "alias": {
-       "description": "unique name in the experiment (Assay Name in SDRF)",
-       "type": "string",
-       "import": {
-         "ae": {
-           "from_type": "string",
-           "parent": "assay_data",
-           "path": ["alias"],
-           "method": "import_string"
-         }
-       }
-     },
+    "alias": {
+      "description": "unique name in the experiment (Assay Name in SDRF)",
+      "type": "string",
+      "import": {
+        "ae": {
+          "from_type": "string",
+          "parent": "assay_data",
+          "path": ["alias"],
+          "method": "import_string"
+        },
+        "hca": {
+          "path": [],
+          "method": "get_hca_bundle_uuid"
+        }
+      }
+    },
     "files": {
       "description": "list of DataFile class objects",
       "type": "array",
@@ -1135,6 +1536,12 @@
             "files"
           ],
           "method": "import_file"
+        },
+        "hca": {
+          "path": [
+            "sequence_file_json"
+          ],
+          "method": "import_nested_data_files"
         }
       }
     },
@@ -1150,6 +1557,11 @@
             "data_type"
           ],
           "method": "get_string_from_attribute"
+        },
+        "hca": {
+          "path": [],
+          "method": "use_translation",
+          "translation": "raw"
         }
       }
     },
@@ -1164,13 +1576,17 @@
             "assayRefs"
           ],
           "method": "get_reference_value_from_json"
+        },
+        "hca": {
+          "path": [],
+          "method": "placeholder"
         }
       }
     },
     "protocolrefs": {
       "description": "protocol name/accessions used to generate data file",
       "type": "array"
-      },
+    },
     "accession": {
       "description": "(not for microarray) ENA run accession",
       "type": "string",
@@ -1202,13 +1618,13 @@
       "description": "unique name in the experiment (auto-generated from processed file name in SDRF)",
       "type": "string",
       "import": {
-         "ae": {
-           "from_type": "string",
-           "parent": "analysis",
-           "path": ["alias"],
-           "method": "import_string"
-         }
-       }
+        "ae": {
+          "from_type": "string",
+          "parent": "analysis",
+          "path": ["alias"],
+          "method": "import_string"
+        }
+      }
     },
     "files": {
       "description": "list of DataFile class objects",
@@ -1294,6 +1710,12 @@
           "path": ["articleTitle"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "title"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1305,6 +1727,12 @@
           "path": ["authors"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "authors"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1316,6 +1744,12 @@
           "path": ["pubmedId"],
           "from_type": "integer",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "pmid"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1327,6 +1761,12 @@
           "path": ["doi"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "doi"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1339,7 +1779,7 @@
           "from_type": "sting",
           "method": "import_string",
           "translation": {
-            "Unknown" : "",
+            "Unknown": "",
             "InPreparation": "in preparation",
             "Submitted": "submitted",
             "Published": "published"
@@ -1349,7 +1789,7 @@
     }
   },
   "contact": {
-    "firstName":{
+    "firstName": {
       "type": "string",
       "import": {
         "ae": {
@@ -1357,10 +1797,16 @@
           "path": ["firstName"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "name"
+          ],
+          "method": "import_first_name"
         }
       }
     },
-    "lastName":{
+    "lastName": {
       "type": "string",
       "import": {
         "ae": {
@@ -1368,6 +1814,12 @@
           "path": ["lastName"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "name"
+          ],
+          "method": "import_last_name"
         }
       }
     },
@@ -1379,6 +1831,12 @@
           "path": ["email"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "email"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1390,6 +1848,12 @@
           "path": ["affiliation"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "institution"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1401,6 +1865,12 @@
           "path": ["address"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "address"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1412,6 +1882,12 @@
           "path": ["phone"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "phone"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1423,6 +1899,13 @@
           "path": ["roles"],
           "from_type": "array",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "project_role",
+            "ontology_label"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1434,6 +1917,12 @@
           "path": ["middleInitials"],
           "from_type": "sting",
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "name"
+          ],
+          "method": "get_middle_initial"
         }
       }
     },
@@ -1463,6 +1952,13 @@
             "name"
           ],
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "file_core",
+            "file_name"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1475,6 +1971,13 @@
             "checksum"
           ],
           "method": "import_string"
+        },
+        "hca": {
+          "path": [
+            "file_core",
+            "checksum"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     },
@@ -1487,6 +1990,11 @@
             "checksumMethod"
           ],
           "method": "import_string"
+        },
+        "hca": {
+          "path": [],
+          "method": "use_translation",
+          "translation": "MD5"
         }
       }
     },
@@ -1508,11 +2016,14 @@
       "import": {
         "ae": {
           "path": ["attributes", "read_type"]
+        },
+        "hca": {
+          "path": [
+            "read_index"
+          ],
+          "method": "import_string_from_selected_entity"
         }
       }
     }
   }
 }
-
-
-
