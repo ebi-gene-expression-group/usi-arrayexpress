@@ -1,7 +1,7 @@
 import unittest
 from converter.dm2magetab import get_protocol_positions, sort_protocol_refs_to_dict, flatten_sample_attribute
-from converter.datamodel.components import Attribute, Unit
-from converter.datamodel.protocol import Protocol
+from datamodel.components import Attribute, Unit
+from datamodel import Protocol
 
 
 class TestReadingProtocolPositions(unittest.TestCase):

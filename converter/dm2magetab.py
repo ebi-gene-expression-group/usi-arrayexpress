@@ -5,6 +5,7 @@ import re
 
 from collections import OrderedDict, defaultdict
 
+from utils.common_utils import get_ontology_source_file
 from utils.converter_utils import get_controlled_vocabulary, new_file_prefix
 
 
@@ -48,8 +49,8 @@ def generate_idf(sub):
         ("Protocol Hardware", [p.hardware for p in sub.protocol]),
         ("Protocol Software", [p.software for p in sub.protocol]),
         ("SDRF File", new_file_prefix(sub) + ".sdrf.txt"),
-        ("Term Source Name", [o for o in sub.get_term_sources()]),
-        ("Term Source File", [path for path in sub.get_term_sources().values()]),
+        ("Term Source Name", [o for o in get_term_sources(sub)]),
+        ("Term Source File", [path for path in get_term_sources(sub).values()]),
         ("Comment[AEExperimentType]", [exptype for exptype in sub.study.experiment_type])
     ])
 
@@ -374,3 +375,16 @@ def write_sdrf_file(pandas_table, new_file_name, logger):
     except Exception as e:
         logger.error("Failed to write SDRF: {}".format(str(e)))
 
+
+def get_term_sources(sub):
+    term_sources = OrderedDict()
+    # Make sure we have at least EFO (used for protocol types etc.)
+    term_sources["EFO"] = "https://www.ebi.ac.uk/efo.owl"
+    ontologies = {a.term_source for s in sub.sample for a in s.attributes.values() if a.term_source}
+    for o in ontologies:
+        if not o.upper() == "EFO":
+            term_sources[o] = get_ontology_source_file(o)
+    # MA submissions need ArrayExpress as Term Ref for array design accessions
+    if sub.info.get("submission_type") == "microarray":
+        term_sources["ArrayExpress"] = "https://www.ebi.ac.uk/arrayexpress/"
+    return term_sources

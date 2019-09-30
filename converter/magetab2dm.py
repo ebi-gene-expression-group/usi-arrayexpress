@@ -4,15 +4,15 @@ import os
 import re
 from collections import defaultdict, OrderedDict
 
-from converter.datamodel.components import Attribute, Unit
+from datamodel.components import Attribute, Unit
 from converter.dm2json import datamodel2json_conversion
-from converter.datamodel.submission import Submission
-from converter.datamodel.sample import Sample
-from converter.datamodel.protocol import Protocol
-from converter.datamodel.study import Study
-from converter.datamodel.project import Project
-from converter.datamodel.data import AssayData, Analysis
-from converter.datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
+from datamodel.submission import Submission
+from datamodel.sample import Sample
+from datamodel.protocol import Protocol
+from datamodel.study import Study
+from datamodel.project import Project
+from datamodel.data import AssayData, Analysis
+from datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
 from utils.common_utils import create_logger
 from utils.converter_utils import get_controlled_vocabulary, get_name, get_value, read_sdrf_file, read_idf_file, \
     get_sdrf_path, strip_extension, guess_submission_type, is_accession, get_taxon, remove_duplicates

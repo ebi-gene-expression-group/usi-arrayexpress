@@ -2,14 +2,14 @@
 import re
 from collections import OrderedDict
 
-from converter.datamodel.submission import Submission
-from converter.datamodel.sample import Sample
-from converter.datamodel.protocol import Protocol
-from converter.datamodel.study import Study
-from converter.datamodel.project import Project
-from converter.datamodel.data import AssayData, Analysis
-from converter.datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
-from converter.datamodel.components import Attribute, Unit
+from datamodel.submission import Submission
+from datamodel.sample import Sample
+from datamodel.protocol import Protocol
+from datamodel.study import Study
+from datamodel.project import Project
+from datamodel.data import AssayData, Analysis
+from datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
+from datamodel.components import Attribute, Unit
 from utils.converter_utils import guess_submission_type_from_study, get_term_from_url
 from utils.common_utils import get_ontology_from_term_url, get_term_parent
 

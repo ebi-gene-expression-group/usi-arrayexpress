@@ -1,7 +1,7 @@
 import re
 
-from converter.datamodel.submission import Submission
-from converter.datamodel.assay import SingleCellAssay
+from datamodel.submission import Submission
+from datamodel.assay import SingleCellAssay
 from utils import converter_utils
 from utils.converter_utils import ontology_term, is_accession
 from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi, get_ena_instrument_terms_via_usi
