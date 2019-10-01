@@ -43,11 +43,11 @@ class JSONConverter:
         :return: Submission object
         """
         # We only take the first project in the list
-        project_json = next(iter(envelope_json.get("projects", [])), {})
+        project_json = self.get_first_object_from_list(envelope_json.get("projects", []))
         project = Project(**self.convert_submittable(project_json, "project"))
 
         # We only take the first study in the list
-        study_json = next(iter(envelope_json.get("studies", [])), {})
+        study_json = self.get_first_object_from_list(envelope_json.get("studies", []))
         study = Study(**self.convert_submittable(study_json, "study"))
 
         protocol_json = envelope_json.get("protocols", [])
