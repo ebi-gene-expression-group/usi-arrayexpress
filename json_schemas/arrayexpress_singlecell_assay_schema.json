@@ -279,7 +279,7 @@
                     }
                 },
                 "umi_barcode_read": {
-                    "description": "The file that contains the unique molecular identifier (UMI) barcode read",
+                    "description": "The read type that contains the unique molecular identifier (UMI) barcode read",
                     "type": "array",
                     "minItems": 1,
                     "maxItems": 1,
@@ -332,7 +332,7 @@
                     }
                 },
                 "cell_barcode_read": {
-                    "description": "The file that contains the cell barcode read",
+                    "description": "The read type that contains the cell barcode read",
                     "type": "array",
                     "minItems": 1,
                     "maxItems": 1,
@@ -385,7 +385,7 @@
                     }
                 },
                 "cDNA_read": {
-                    "description": "The file that contains the cDNA read",
+                    "description": "The read type that contains the cDNA read",
                     "type": "array",
                     "minItems": 1,
                     "maxItems": 1,
