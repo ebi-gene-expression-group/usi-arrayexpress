@@ -110,19 +110,22 @@ class JSONConverter:
             method = mapping_info.get("method", "")
             translation = mapping_info.get("translation", {})
             if method:
+                # Retrieve function by name
                 convert_function = getattr(self, method)
             if path and convert_function:
+                # Find the target object in the input JSON using the directions in path
                 target_object = self.interpret_path(path, submittable_object)
+                # For lists
                 if isinstance(target_object, list):
-                    if attribute_info.get("type") in ["string", "attribute_object"]:
+                    if attribute_info.get("type") in ("string", "attribute"):
                         # Take the first entry
-                        submittable_attributes[attribute] = next(iter([convert_function(o, translation=translation)
-                                                                       for o in target_object]))
+                        submittable_attributes[attribute] = self.get_first_object_from_list(
+                            [convert_function(o, translation) for o in target_object])
                     else:
-                        submittable_attributes[attribute] = [convert_function(o, translation=translation)
-                                                             for o in target_object]
+                        # Apply the conversion on each element of the list
+                        submittable_attributes[attribute] = [convert_function(o, translation) for o in target_object]
                 elif target_object:
-                    submittable_attributes[attribute] = convert_function(target_object, translation=translation)
+                    submittable_attributes[attribute] = convert_function(target_object, translation)
 
         return submittable_attributes
 
@@ -149,9 +152,6 @@ class JSONConverter:
 
     def import_file(self, element, translation={}):
         return self.convert_submittable(element, "data_file")
-
-    def import_lib_attribs(self, element, translation={}):
-        return self.convert_submittable(element, "lib_attribs")
 
     def generate_attribute_from_json(self, element, translation={}):
         """
