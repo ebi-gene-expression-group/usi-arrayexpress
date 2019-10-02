@@ -232,6 +232,11 @@
                     {
                         "value": "RNA-seq of coding RNA"
                     }
+                ],
+                "secondary_accession": [
+                    {
+                    "value": "ERP0000001"
+                    }
                 ]
             },
             "protocolRefs": [],

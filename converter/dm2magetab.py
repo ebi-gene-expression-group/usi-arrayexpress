@@ -53,12 +53,16 @@ def generate_idf(sub):
         ("Term Source File", [path for path in get_term_sources(sub).values()]),
         ("Comment[AEExperimentType]", [exptype for exptype in sub.study.experiment_type])
     ])
-
+    # Optional comments
     if sub.study.accession:
         idf["Comment[ArrayExpressAccession]"] = sub.study.accession
+    if sub.study.related_experiment:
+        idf["Comment[RelatedExperiment"] = [ac for ac in sub.study.related_experiment]
+    # Sequencing specific comments
     if sub.info.get("submission_type") == "sequencing" or sub.info.get("submission_type") == "singlecell":
-        pass
-        # TODO: Add comments for ENA accessions Comment[SecondaryAccession] and Comment[SequenceDataURI]
+        if sub.study.secondary_accession:
+            idf["Comment[SecondaryAccession]"] = [ac for ac in sub.study.secondary_accession]
+        # TODO: Add comments for Comment[RelatedExperiment] and Comment[SequenceDataURI]
 
     return idf
 
@@ -388,3 +392,9 @@ def get_term_sources(sub):
     if sub.info.get("submission_type") == "microarray":
         term_sources["ArrayExpress"] = "https://www.ebi.ac.uk/arrayexpress/"
     return term_sources
+
+
+def generate_sequence_data_uri(run_list):
+    """Return the intervals of ENA run URIs"""
+    base_uri = "https://www.ebi.ac.uk/ena/data/view/"
+    pass
