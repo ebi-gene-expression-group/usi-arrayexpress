@@ -6,8 +6,11 @@ and runs metadata conversion from USI-JSON to MAGE-TAB format.
 """
 
 import argparse
+import json
 import sys
 from os import path
+
+import pkg_resources
 
 from converter import json2dm, dm2magetab
 from validator.json_schema_validation import validate_submission_json
@@ -23,6 +26,8 @@ def parse_args():
                         help="Path where to write the MAGE-TAB files")
     parser.add_argument('-v', '--verbose', action='store_const', const=10, default=20,
                         help="Option to output detailed logging (debug level).")
+    parser.add_argument('-k', '--key', default='ae',
+                        help="The import key used to determine the conversion rules (default is 'ae')")
     args = parser.parse_args()
 
     return args
@@ -51,14 +56,11 @@ def main():
         sys.exit()
 
     json_data = read_json_file(json_file)
-    #sub = json2dm.data_objects_from_json(json_data, json_file)
-    #print(sub.sample)
 
-    wd = path.dirname(path.realpath(__file__))
-    mapping_file = path.join(wd, "converter", "config", "mapping_ae-usi_to_datamodel.json")
-    mapping = read_json_file(mapping_file)
-    ae_converter = json2dm.JSONConverter(mapping, import_key="ae")
-    sub = ae_converter.convert_usi_sub(json_data, source_file_name=json_file)
+    mapping = json.loads(pkg_resources.resource_string('datamodel',
+                                                            path.join("config", "datamodel_mapping_config.json")))
+    ae_converter = json2dm.JSONConverter(mapping, import_key=args.key)
+    sub = ae_converter.convert_submission(json_data, source_file_name=json_file)
 
     # Generate IDF dictionary
     logger.debug("Generating IDF file")

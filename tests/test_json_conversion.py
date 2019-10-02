@@ -2,8 +2,8 @@
 import unittest
 from collections import OrderedDict
 
-from converter.datamodel.sample import Sample
-from converter.datamodel.components import Attribute, Unit
+from datamodel.sample import Sample
+from datamodel.components import Attribute, Unit
 
 
 class TestSampleParsing(unittest.TestCase):

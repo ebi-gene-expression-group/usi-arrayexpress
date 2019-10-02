@@ -2,7 +2,7 @@ import os
 import unittest
 import logging
 
-from converter import datamodel
+import datamodel
 from converter.magetab2dm import data_objects_from_magetab
 from validator import metadata_validation
 from utils.converter_utils import guess_submission_type_from_sdrf, guess_submission_type_from_idf, \
@@ -61,9 +61,9 @@ class TestMetaDataValidation(unittest.TestCase):
         # Organism not from taxonomy, should give error SAMP-E08
         self.sub.sample[0].taxon = "unknown species"
         # Non-annotated factor should give error SAMP-E05
-        self.sub.study.experimental_factor.append(datamodel.Attribute("forgotten_factor", None, None))
+        self.sub.study.experimental_factor.append(datamodel.components.Attribute(value="forgotten_factor"))
         # Add nonsense unit, should give error SAMP-E04
-        self.sub.sample[0].attributes["organism"].unit = datamodel.Unit("xxx", "silly unit", None, None)
+        self.sub.sample[0].attributes["organism"].unit = datamodel.components.Unit(value="xxx", unit_type="silly unit")
         error_codes = metadata_validation.run_sample_checks(self.sub, self.logger)
         self.assertIn("SAMP-E02", error_codes)
         self.assertIn("SAMP-E03", error_codes)
@@ -111,7 +111,9 @@ class TestMetaDataValidation(unittest.TestCase):
         # No email should give PROJ-E-04 (no submitter details found)
         self.sub.project.contacts[0].email = ""
         # Wrong PubMed ID and DOI should give PROJ-E06 and PROJ-E07
-        self.sub.project.publications = [datamodel.Publication("Test Article Title", "everyone", "haha", "000", "")]
+        self.sub.project.publications = [datamodel.components.Publication(articleTitle="Test Article Title",
+                                                                          authors="everyone", pubmedId="haha",
+                                                                          doi="000")]
         # Wrong release date format should give error PROJ-E09
         self.sub.project.releaseDate = "17.03.2012"
         error_codes = metadata_validation.run_project_checks(self.sub, self.logger)

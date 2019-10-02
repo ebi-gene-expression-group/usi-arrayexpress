@@ -4,6 +4,7 @@ python: 3.6
 
 install:
   - pip install -r requirements.txt
+  - pip install git+https://github.com/ebi-gene-expression-group/common-datamodel.git@master
 
 before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
@@ -16,3 +17,5 @@ script:
 
     # Unit tests for the JSON converter
   - python -m unittest tests/test_json_conversion_using_mapping.py
+    # Check that JSON converter runs without crashing
+  - python json2mtab_conversion.py tests/test_data/submission_envelope/dummy_sequencing_submission_envelope.json

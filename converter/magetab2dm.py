@@ -4,17 +4,18 @@ import os
 import re
 from collections import defaultdict, OrderedDict
 
+from datamodel.components import Attribute, Unit
 from converter.dm2json import datamodel2json_conversion
-from converter.datamodel.submission import Submission
-from converter.datamodel.sample import Sample
-from converter.datamodel.protocol import Protocol
-from converter.datamodel.study import Study
-from converter.datamodel.project import Project
-from converter.datamodel.data import AssayData, Analysis
-from converter.datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
+from datamodel.submission import Submission
+from datamodel.sample import Sample
+from datamodel.protocol import Protocol
+from datamodel.study import Study
+from datamodel.project import Project
+from datamodel.data import AssayData, Analysis
+from datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
 from utils.common_utils import create_logger
 from utils.converter_utils import get_controlled_vocabulary, get_name, get_value, read_sdrf_file, read_idf_file, \
-    get_sdrf_path, strip_extension, guess_submission_type
+    get_sdrf_path, strip_extension, guess_submission_type, is_accession, get_taxon, remove_duplicates
 
 
 def get_protocol_refs(sdrf_row, header_dict, node_map, node2_index):
@@ -310,7 +311,6 @@ def parse_sdrf(sdrf_file):
         parse_data_file_columns(processed_data_nodes, header_dict, header, node_map, row,
                                 processed_data, sample_name, extract_name, le_name, assay_name)
 
-
         # Factor Values
 
         # For now we'll assume that each factor value corresponds to a biological replicate, i.e. sample,
@@ -515,28 +515,28 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
 
     # For MAGE-TAB files we don't have USI submission info might need to store these somewhere once we get this
     idf_file_name = os.path.basename(idf_file_path)
-    sub_info = {"alias": re.sub("\.idf\.txt$", "", idf_file_name),
+    sub_info = {"alias": re.sub(r"\.idf\.txt$", "", idf_file_name),
                 "accession": study_info.get("accession"),
                 "team": "my-super-test-team",
                 "metadata": idf_file_path,
                 "submission_type": submission_type}
 
     # Project
-    project_object = Project.from_magetab(study_info)
+    project_object = project_from_magetab(study_info)
 
     # Study
-    study_object = Study.from_magetab(study_info)
+    study_object = study_from_magetab(study_info)
 
     # Protocols
     protocol_objects = []
     for p in protocols:
-        protocol = Protocol.from_magetab(p)
+        protocol = protocol_from_magetab(p)
         protocol_objects.append(protocol)
 
     # Samples
     sample_objects = []
     for sample in samples.values():
-        new_sample = Sample.from_magetab(sample)
+        new_sample = sample_from_magetab(sample)
         sample_objects.append(new_sample)
 
     # Assays
@@ -557,7 +557,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
                 if le_name in assay_attributes["extract_ref"]:
                     linked_assays.append(assay_attributes)
 
-            new_assay = MicroarrayAssay.from_magetab(le_attributes, linked_extracts, linked_assays)
+            new_assay = microarray_assay_from_magetab(le_attributes, linked_extracts, linked_assays)
             assay_objects.append(new_assay)
     # Sequencing assays
     else:
@@ -568,9 +568,9 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
                 if extract_name in assay_attributes["extract_ref"]:
                     linked_assays.append(assay_attributes)
             if submission_type == "singlecell":
-                new_assay = SingleCellAssay.from_magetab(extract_attributes, linked_assays, protocols)
+                new_assay = sequencing_assay_from_magetab(extract_attributes, linked_assays, protocols, SingleCellAssay)
             else:
-                new_assay = SeqAssay.from_magetab(extract_attributes, linked_assays, protocols)
+                new_assay = sequencing_assay_from_magetab(extract_attributes, linked_assays, protocols, SeqAssay)
             assay_objects.append(new_assay)
 
     # Assay data
@@ -594,7 +594,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
         # Create dataFile object for each individual file within the group
         file_objects = [datafile_from_magetab(f_attrib) for f_attrib in group]
         # The assay_data has a common alias and holds the file objects + common attributes of the group)
-        assay_data = AssayData.from_magetab(name, file_objects, group)
+        assay_data = assay_data_from_magetab(name, file_objects, group)
         ad_objects.append(assay_data)
 
     # Analysis (processed data)
@@ -602,7 +602,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
     # Here loading the data into the datamodel is a bit simpler: create dataFile objects for each file
     # and then Analysis object with the additional attributes
     # We only want one Analysis object per file but the standard structure of the objects is a list
-    analysis_objects = [Analysis.from_magetab([datafile_from_magetab(f_attrib)], f_attrib)
+    analysis_objects = [analysis_from_magetab([datafile_from_magetab(f_attrib)], f_attrib)
                         for f_attrib in processed_data.values()]
 
     # Assembling it all into a submission object
@@ -636,3 +636,279 @@ def datafile_from_magetab(file_attributes):
             "checksum": comments.get("MD5"),
             "checksum_method": "MD5",
             "ftp_location": ftp_location}
+
+
+def project_from_magetab(study_info):
+    idf_file = os.path.basename(study_info.get("idf_filename", ""))
+    temp_project_name = re.sub(r"\.idf\.txt$", "", idf_file)
+    alias = "project_" + temp_project_name
+    # The project accession might be the BioStudies accession, which could be saved as IDF comment
+    # Placeholder code which returns None for now
+    comments = study_info.get("comments")
+    accession = comments.get("biostudiesaccession", None)
+    releaseDate = study_info.get("releaseDate", None)
+    contact_terms = get_controlled_vocabulary("contact_terms")
+    contacts_raw = study_info.get("contacts", [])
+    contacts = [{contact_terms["Person First Name"]: c.get(contact_terms["Person First Name"]),
+                 contact_terms["Person Last Name"]: c.get(contact_terms["Person Last Name"]),
+                 contact_terms["Person Email"]: c.get(contact_terms["Person Email"]),
+                 contact_terms["Person Affiliation"]: c.get(contact_terms["Person Affiliation"]),
+                 contact_terms["Person Address"]: c.get(contact_terms["Person Address"]),
+                 contact_terms["Person Phone"]: c.get(contact_terms["Person Phone"]),
+                 contact_terms["Person Roles"]: re.split(r"\s*;\s*", c.get(contact_terms["Person Roles"])),
+                 contact_terms["Person Mid Initials"]: c.get(contact_terms["Person Mid Initials"]),
+                 contact_terms["Person Fax"]: c.get(contact_terms["Person Fax"])}
+                for c in contacts_raw]
+
+    # Get publication terms and create list of
+    publications_raw = study_info.get("publications", [])
+    pub_terms = get_controlled_vocabulary("publication_terms")
+    publications = [{pub_terms["Publication Title"]: pub.get(pub_terms["Publication Title"]),
+                     pub_terms["Publication Author List"]: pub.get(pub_terms["Publication Author List"]),
+                     pub_terms["PubMed ID"]: pub.get(pub_terms["PubMed ID"]),
+                     pub_terms["Publication DOI"]: pub.get(pub_terms["Publication DOI"]),
+                     pub_terms["Publication Status"]: pub.get(pub_terms["Publication Status"])}
+                    for pub in publications_raw]
+    title = study_info.get("title")
+    description = study_info.get("description")
+
+    return Project(alias=alias,
+                   accession=accession,
+                   title=title,
+                   description=description,
+                   releaseDate=releaseDate,
+                   publications=publications,
+                   contacts=contacts)
+
+
+def study_from_magetab(study_info):
+    accession = study_info.get("accession")
+    idf_file = os.path.basename(study_info.get("idf_filename", ""))
+    alias = re.sub(r"\.idf\.txt$", "", idf_file)
+    projectref = "project_" + alias
+    title = study_info.get("title")
+    description = study_info.get("description")
+    ef = study_info.get("experimental_factor", [])
+    ef_objects = [Attribute(value=d.get("experimental_factor"),
+                            unit=None,
+                            term_accession=d.get("term_accession"),
+                            term_source=d.get("term_source")) for d in ef]
+    ed = study_info.get("experimental_design", [])
+    ed_objects = [Attribute(value=d.get("experimental_design"),
+                            unit=None,
+                            term_accession=d.get("term_accession"),
+                            term_source=d.get("term_source")) for d in ed]
+    protocolrefs = study_info.get("protocolRefs", [])
+    date_of_experiment = study_info.get("date_of_experiment", None)
+    comments = study_info.get("comments", {})
+    experiment_type = comments.get("experiment_type", [])
+
+    return Study(alias=alias,
+                 accession=accession,
+                 title=title,
+                 description=description,
+                 protocolrefs=protocolrefs,
+                 projectref=projectref,
+                 experimental_factor=ef_objects,
+                 experimental_design=ed_objects,
+                 experiment_type=experiment_type,
+                 date_of_experiment=date_of_experiment)
+
+
+def protocol_from_magetab(protocol_dict):
+    alias = protocol_dict.get("title")
+    if is_accession(alias):
+        accession = alias
+    else:
+        accession = None
+    description = protocol_dict.get("description")
+    hardware = protocol_dict.get("hardware")
+    software = protocol_dict.get("software")
+    protocol_type = Attribute(value=protocol_dict.get("protocol_type"),
+                              unit=None,
+                              term_accession=protocol_dict.get("term_accession"),
+                              term_source=protocol_dict.get("term_source"))
+
+    return Protocol(alias=alias,
+                    accession=accession,
+                    description=description,
+                    protocol_type=protocol_type,
+                    hardware=hardware,
+                    software=software)
+
+
+def sample_from_magetab(sample_attributes):
+    alias = sample_attributes.get("name")
+    description = sample_attributes.get("description")
+    material_type = sample_attributes.get("material_type")
+
+    comments = sample_attributes.get("comments")
+    accession = comments.get("BioSD_SAMPLE")
+
+    characteristics = sample_attributes.get("characteristics")
+    factors = sample_attributes.get("factors")
+    organism = characteristics.get("organism", {})
+    taxon = organism.get("value")
+    taxonId = get_taxon(taxon)
+
+    # Note this will overwrite the characteristics values if a factor is also a characteristics
+    raw_attributes = characteristics.copy()
+    raw_attributes.update(factors)
+
+    attributes = OrderedDict()
+    for c_name, c_attrib in raw_attributes.items():
+        new_unit = None
+        if "unit" in c_attrib:
+            unit_attrib = c_attrib.get("unit")
+            new_unit = Unit(value=unit_attrib.get("value"),
+                            unit_type=unit_attrib.get("unit_type"),
+                            term_accession=unit_attrib.get("term_accession"),
+                            term_source=unit_attrib.get("term_source"))
+
+        attributes[c_name] = Attribute(value=c_attrib.get("value"),
+                                       unit=new_unit,
+                                       term_accession=c_attrib.get("term_accession"),
+                                       term_source=c_attrib.get("term_source"))
+
+    return Sample(alias=alias,
+                  accession=accession,
+                  taxon=taxon,
+                  taxonId=taxonId,
+                  attributes=attributes,
+                  material_type=material_type,
+                  description=description)
+
+
+def microarray_assay_from_magetab(le_attributes, extract_attributes, assay_attributes):
+    """Intialise assay attributes from MAGE-TAB data dicts.
+    The central node for the microarray assay is the Labeled Extract Name."""
+
+    technology_type = remove_duplicates([a.get("technology_type") for a in assay_attributes])
+
+    # Get all protocol refs
+    protocolrefs = []
+    for a in assay_attributes:
+        protocolrefs.extend(a.get("protocol_ref"))
+    protocolrefs.extend(extract_attributes.get("protocol_ref", []))
+    protocolrefs.extend(le_attributes.get("protocol_ref", []))
+    protocolrefs = remove_duplicates(protocolrefs)
+
+    # Get Array design REF, we are only expecting one unique per extract
+    array_design = [a.get("array_design") for a in assay_attributes]
+
+    return MicroarrayAssay(alias=le_attributes.get("name"),
+                           technology_type=technology_type[0],
+                           protocolrefs=protocolrefs,
+                           sampleref=extract_attributes.get("sample_ref"),
+                           label=le_attributes.get("label"),
+                           array_design=array_design[0])
+
+
+def sequencing_assay_from_magetab(extract_attributes, assay_attributes, protocols, assay_class):
+    """Intialise assay attributes from MAGE-TAB data dicts.
+    The central node for the sequencing assay is the Extract Name."""
+
+    # Get library attributes from extract comments
+    comments = extract_attributes.get("comments")
+    lib_attrib_cv = get_controlled_vocabulary("sdrf_comments_ena")
+    lib_attrib_cv.update(get_controlled_vocabulary("sdrf_comments_singlecell"))
+    lib_attribs = {t: comments[a] for a, t in lib_attrib_cv.items() if comments.get(a)}
+
+    # Get technology type(s) from assay attributes
+    technology_type = remove_duplicates([a.get("technology_type", "") for a in assay_attributes])
+    if len(technology_type) > 0:
+        technology_type = technology_type[0]
+
+    # Get accession from ENA Experiment in assay comments
+    accession = remove_duplicates([a.get('comments', {}).get('ENA_EXPERIMENT', "") for a in assay_attributes])
+    if len(accession) == 1:
+        accession = accession[0]
+
+    # Get all protocol refs
+    protocolrefs = []
+    for a in assay_attributes:
+        protocolrefs.extend(a.get("protocol_ref"))
+    protocolrefs.extend(extract_attributes.get("protocol_ref", []))
+    protocolrefs = remove_duplicates(protocolrefs)
+
+    # Get platform and instrument from sequencing protocol
+    for p in protocols:
+        if p.get("title") in protocolrefs and p.get("protocol_type") == "nucleic acid sequencing protocol":
+            hardware = p.get("hardware")
+            lib_attribs["instrument_model"] = hardware
+            # TODO: need to look up the platform type from ENA's controlled vocab
+            # Using ILLUMINA as placeholder for now as it fits 90% of cases
+            lib_attribs["platform_type"] = "ILLUMINA"
+            # Expecting only one sequencing protocol per assay
+            break
+
+    return assay_class(alias=extract_attributes.get("name"),
+                       accession=accession,
+                       technology_type=technology_type,
+                       protocolrefs=protocolrefs,
+                       sampleref=extract_attributes.get("sample_ref"),
+                       **lib_attribs)
+
+
+def assay_data_from_magetab(name, datafile_objects, file_attributes):
+    """Initialise AssayData object with information about raw data"""
+
+    alias = name
+
+    # Assuming here that attributes of grouped files are the same
+    common_file_attributes = file_attributes[0]
+
+    # Try getting le_ref first for MA
+    if common_file_attributes.get("le_ref"):
+        assayrefs = remove_duplicates(common_file_attributes.get("le_ref"))
+    else:
+        assayrefs = remove_duplicates(common_file_attributes.get("extract_ref"))
+
+    mage_data_type = common_file_attributes.get("data_type")
+    if mage_data_type == "arraydatafile" or mage_data_type == "scanname":
+        data_type = "raw"
+    elif mage_data_type == "arraydatamatrixfile":
+        data_type = "raw matrix"
+    else:
+        data_type = None
+
+    comments = common_file_attributes.get("comments")
+    accession = comments.get("ENA_RUN")
+
+    protocolrefs = common_file_attributes.get("protocol_ref")
+
+    return AssayData(alias=alias,
+                     files=datafile_objects,
+                     data_type=data_type,
+                     assayrefs=assayrefs,
+                     protocolrefs=protocolrefs,
+                     accession=accession)
+
+
+def analysis_from_magetab(datafile_objects, file_attributes):
+    """Initialise Analysis object with information about processed data"""
+
+    alias = file_attributes.get("name")
+
+    mage_data_type = file_attributes.get("data_type")
+    if mage_data_type == "derivedarraydatamatrixfile":
+        data_type = "processed matrix"
+    else:
+        data_type = "processed"
+
+    protocolrefs = file_attributes.get("protocol_ref", [])
+
+    # Assay ref is generated based on le_ref (for MA) or extract_ref (for HTS)
+    if file_attributes.get("le_ref"):
+        assayrefs = remove_duplicates(file_attributes.get("le_ref", []))
+    else:
+        assayrefs = remove_duplicates(file_attributes.get("extract_ref", []))
+
+    assaydatarefs = remove_duplicates(file_attributes.get("assay_ref", []))
+
+    return Analysis(alias=alias,
+                    files=datafile_objects,
+                    data_type=data_type,
+                    assayrefs=assayrefs,
+                    assaydatarefs=assaydatarefs,
+                    protocolrefs=protocolrefs)
