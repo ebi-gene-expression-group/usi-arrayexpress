@@ -43,7 +43,7 @@ class TestSampleParsing(unittest.TestCase):
                       "material_type": [
                           {"value": "cell"}]
                   }}
-        target = Sample(alias="Control 1", accession=None, taxon="Homo sapiens", taxonId=9606,
+        target = Sample(alias="Control 1", accession=None, taxon="Homo sapiens", taxonId="9606",
                         attributes=OrderedDict([
                             ("organism",
                              Attribute(value="Homo sapiens", unit=None,
@@ -76,7 +76,7 @@ class TestSampleParsing(unittest.TestCase):
                            "terms": [{"url": "http://www.ebi.ac.uk/efo/EFO_0002218"}]}
                       ]
                   }}
-        target = Sample(alias="Control 1", accession=None, taxon="Homo sapiens", taxonId=9606,
+        target = Sample(alias="Control 1", accession=None, taxon="Homo sapiens", taxonId="9606",
                         attributes=OrderedDict([
                             ("organism",
                              Attribute(value="Homo sapiens", unit=None,
@@ -104,7 +104,7 @@ class TestSampleParsing(unittest.TestCase):
                            "terms": [{"url": "http://purl.obolibrary.org/obo/CHEBI_36049"}]}
                       ]
                   }}
-        target = Sample(alias="Control 1", accession=None, taxon="Homo sapiens", taxonId=9606,
+        target = Sample(alias="Control 1", accession=None, taxon="Homo sapiens", taxonId="9606",
                         attributes=OrderedDict([
                             ("compound",
                              Attribute(value="sodium arsanilate", unit=None,
@@ -112,6 +112,7 @@ class TestSampleParsing(unittest.TestCase):
                         material_type=None, description=None)
         sample_dict = self.converter.convert_submittable(source, "sample")
         converted_sample = Sample(**sample_dict)
+        print(type(converted_sample.taxonId))
         self.assertEqual(str(target), str(converted_sample))
 
 
