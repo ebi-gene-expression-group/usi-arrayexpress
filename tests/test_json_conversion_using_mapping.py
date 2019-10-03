@@ -112,7 +112,6 @@ class TestSampleParsing(unittest.TestCase):
                         material_type=None, description=None)
         sample_dict = self.converter.convert_submittable(source, "sample")
         converted_sample = Sample(**sample_dict)
-        print(type(converted_sample.taxonId))
         self.assertEqual(str(target), str(converted_sample))
 
 
