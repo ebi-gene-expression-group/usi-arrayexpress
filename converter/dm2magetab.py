@@ -57,12 +57,13 @@ def generate_idf(sub):
     if sub.study.accession:
         idf["Comment[ArrayExpressAccession]"] = sub.study.accession
     if sub.study.related_experiment:
-        idf["Comment[RelatedExperiment"] = [ac for ac in sub.study.related_experiment]
+        idf["Comment[RelatedExperiment]"] = [ac for ac in sub.study.related_experiment]
+
     # Sequencing specific comments
-    if sub.info.get("submission_type") == "sequencing" or sub.info.get("submission_type") == "singlecell":
+    if sub.info.get("submission_type") in ("sequencing", "singlecell"):
+        idf["Comment[SequenceDataURI]"] = generate_sequence_data_uri([a.accession for a in sub.assay_data])
         if sub.study.secondary_accession:
             idf["Comment[SecondaryAccession]"] = [ac for ac in sub.study.secondary_accession]
-        # TODO: Add comments for Comment[RelatedExperiment] and Comment[SequenceDataURI]
 
     return idf
 
@@ -397,4 +398,39 @@ def get_term_sources(sub):
 def generate_sequence_data_uri(run_list):
     """Return the intervals of ENA run URIs"""
     base_uri = "https://www.ebi.ac.uk/ena/data/view/"
-    pass
+    uri_list = []
+    first = None
+    latest = None
+
+    for acc in sorted(run_list):
+        if not first:
+            first = acc
+            # Nothing more to do we have no second value yet
+            continue
+
+        # We should now have first or latest and compare against the current acc
+        if latest and (int(acc.split("ERR")[-1]) == int(latest.split("ERR")[-1]) + 1):
+            # Found that the next one in line belongs to the interval, setting latest to next acc
+            latest = acc
+        elif int(acc.split("ERR")[-1]) == int(first.split("ERR")[-1]) + 1:
+            # It continues the interval, setting value to latest
+            latest = acc
+        else:
+            # It's not the first of a new interval and it doesn't increase by 1
+            # Close the previous interval
+            if latest:
+                uri_list.append("{}{}-{}".format(base_uri, first, latest))
+            else:
+                uri_list.append("{}{}".format(base_uri, first))
+            # Start a new interval
+            first = acc
+            latest = None
+
+    # For the last two
+    if first and latest:
+        uri_list.append("{}{}-{}".format(base_uri, first, latest))
+    # Or the last one
+    elif first:
+        uri_list.append("{}{}".format(base_uri, first))
+
+    return uri_list
