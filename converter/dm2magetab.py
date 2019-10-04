@@ -82,9 +82,15 @@ def generate_sdrf(sub):
         row = []
         all_protocols = set()
 
+        # Move annotations from attributes dict to base attributes
+        rearrange_sample_attributes(sample)
+
         sample_values = [("Source Name", sample.alias)]
         if sample.accession:
             sample_values.append(("Comment[BioSD_SAMPLE]", sample.accession))
+        if sample.taxon:
+            sample_values.append(("Characteristics[organism]", sample.taxon))
+
         # Expand sample attributes to characteristics columns (they can be different between different samples)
         for category, sample_attrib in sample.attributes.items():
             sample_values.extend(flatten_sample_attribute(category, sample_attrib, "Characteristics"))
@@ -312,7 +318,8 @@ def flatten_sample_attribute(category, attrib_object, column_header, make_unique
 
 
 def get_protocol_positions(techtype):
-    """Fetch all protocol types for microarray/sequencing studies and return a dictionary sorted by position in the SDRF.
+    """Fetch all protocol types for microarray/sequencing studies and return a dictionary
+    sorted by position in the SDRF.
     {1: [sample collection, growth, treatment], 2: [labeling], 3: [hybridization] ...}"""
     # Use the same protocols for singlecell as for sequencing
     if techtype == "singlecell":
@@ -434,3 +441,30 @@ def generate_sequence_data_uri(run_list):
         uri_list.append("{}{}".format(base_uri, first))
 
     return uri_list
+
+
+def rearrange_sample_attributes(sample):
+    """Some sample attributes can be assigned to the standard MAGE-TAB categories.
+    This removes duplicated categories from the characteristics if we have them
+    already in the sample class base attributes like taxon, description, etc.
+    In order to avoid duplication, categories remaining in the attributes list are renamed."""
+
+    translation = {
+        "taxon": (re.compile(r"\s*organism\s*"), "submitted organism"),
+        "description": (re.compile(r"\s*description\s*"), "submitted description"),
+        "material_type": (re.compile(r"\s*material_type\s*"), "submitted material type")
+    }
+
+    for attribute, mapping in translation.items():
+        regex, new_name = mapping
+        for category in sample.attributes:
+            if re.match(regex, category):
+                annotation = sample.attributes.pop(category)
+                base_attribute = getattr(sample, attribute)
+                if base_attribute and base_attribute != annotation.value:
+                    # Put the annotation back under a new name if it is not the same in the base attribute
+                    sample.attributes[new_name] = annotation
+                else:
+                    # Set or overwrite if the attribute is empty or is the same
+                    setattr(sample, attribute, annotation.value)
+                break

@@ -1,7 +1,9 @@
 import unittest
-from converter.dm2magetab import get_protocol_positions, sort_protocol_refs_to_dict, flatten_sample_attribute
+from converter.dm2magetab import get_protocol_positions, sort_protocol_refs_to_dict, flatten_sample_attribute, \
+    rearrange_sample_attributes
 from datamodel.components import Attribute, Unit
-from datamodel import Protocol
+from datamodel.protocol import Protocol
+from datamodel.sample import Sample
 
 
 class TestReadingProtocolPositions(unittest.TestCase):
@@ -105,3 +107,39 @@ class TestFlatteningAttributesToList(unittest.TestCase):
     def test_empty_object(self):
         result = flatten_sample_attribute("", Attribute(value=None), "Characteristics")
         assert(result == [])
+
+
+class TestSampleAnnotationCleanUp(unittest.TestCase):
+
+    def test_sample_with_typo_organism(self):
+        test_sample = Sample(taxon="Homo sapiens", attributes={"organism": Attribute(value="Homo Sapiens")})
+        rearrange_sample_attributes(test_sample)
+        self.assertEqual(str(test_sample),
+                         str(Sample(taxon="Homo sapiens",
+                                    attributes={"submitted organism": Attribute(value="Homo Sapiens")})))
+
+    def test_sample_with_material_and_description(self):
+        test_sample = Sample(taxon="Homo sapiens",
+                             attributes={"material_type ": Attribute(value="cell"),
+                                         "description":  Attribute(value="test")})
+        rearrange_sample_attributes(test_sample)
+        self.assertEqual(str(test_sample),
+                         str(Sample(taxon="Homo sapiens", material_type="cell",
+                                    description="test", attributes={})))
+
+    def test_sample_with_all_equal(self):
+        test_sample = Sample(taxon="Homo sapiens", material_type="cell", description="test",
+                             attributes={"material_type ": Attribute(value="cell"),
+                                         "description":  Attribute(value="test")})
+        rearrange_sample_attributes(test_sample)
+        self.assertEqual(str(test_sample),
+                         str(Sample(taxon="Homo sapiens", material_type="cell",
+                                    description="test", attributes={})))
+
+    def test_sample_with_material_type(self):
+        test_sample = Sample(taxon="Homo sapiens", description="test",
+                             attributes={"material_type ": Attribute(value="cell")})
+        rearrange_sample_attributes(test_sample)
+        self.assertEqual(str(test_sample),
+                         str(Sample(taxon="Homo sapiens", material_type="cell",
+                                    description="test", attributes={})))
