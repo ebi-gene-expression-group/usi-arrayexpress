@@ -35,6 +35,8 @@ def parse_args():
                         help="Option to output detailed logging (debug level)")
     parser.add_argument('-l', '--logdir',
                         help="The path where to write the log. Default is same directory as IDF file.")
+    parser.add_argument('-k', '--key', default='ae',
+                        help="The import key used to determine the conversion rules (default is 'ae')")
 
     return parser.parse_args()
 
@@ -90,10 +92,10 @@ def main():
     json_data = read_json_file(json_file)
 
     # Convert from JSON to data model
-    mapping_file = pkg_resources.resource_string("converter", "config/mapping_ae-usi_to_datamodel.json")
-    mapping = json.loads(mapping_file)
-    ae_converter = JSONConverter(mapping, import_key="ae")
-    sub2 = ae_converter.convert_usi_sub(json_data, source_file_name=json_file)
+    mapping = json.loads(pkg_resources.resource_string('datamodel',
+                                                       os.path.join("config", "datamodel_mapping_config.json")))
+    ae_converter = JSONConverter(mapping, import_key=args.key)
+    sub2 = ae_converter.convert_submission(json_data, source_file_name=json_file)
 
     # Run metadata validation again
     error_codes = []
