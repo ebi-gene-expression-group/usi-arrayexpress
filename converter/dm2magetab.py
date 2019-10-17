@@ -6,7 +6,7 @@ import re
 from collections import OrderedDict, defaultdict
 
 from utils.common_utils import get_ontology_source_file
-from utils.converter_utils import get_controlled_vocabulary, new_file_prefix
+from utils.converter_utils import get_controlled_vocabulary, new_file_prefix, dict_to_vertical_table
 
 
 def generate_idf(sub):
@@ -386,6 +386,16 @@ def write_sdrf_file(pandas_table, new_file_name, logger):
         pandas_table.to_csv(new_file_name, sep='\t', encoding='utf-8', index=False)
     except Exception as e:
         logger.error("Failed to write SDRF: {}".format(str(e)))
+
+
+def write_idf_file(idf, new_idf_file, logger):
+    """Write out IDF tab-delimited text file from dictionary
+
+    :param idf: dictionary with IDF fields as keys
+    :param new_idf_file, file path to write IDF
+    :param logger: log for errors
+    """
+    return dict_to_vertical_table(idf, new_idf_file, logger)
 
 
 def get_term_sources(sub):
