@@ -3,7 +3,7 @@
 from collections import OrderedDict, defaultdict
 
 from datamodel.components import Attribute
-from utils.converter_utils import is_accession, get_efo_url, write_json_file, attrib2dict
+from utils.converter_utils import is_accession, get_efo_url, write_json_file, attrib2dict, get_controlled_vocabulary
 
 
 def generate_usi_project_object(project):
@@ -43,6 +43,17 @@ def generate_usi_study_object(study, sub_info):
     # Optional attributes
     if study.date_of_experiment:
         study_attributes["date_of_experiment"] = generate_usi_attribute_entry(study.date_of_experiment)
+    if study.secondary_accession:
+        for acc in study.secondary_accession:
+            study_attributes["secondary_accession"].extend(generate_usi_attribute_entry(acc))
+    if study.related_experiment:
+        for acc in study.related_experiment:
+            study_attributes["related_study"].extend(generate_usi_attribute_entry(acc))
+
+    # Comments
+    for comment, values in study.comments.items():
+        for v in values:
+            study_attributes["Comment[{}]".format(comment)].extend(generate_usi_attribute_entry(v))
 
     study_object["attributes"] = study_attributes
 
@@ -73,6 +84,8 @@ def generate_usi_sample_object(sample):
 
     if sample.description:
         sample_object['description'] = sample.description
+    if sample.material_type:
+        sample.attributes["material_type"] = Attribute(value=sample.material_type)
 
     attributes = OrderedDict()
     for a_name, a_attrib in sample.attributes.items():

@@ -372,5 +372,5 @@ def new_file_prefix(sub):
         return sub.study.accession
     else:
         # Use prefix of original file name after stripping file extension
-        source_file = sub.info.get("metadata")
-        return re.sub("\.\w+$", "", os.path.basename(source_file), flags=re.IGNORECASE)
+        source_file = sub.info.get("metadata", "")
+        return re.sub(r"\.\w+$", "", os.path.basename(source_file), flags=re.IGNORECASE)

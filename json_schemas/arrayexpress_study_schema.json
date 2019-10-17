@@ -79,7 +79,7 @@
                   }
                 }
               },
-              "related_experiment": {
+              "related_study": {
                 "description": "Accession numbers of other studies that are related to the current submission, e.g. for multi-omics studies. These accessions can be from ArrayExpress or other archives such as PRIDE, ENA etc."
               },
               "secondary_accession": {

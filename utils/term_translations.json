@@ -54,9 +54,9 @@
   "idf_comment_terms": {
     "ArrayExpressAccession": "accession",
     "AEExperimentType": "experiment_type",
-    "RelatedExperiment": "",
+    "RelatedExperiment": "related_experiment",
     "AdditionalFile": "",
-    "SecondaryAccession": "",
+    "SecondaryAccession": "secondary_accession",
     "SequenceDataURI": "",
     "AEExperimentDisplayName": "",
     "EAExpectedClusters": "",

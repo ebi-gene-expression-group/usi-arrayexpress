@@ -235,9 +235,9 @@ class JSONConverter:
         return [self.import_string(element, translation)]
 
     @staticmethod
-    def get_first_object_from_list(input_json,  translation={}):
+    def get_first_object_from_list(input_json, default={}, translation={}):
         """Return the first object from a list or an empty dictionary if the list is empty."""
-        return next(iter(input_json), [])
+        return next(iter(input_json), default)
 
     @staticmethod
     def import_as_is(input_json, translation={}):

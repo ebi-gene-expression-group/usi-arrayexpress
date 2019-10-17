@@ -6,7 +6,7 @@ import re
 from collections import OrderedDict, defaultdict
 
 from utils.common_utils import get_ontology_source_file
-from utils.converter_utils import get_controlled_vocabulary, new_file_prefix
+from utils.converter_utils import get_controlled_vocabulary, new_file_prefix, dict_to_vertical_table
 
 
 def generate_idf(sub):
@@ -42,9 +42,9 @@ def generate_idf(sub):
         ("Publication Status Term Source REF", ["EFO" for p in sub.project.publications if p.publicationStatus]),
         ("Publication Status Term Accession Number", []),
         ("Protocol Name", [p.alias for p in sub.protocol]),
-        ("Protocol Type", [p.protocol_type.value for p in sub.protocol]),
-        ("Protocol Term Source REF", [p.protocol_type.term_source for p in sub.protocol]),
-        ("Protocol Term Accession Number", [p.protocol_type.term_accession for p in sub.protocol]),
+        ("Protocol Type", [p.protocol_type.value for p in sub.protocol if p.protocol_type]),
+        ("Protocol Term Source REF", [p.protocol_type.term_source for p in sub.protocol if p.protocol_type]),
+        ("Protocol Term Accession Number", [p.protocol_type.term_accession for p in sub.protocol if p.protocol_type]),
         ("Protocol Description", [p.description for p in sub.protocol]),
         ("Protocol Hardware", [p.hardware for p in sub.protocol]),
         ("Protocol Software", [p.software for p in sub.protocol]),
@@ -57,12 +57,13 @@ def generate_idf(sub):
     if sub.study.accession:
         idf["Comment[ArrayExpressAccession]"] = sub.study.accession
     if sub.study.related_experiment:
-        idf["Comment[RelatedExperiment"] = [ac for ac in sub.study.related_experiment]
+        idf["Comment[RelatedExperiment]"] = [ac for ac in sub.study.related_experiment]
+
     # Sequencing specific comments
-    if sub.info.get("submission_type") == "sequencing" or sub.info.get("submission_type") == "singlecell":
+    if sub.info.get("submission_type") in ("sequencing", "singlecell"):
+        idf["Comment[SequenceDataURI]"] = generate_sequence_data_uri([a.accession for a in sub.assay_data])
         if sub.study.secondary_accession:
             idf["Comment[SecondaryAccession]"] = [ac for ac in sub.study.secondary_accession]
-        # TODO: Add comments for Comment[RelatedExperiment] and Comment[SequenceDataURI]
 
     return idf
 
@@ -81,9 +82,15 @@ def generate_sdrf(sub):
         row = []
         all_protocols = set()
 
+        # Move annotations from attributes dict to base attributes
+        rearrange_sample_attributes(sample)
+
         sample_values = [("Source Name", sample.alias)]
         if sample.accession:
             sample_values.append(("Comment[BioSD_SAMPLE]", sample.accession))
+        if sample.taxon:
+            sample_values.append(("Characteristics[organism]", sample.taxon))
+
         # Expand sample attributes to characteristics columns (they can be different between different samples)
         for category, sample_attrib in sample.attributes.items():
             sample_values.extend(flatten_sample_attribute(category, sample_attrib, "Characteristics"))
@@ -311,7 +318,8 @@ def flatten_sample_attribute(category, attrib_object, column_header, make_unique
 
 
 def get_protocol_positions(techtype):
-    """Fetch all protocol types for microarray/sequencing studies and return a dictionary sorted by position in the SDRF.
+    """Fetch all protocol types for microarray/sequencing studies and return a dictionary
+    sorted by position in the SDRF.
     {1: [sample collection, growth, treatment], 2: [labeling], 3: [hybridization] ...}"""
     # Use the same protocols for singlecell as for sequencing
     if techtype == "singlecell":
@@ -339,7 +347,7 @@ def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
     protocol_dict = defaultdict(OrderedDict)
 
     for pos, p_types in protocol_positions.items():
-        prefs_for_position = [p for p in all_protocols if p.protocol_type.value in p_types]
+        prefs_for_position = [p for p in all_protocols if p.protocol_type and p.protocol_type.value in p_types]
         # Number of entries in the dict corresponds to the number of columns that will be created and
         # should be equal of the number of protocol refs for the same position
         column_number = 1
@@ -380,6 +388,16 @@ def write_sdrf_file(pandas_table, new_file_name, logger):
         logger.error("Failed to write SDRF: {}".format(str(e)))
 
 
+def write_idf_file(idf, new_idf_file, logger):
+    """Write out IDF tab-delimited text file from dictionary
+
+    :param idf: dictionary with IDF fields as keys
+    :param new_idf_file, file path to write IDF
+    :param logger: log for errors
+    """
+    return dict_to_vertical_table(idf, new_idf_file, logger)
+
+
 def get_term_sources(sub):
     term_sources = OrderedDict()
     # Make sure we have at least EFO (used for protocol types etc.)
@@ -397,4 +415,66 @@ def get_term_sources(sub):
 def generate_sequence_data_uri(run_list):
     """Return the intervals of ENA run URIs"""
     base_uri = "https://www.ebi.ac.uk/ena/data/view/"
-    pass
+    uri_list = []
+    first = None
+    latest = None
+
+    for acc in sorted(run_list):
+        if not first:
+            first = acc
+            # Nothing more to do we have no second value yet
+            continue
+
+        # We should now have first or latest and compare against the current acc
+        if latest and (int(acc.split("ERR")[-1]) == int(latest.split("ERR")[-1]) + 1):
+            # Found that the next one in line belongs to the interval, setting latest to next acc
+            latest = acc
+        elif int(acc.split("ERR")[-1]) == int(first.split("ERR")[-1]) + 1:
+            # It continues the interval, setting value to latest
+            latest = acc
+        else:
+            # It's not the first of a new interval and it doesn't increase by 1
+            # Close the previous interval
+            if latest:
+                uri_list.append("{}{}-{}".format(base_uri, first, latest))
+            else:
+                uri_list.append("{}{}".format(base_uri, first))
+            # Start a new interval
+            first = acc
+            latest = None
+
+    # For the last two
+    if first and latest:
+        uri_list.append("{}{}-{}".format(base_uri, first, latest))
+    # Or the last one
+    elif first:
+        uri_list.append("{}{}".format(base_uri, first))
+
+    return uri_list
+
+
+def rearrange_sample_attributes(sample):
+    """Some sample attributes can be assigned to the standard MAGE-TAB categories.
+    This removes duplicated categories from the characteristics if we have them
+    already in the sample class base attributes like taxon, description, etc.
+    In order to avoid duplication, categories remaining in the attributes list are renamed."""
+
+    translation = {
+        "taxon": (re.compile(r"\s*organism\s*"), "submitted organism"),
+        "description": (re.compile(r"\s*description\s*"), "submitted description"),
+        "material_type": (re.compile(r"\s*material_type\s*"), "submitted material type")
+    }
+
+    for attribute, mapping in translation.items():
+        regex, new_name = mapping
+        for category in sample.attributes:
+            if re.match(regex, category):
+                annotation = sample.attributes.pop(category)
+                base_attribute = getattr(sample, attribute)
+                if base_attribute and base_attribute != annotation.value:
+                    # Put the annotation back under a new name if it is not the same in the base attribute
+                    sample.attributes[new_name] = annotation
+                else:
+                    # Set or overwrite if the attribute is empty or is the same
+                    setattr(sample, attribute, annotation.value)
+                break

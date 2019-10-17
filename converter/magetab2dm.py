@@ -437,7 +437,10 @@ def parse_idf(idf_file):
             # Remove empty list entries, e.g. 'related experiment': ['E-MTAB-7236', '', '', '']
             comment_values = [x for x in idf_dict[idf_ct] if x]
             # A new dict entry for the term with the list of values
-            study_info["comments"][usi_ct] = comment_values
+            if usi_ct:
+                study_info["comments"][usi_ct] = comment_values
+            else:
+                study_info["comments"][idf_ct] = comment_values
 
     # General Info
     general_terms = {get_name(t): val for t, val in get_controlled_vocabulary("investigation_terms").items()}
@@ -526,6 +529,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
 
     # Study
     study_object = study_from_magetab(study_info)
+    print(study_object)
 
     # Protocols
     protocol_objects = []
@@ -701,7 +705,9 @@ def study_from_magetab(study_info):
     protocolrefs = study_info.get("protocolRefs", [])
     date_of_experiment = study_info.get("date_of_experiment", None)
     comments = study_info.get("comments", {})
-    experiment_type = comments.get("experiment_type", [])
+    experiment_type = comments.pop("experiment_type", [])
+    secondary_accession = comments.pop("secondary_accession", [])
+    related_experiment = comments.pop("related_experiment", [])
 
     return Study(alias=alias,
                  accession=accession,
@@ -712,7 +718,10 @@ def study_from_magetab(study_info):
                  experimental_factor=ef_objects,
                  experimental_design=ed_objects,
                  experiment_type=experiment_type,
-                 date_of_experiment=date_of_experiment)
+                 date_of_experiment=date_of_experiment,
+                 secondary_accession=secondary_accession,
+                 related_experiment=related_experiment,
+                 comments=comments)
 
 
 def protocol_from_magetab(protocol_dict):
