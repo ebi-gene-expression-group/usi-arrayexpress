@@ -42,9 +42,9 @@ def generate_idf(sub):
         ("Publication Status Term Source REF", ["EFO" for p in sub.project.publications if p.publicationStatus]),
         ("Publication Status Term Accession Number", []),
         ("Protocol Name", [p.alias for p in sub.protocol]),
-        ("Protocol Type", [p.protocol_type.value for p in sub.protocol]),
-        ("Protocol Term Source REF", [p.protocol_type.term_source for p in sub.protocol]),
-        ("Protocol Term Accession Number", [p.protocol_type.term_accession for p in sub.protocol]),
+        ("Protocol Type", [p.protocol_type.value for p in sub.protocol if p.protocol_type]),
+        ("Protocol Term Source REF", [p.protocol_type.term_source for p in sub.protocol if p.protocol_type]),
+        ("Protocol Term Accession Number", [p.protocol_type.term_accession for p in sub.protocol if p.protocol_type]),
         ("Protocol Description", [p.description for p in sub.protocol]),
         ("Protocol Hardware", [p.hardware for p in sub.protocol]),
         ("Protocol Software", [p.software for p in sub.protocol]),
@@ -347,7 +347,7 @@ def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
     protocol_dict = defaultdict(OrderedDict)
 
     for pos, p_types in protocol_positions.items():
-        prefs_for_position = [p for p in all_protocols if p.protocol_type.value in p_types]
+        prefs_for_position = [p for p in all_protocols if p.protocol_type and p.protocol_type.value in p_types]
         # Number of entries in the dict corresponds to the number of columns that will be created and
         # should be equal of the number of protocol refs for the same position
         column_number = 1
