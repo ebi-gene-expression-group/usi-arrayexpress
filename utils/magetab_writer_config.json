@@ -1,0 +1,12 @@
+{
+  "factor_only_attributes": [
+    "compound",
+    "dose",
+    "time",
+    "single cell identifier",
+    "immunoprecipitate",
+    "infect",
+    "irradiate",
+    "RNA interference"
+  ]
+}

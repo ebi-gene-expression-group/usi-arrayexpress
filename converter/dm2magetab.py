@@ -73,6 +73,7 @@ def generate_sdrf(sub):
 
     submission_type = sub.info.get("submission_type")
     protocol_positions = get_protocol_positions(submission_type)
+    factor_only_terms = get_controlled_vocabulary("factor_only_attributes", "magetab_writer")
     rows = []
 
     # For each node (sample, extract, assay etc.) start a list of tuples with category value pairs,
@@ -93,6 +94,8 @@ def generate_sdrf(sub):
 
         # Expand sample attributes to characteristics columns (they can be different between different samples)
         for category, sample_attrib in sample.attributes.items():
+            if category in factor_only_terms:
+                continue
             sample_values.extend(flatten_sample_attribute(category, sample_attrib, "Characteristics"))
         if sample.description:
             sample_values.append(("Description", sample.description))

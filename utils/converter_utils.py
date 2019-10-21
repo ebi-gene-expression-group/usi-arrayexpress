@@ -60,6 +60,8 @@ def get_controlled_vocabulary(category, resource="translations"):
         resource_path = "ontology_terms.json"
     elif resource == "magetab":
         resource_path = "magetab_fields.json"
+    elif resource == "magetab_writer":
+        resource_path = "magetab_writer_config.json"
     else:
         resource_path = "term_translations.json"
     all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
