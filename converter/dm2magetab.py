@@ -94,7 +94,7 @@ def generate_sdrf(sub):
 
         # Expand sample attributes to characteristics columns (they can be different between different samples)
         for category, sample_attrib in sample.attributes.items():
-            if category in factor_only_terms:
+            if category.lower() in factor_only_terms:
                 continue
             sample_values.extend(flatten_sample_attribute(category, sample_attrib, "Characteristics"))
         if sample.description:
@@ -402,6 +402,9 @@ def write_idf_file(idf, new_idf_file, logger):
 
 
 def get_term_sources(sub):
+    """Generate a dictionary of the Term Sources (ontologies) used in the sample annotation.
+    The keys are the names of the ontologies or other source and the values are the corresponding web URIs.
+    The source URIs are looked up using OLS."""
     term_sources = OrderedDict()
     # Make sure we have at least EFO (used for protocol types etc.)
     term_sources["EFO"] = "https://www.ebi.ac.uk/efo.owl"
