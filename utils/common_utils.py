@@ -123,7 +123,6 @@ def get_term_parent(ontology, term):
 
     term_url = ols_lookup(ontology, term)
     url_encoded = url_encode_for_ols(term_url)
-    print(term_url)
     api_url = "ontologies/{}/terms/{}/parents".format(ontology, url_encoded)
     data = query_ols(api_url, {}, logging.getLogger())
     if data:
@@ -141,7 +140,6 @@ def ols_lookup(ontology, term):
     # Just in case we already have a url
     term_encoded = url_encode_for_ols(term)
     api_url = "search?q={{{}}}&ontology={}".format(term_encoded, ontology)
-    print(api_url)
     data = query_ols(api_url, {}, logging.getLogger())
     if data:
         try:
