@@ -1,0 +1,166 @@
+{
+  "_id": "",
+  "dataTypeId": "",
+  "displayName": "FG Plant Samples",
+  "description": "",
+  "spreadsheetTemplate": {
+    "columnCaptures": {
+      "alias": {
+        "fieldName": "alias",
+        "fieldType": "String",
+        "required": true
+      },
+      "title": {
+        "fieldName": "title",
+        "fieldType": "String",
+        "required": true
+      },
+      "description": {
+        "fieldName": "description",
+        "fieldType": "String",
+        "required": false
+      },
+      "release date": {
+        "fieldName": "releaseDate",
+        "fieldType": "String",
+        "required": true
+      },
+      "taxon": {
+        "fieldName": "taxon",
+        "fieldType": "String",
+        "required": true
+      },
+      "taxon id": {
+        "fieldName": "taxonId",
+        "fieldType": "IntegerNumber",
+        "required": true
+      },
+      "cultivar": {
+        "required": true,
+        "allowUnits": false,
+        "allowTerms": true
+      },
+      "organism part": {
+        "required": true,
+        "allowUnits": false,
+        "allowTerms": true
+      },
+      "age": {
+        "required": true,
+        "allowUnits": true,
+        "allowTerms": true
+      },
+      "developmental stage": {
+        "required": true,
+        "allowUnits": false,
+        "allowTerms": true
+      },
+      "genotype": {
+        "required": true,
+        "allowUnits": false,
+        "allowTerms": true
+      },
+      "cell type": {
+        "required": false,
+        "allowUnits": false,
+        "allowTerms": true
+      },
+      "material type": {
+        "required": true,
+        "allowUnits": false,
+        "allowTerms": false
+      }
+    }
+  },
+  "validationSchema": {
+    "id": "",
+    "#dollar#schema": "http://json-schema.org/draft-07/schema#",
+    "title": "FG Plant Samples Schema",
+    "description": "Minimum sample annotation for functional genomics plant samples",
+    "properties": {
+      "attributes": {
+        "type": "object",
+        "required": [
+          "organism part",
+          "age",
+          "developmental stage",
+          "genotype"
+        ],
+        "oneOf": [
+          {"required":
+            ["cultivar"]
+          },
+          {"required":
+            ["ecotype"]
+          }
+        ],
+        "properties": {
+          "cultivar": {
+            "description": "For crop plants: the strain/variety of plant , e.g. Desiree for potato."
+          },
+          "ecotype": {
+            "description": "For non-food plants: the strain/sub-type of plant, e.g. Col-0 for Arabidopsis."
+          },
+          "organism part": {
+            "description": "The specific plant tissue or plant part that was sampled, e.g. root tip."
+          },
+          "age": {
+            "description": "The age of the plant at the time of sampling.",
+            "items": {
+              "required": [
+                "units"
+              ]
+            }
+          },
+          "developmental stage": {
+            "description": "The stage in the life cycle of the plant at which it was sampled."
+          },
+          "genotype": {
+            "description": "Any genetic modification that has been introduced. Use 'wild type genotype' if there was no genetic modification."
+          },
+          "cell type": {
+            "description": "The type of cells if a particular cell type was sampled."
+          }
+        },
+        "patternProperties": {
+          "^.*$": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "required": [
+                "value"
+              ],
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "units": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "terms": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "url"
+                    ],
+                    "properties": {
+                      "url": {
+                        "format": "uri",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
