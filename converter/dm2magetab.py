@@ -178,6 +178,9 @@ def generate_sdrf(sub):
                         data_values.append(("Comment[{}]".format(f.checksum_method.upper()), f.checksum))
                     if f.ftp_location:
                         data_values.append(("Comment[ArrayExpress FTP file]", f.ftp_location))
+                    if f.read_type:
+                        for fx in ad.files:
+                            data_values.append(("Comment[{} file]".format(fx.read_type), fx.name))
                     row4 = row3[:] + [OrderedDict(data_values)]
 
                     end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)

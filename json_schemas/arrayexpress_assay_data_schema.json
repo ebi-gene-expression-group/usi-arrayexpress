@@ -42,7 +42,7 @@
             "description": "Attributes for describing a data file",
             "type": "object",
             "properties": {
-              "read": {
+              "read_type": {
               "description": "The type of sequencing read. Required for multiplexed single cell raw data files.",
               "type": "array",
               "minItems": 1,
