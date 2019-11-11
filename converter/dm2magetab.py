@@ -106,7 +106,6 @@ def generate_sdrf(sub):
         row.extend([OrderedDict(sample_values)])
 
         # Get all assay objects that belong to this sample (based on alias or accession)
-
         assays = [assay for assay in sub.assay if assay.sampleref in (sample.accession, sample.alias)]
 
         for assay in assays:
@@ -141,9 +140,10 @@ def generate_sdrf(sub):
                 row2 = row[:] + [protocol_refs[1], OrderedDict(extract_values)]
 
             # Get all assay data objects that belong to this assay
-            data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]
+            data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs or assay.accession in ad.assayrefs]
 
             for ad in data:
+
                 # For matrix files the Assay Name is inferred from the assay object (i.e. labeled extract name)
                 if ad.data_type == "raw matrix":
                     assay_name = assay.alias
