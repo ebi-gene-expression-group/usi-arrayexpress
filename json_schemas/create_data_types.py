@@ -20,9 +20,7 @@ def load_schema_for_mongo(schema_file):
     try:
         with open(schema_file) as sf:
             json_string = json.dumps(json.load(sf))
-            print(json_string)
             mongo_string = re.sub(r"\"\$", "\"#dollar#", re.sub(r"\"\.", "\"#dot#", json_string))
-            print(mongo_string)
             return json.loads(mongo_string)
     except IOError:
         print("Schema file {} not found or not readable.".format(schema_file))
@@ -131,7 +129,22 @@ new_data_types = {
                                            "optionalValidationAuthors": [],
                                            "submittableClassName": "uk.ac.ebi.subs.repository.model.Assay",
                                            "archive": "ArrayExpress"},
-    "functionalGenomicsAssayData": {},
+
+    "functionalGenomicsAssayData": {"displayNameSingular": "Single Cell Sequencing Assay",
+                                    "displayNamePlural": "Single Cell Sequencing Assays",
+                                    "description": "",
+                                    "validationSchema": load_schema_for_mongo("arrayexpress_assay_data_schema.json"),
+                                    "refRequirements": [
+                                       {"refClassName": "uk.ac.ebi.subs.data.component.AssayRef",
+                                        "dataTypeIdForReferencedDocument": "functionalGenomicsStudies",
+                                        "additionalRequiredValidation": []}
+                                       ],
+                                    "requiredValidationAuthors": ["core",
+                                                                  "JsonSchema",
+                                                                  "FileReference"],
+                                    "optionalValidationAuthors": [],
+                                    "submittableClassName": "uk.ac.ebi.subs.repository.model.AssayData",
+                                    "archive": "ArrayExpress"},
     "functionalGenomicsAnalysis": {},
     "functionalGenomicsFiles": {}
     }
