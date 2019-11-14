@@ -15,6 +15,8 @@ from pprint import pprint
 
 
 def load_schema_for_mongo(schema_file):
+    """The version of MongoDB that is used doesn't support special characters like $ and . at the start
+     of a keyword. These need to be replaced before inserting the JSON schema into the database."""
     try:
         with open(schema_file) as sf:
             json_string = json.dumps(json.load(sf))
