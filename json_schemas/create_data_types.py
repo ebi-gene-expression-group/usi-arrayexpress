@@ -1,11 +1,10 @@
-"""A script to define the USI data types insert them into the database.
+"""A script to define the USI data types and insert them into the database.
 
 Environment variables are needed to specify the following parameters:
 DBCON: MongoDB connection string
 SUBS_DATABASE: The database name to write to
-DATA_TYPE_COLLECTION: The name of the collection for storing the datatypes
+DATA_TYPE_COLLECTION: The name of the collection for storing the data types
 """
-
 
 import json
 import re
@@ -153,17 +152,13 @@ new_data_types = {
 # Get MongoDB connection string from environment variable $DBCON
 db_url = environ.get("DBCON")
 
-
-# connect to MongoDB, change the << MONGODB URL >> to reflect your own connection string
+# Connecting to MongoDB
 client = MongoClient(db_url)
 db = getattr(client, environ.get("SUBS_DATABASE"))
 
-
+# For testing the connection
 files_entry = getattr(db, environ.get("DATA_TYPE_COLLECTION")).find_one({"_id": "files"})
-
 pprint(files_entry)
-
-
 
 
 if __name__ == "__main__":
