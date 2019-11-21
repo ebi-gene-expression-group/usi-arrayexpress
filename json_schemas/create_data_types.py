@@ -59,6 +59,21 @@ new_data_types = {
         "archive": "ArrayExpress"
     },
 
+    "functionalGenomicsProjects": {
+        "displayNameSingular": "Functional Genomics Project",
+        "displayNamePlural": "Functional Genomics Projects",
+        "description": "Scientific projects including functional genomics studies",
+        "validationSchema": load_schema_for_mongo("arrayexpress_project_schema.json"),
+        "refRequirements": [],
+        "requiredValidationAuthors": [
+            "BioStudies",
+            "JsonSchema"
+        ],
+        "optionalValidationAuthors": [],
+        "submittableClassName": "uk.ac.ebi.subs.repository.model.Project",
+        "archive": "BioStudies"
+    },
+
     "functionalGenomicsMicroarrayStudies": {
         "displayNameSingular": "Functional Genomics Microarray Study",
         "displayNamePlural": "Functional Genomics Microarray Studies",
@@ -67,7 +82,7 @@ new_data_types = {
         "refRequirements": [
             {
                 "refClassName": "uk.ac.ebi.subs.data.component.ProjectRef",
-                "dataTypeIdForReferencedDocument": "projects",
+                "dataTypeIdForReferencedDocument": "functionalGenomicsProjects",
                 "additionalRequiredValidationAuthors": []
             },
             {
@@ -329,7 +344,7 @@ new_data_types = {
                 "refClassName": "uk.ac.ebi.subs.data.component.AssayRef",
                 "dataTypeIdForReferencedDocument": "functionalGenomicsSequencingAssays",
                 "additionalRequiredValidation": []
-           }
+            }
         ],
         "requiredValidationAuthors": [
             "core",
