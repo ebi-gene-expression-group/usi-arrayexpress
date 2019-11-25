@@ -1,7 +1,7 @@
 import re
 
 from datamodel.submission import Submission
-from datamodel.assay import SingleCellAssay
+from datamodel.assay import SingleCellAssay, MicroarrayAssay
 from utils import converter_utils
 from utils.converter_utils import ontology_term, is_accession
 from utils.common_utils import get_term_descendants, get_ena_library_terms_via_usi, get_ena_instrument_terms_via_usi
@@ -473,6 +473,19 @@ def run_file_checks(sub: Submission, logger):
         codes.append("DATA-E02")
     else:
         _data_object_checks(sub.assay_data, logger, codes)
+        # Assay labels to raw data file assignment check
+        if sub.info.get("submission_type") == "microarray":
+            for ad in sub.assay_data:
+                if ad.data_type == "raw":
+                    connected_assays = [aref for aref in ad.assayrefs if ad.assayrefs]
+                    labels = [sub.get_assay(assay_name).label for assay_name in connected_assays
+                              if isinstance(sub.get_assay(assay_name), MicroarrayAssay)]
+                    if len(labels) != len(set(labels)):
+                        logger.error("The number of assays linked to the same raw data file must match the number of "
+                                     "different channels (dyes used) and the labels of these assays must be distinct. "
+                                     "{} is currently linked to {} assays with labels {}.".format(
+                                      ad.alias, str(len(labels)), " and ".join(labels)))
+                        codes.append("DATA-E07")
 
     # Run analysis (processed data) checks
     if not sub.analysis:
