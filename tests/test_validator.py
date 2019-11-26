@@ -165,6 +165,15 @@ class TestMetaDataValidation(unittest.TestCase):
         error_codes = metadata_validation.run_assay_checks(self.sub, self.logger)
         self.assertEqual(["ASSA-E01"], error_codes)
 
+    def test_assay_data_validation(self):
+        # Expecting "no processed data warning"
+        error_codes = metadata_validation.run_file_checks(self.sub, self.logger)
+        self.assertEqual(error_codes, ['DATA-W01'])
+        # Two assays with the same label connected to one file should give DATA-E07
+        self.sub.assay[0].label = "Cy5"
+        error_codes = metadata_validation.run_file_checks(self.sub, self.logger)
+        self.assertIn('DATA-E07', error_codes)
+
 
 if __name__ == '__main__':
     unittest.main()
