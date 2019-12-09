@@ -71,7 +71,7 @@ def generate_idf(sub):
             idf["Comment[EACurator]"] = [c for c in sub.study.ea_curator if c]
         if sub.study.ea_experiment_type:
             idf["Comment[EAExperimentType]"] = [et for et in sub.study.ea_experiment_type if et]
-        if sub.study.ea_experiment_type:
+        if sub.study.ea_additional_attributes:
             idf["Comment[EAAdditionalAttributes]"] = [aa for aa in sub.study.ea_additional_attributes if aa]
         if sub.study.ea_expected_clusters:
             idf["Comment[EAExpectedClusters]"] = [ec for ec in sub.study.ea_expected_clusters if ec]
