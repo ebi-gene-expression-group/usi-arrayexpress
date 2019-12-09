@@ -49,6 +49,18 @@ def generate_usi_study_object(study, sub_info):
     if study.related_experiment:
         for acc in study.related_experiment:
             study_attributes["related_study"].extend(generate_usi_attribute_entry(acc))
+    if study.ea_curator:
+        for acc in study.ea_curator:
+            study_attributes["ea_curator"].extend(generate_usi_attribute_entry(acc))
+    if study.ea_experiment_type:
+        for acc in study.ea_experiment_type:
+            study_attributes["ea_experiment_type"].extend(generate_usi_attribute_entry(acc))
+    if study.ea_additional_attributes:
+        for acc in study.ea_additional_attributes:
+            study_attributes["ea_additional_attributes"].extend(generate_usi_attribute_entry(acc))
+    if study.ea_expected_clusters:
+        for acc in study.ea_expected_clusters:
+            study_attributes["ea_expected_clusters"].extend(generate_usi_attribute_entry(acc))
 
     # Comments
     for comment, values in study.comments.items():
