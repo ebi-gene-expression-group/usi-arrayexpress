@@ -68,7 +68,8 @@
     "GEOReleaseDate": "",
     "GEOLastUpdateDate": "",
     "TemplateType": "",
-    "AEAnonymousReview": ""
+    "AEAnonymousReview": "",
+    "AEExperimentDisplyName": ""
   },
   "node_terms": {
     "Source Name": "",
