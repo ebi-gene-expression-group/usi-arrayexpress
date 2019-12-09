@@ -708,6 +708,10 @@ def study_from_magetab(study_info):
     experiment_type = comments.pop("experiment_type", [])
     secondary_accession = comments.pop("secondary_accession", [])
     related_experiment = comments.pop("related_experiment", [])
+    ea_curator = comments.pop("ea_curator", [])
+    ea_experiment_type = comments.pop("ea_experiment_type", [])
+    ea_additional_attributes = comments.pop("ea_additional_attributes", [])
+    ea_expected_clusters = comments.pop("ea_expected_clusters", [])
 
     return Study(alias=alias,
                  accession=accession,
@@ -721,6 +725,10 @@ def study_from_magetab(study_info):
                  date_of_experiment=date_of_experiment,
                  secondary_accession=secondary_accession,
                  related_experiment=related_experiment,
+                 ea_curator=ea_curator,
+                 ea_experiment_type=ea_experiment_type,
+                 ea_additional_attributes=ea_additional_attributes,
+                 ea_expected_clusters=ea_expected_clusters,
                  comments=comments)
 
 
