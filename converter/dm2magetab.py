@@ -73,6 +73,7 @@ def generate_sdrf(sub):
 
     submission_type = sub.info.get("submission_type")
     protocol_positions = get_protocol_positions(submission_type)
+    factor_only_terms = get_controlled_vocabulary("factor_only_attributes", "magetab_writer")
     rows = []
 
     # For each node (sample, extract, assay etc.) start a list of tuples with category value pairs,
@@ -93,6 +94,8 @@ def generate_sdrf(sub):
 
         # Expand sample attributes to characteristics columns (they can be different between different samples)
         for category, sample_attrib in sample.attributes.items():
+            if category.lower() in factor_only_terms:
+                continue
             sample_values.extend(flatten_sample_attribute(category, sample_attrib, "Characteristics"))
         if sample.description:
             sample_values.append(("Description", sample.description))
@@ -103,7 +106,6 @@ def generate_sdrf(sub):
         row.extend([OrderedDict(sample_values)])
 
         # Get all assay objects that belong to this sample (based on alias or accession)
-
         assays = [assay for assay in sub.assay if assay.sampleref in (sample.accession, sample.alias)]
 
         for assay in assays:
@@ -138,9 +140,10 @@ def generate_sdrf(sub):
                 row2 = row[:] + [protocol_refs[1], OrderedDict(extract_values)]
 
             # Get all assay data objects that belong to this assay
-            data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs]
+            data = [ad for ad in sub.assay_data if assay.alias in ad.assayrefs or assay.accession in ad.assayrefs]
 
             for ad in data:
+
                 # For matrix files the Assay Name is inferred from the assay object (i.e. labeled extract name)
                 if ad.data_type == "raw matrix":
                     assay_name = assay.alias
@@ -175,6 +178,9 @@ def generate_sdrf(sub):
                         data_values.append(("Comment[{}]".format(f.checksum_method.upper()), f.checksum))
                     if f.ftp_location:
                         data_values.append(("Comment[ArrayExpress FTP file]", f.ftp_location))
+                    if f.read_type:
+                        for fx in ad.files:
+                            data_values.append(("Comment[{} file]".format(fx.read_type), fx.name))
                     row4 = row3[:] + [OrderedDict(data_values)]
 
                     end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
@@ -399,6 +405,9 @@ def write_idf_file(idf, new_idf_file, logger):
 
 
 def get_term_sources(sub):
+    """Generate a dictionary of the Term Sources (ontologies) used in the sample annotation.
+    The keys are the names of the ontologies or other source and the values are the corresponding web URIs.
+    The source URIs are looked up using OLS."""
     term_sources = OrderedDict()
     # Make sure we have at least EFO (used for protocol types etc.)
     term_sources["EFO"] = "https://www.ebi.ac.uk/efo.owl"

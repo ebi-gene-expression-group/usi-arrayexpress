@@ -60,6 +60,8 @@ def get_controlled_vocabulary(category, resource="translations"):
         resource_path = "ontology_terms.json"
     elif resource == "magetab":
         resource_path = "magetab_fields.json"
+    elif resource == "magetab_writer":
+        resource_path = "magetab_writer_config.json"
     else:
         resource_path = "term_translations.json"
     all_terms = json.loads(pkg_resources.resource_string(resource_package, resource_path))
@@ -240,10 +242,9 @@ def guess_submission_type_from_idf(idf_dict):
     """Based on the experiment type, we can try to infer the basic experiment type
     This returns the type of the first experiment type found. We cannot handle mixed type experiments.
     """
-    print(idf_dict)
+
     if "AEExperimentType" in idf_dict:
         all_types = get_controlled_vocabulary("experiment_type", "ontology")
-        print(all_types)
         for exptype in idf_dict["AEExperimentType"]:
             if exptype in all_types["sequencing"]:
                 return "sequencing"
