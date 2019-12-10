@@ -438,6 +438,7 @@ def generate_sequence_data_uri(run_list):
     uri_list = []
     first = None
     latest = None
+    acc_pattern = re.compile(r"(E|D|S)RR")
 
     try:
         for acc in sorted(run_list):
@@ -447,10 +448,10 @@ def generate_sequence_data_uri(run_list):
                 continue
 
             # We should now have first or latest and compare against the current acc
-            if latest and (int(acc.split("ERR")[-1]) == int(latest.split("ERR")[-1]) + 1):
+            if latest and (int(acc_pattern.split(acc)[-1]) == int(acc_pattern.split(latest)[-1]) + 1):
                 # Found that the next one in line belongs to the interval, setting latest to next acc
                 latest = acc
-            elif int(acc.split("ERR")[-1]) == int(first.split("ERR")[-1]) + 1:
+            elif int(acc_pattern.split(acc)[-1]) == int(acc_pattern.split(first)[-1]) + 1:
                 # It continues the interval, setting value to latest
                 latest = acc
             else:
