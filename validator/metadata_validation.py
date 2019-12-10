@@ -442,16 +442,16 @@ def run_singlecell_checks(sub: Submission, logger):
                 codes.append("CELL-E04")
         # Warnings about non-critical single cell attributes
         if not a.single_cell_isolation:
-            logger.warn("Single-cell assay \"{}\" has no single cell isolation specified.").format(a.alias)
+            logger.warn("Single-cell assay \"{}\" has no single cell isolation specified.".format(a.alias))
             codes.append("CELL-W05")
         if not a.end_bias:
-            logger.warn("Single-cell assay \"{}\" has no end bias specified.").format(a.alias)
+            logger.warn("Single-cell assay \"{}\" has no end bias specified.".format(a.alias))
             codes.append("CELL-W06")
         if not a.input_molecule:
-            logger.warn("Single-cell assay \"{}\" has no input molecule specified.").format(a.alias)
+            logger.warn("Single-cell assay \"{}\" has no input molecule specified.".format(a.alias))
             codes.append("CELL-W07")
         if not a.primer:
-            logger.warn("Single-cell assay \"{}\" has no primer specified.").format(a.alias)
+            logger.warn("Single-cell assay \"{}\" has no primer specified.".format(a.alias))
             codes.append("CELL-W08")
 
     return codes

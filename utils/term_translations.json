@@ -59,17 +59,16 @@
     "SecondaryAccession": "secondary_accession",
     "SequenceDataURI": "",
     "AEExperimentDisplayName": "",
-    "EAExpectedClusters": "",
-    "EAAdditionalAttributes": "",
-    "EAExperimentType": "",
-    "EACurator": "",
+    "EAExpectedClusters": "ea_expected_clusters",
+    "EAAdditionalAttributes": "ea_additional_attributes",
+    "EAExperimentType": "ea_experiment_type",
+    "EACurator": "ea_curator",
     "Submitted Name": "",
     "SRASubmissionDate": "",
     "GEOReleaseDate": "",
     "GEOLastUpdateDate": "",
     "TemplateType": "",
-    "AEAnonymousReview": "",
-    "AEExperimentDisplyName": ""
+    "AEAnonymousReview": ""
   },
   "node_terms": {
     "Source Name": "",
