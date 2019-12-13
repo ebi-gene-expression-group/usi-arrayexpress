@@ -528,7 +528,7 @@ def data_objects_from_magetab(idf_file_path, sdrf_file_path, submission_type):
     project_object = project_from_magetab(study_info)
 
     # Study
-    study_object = study_from_magetab(study_info)
+    study_object = study_from_magetab(study_info, sub_info)
     print(study_object)
 
     # Protocols
@@ -685,7 +685,8 @@ def project_from_magetab(study_info):
                    contacts=contacts)
 
 
-def study_from_magetab(study_info):
+def study_from_magetab(study_info, sub_info):
+    submission_type = sub_info.get("submission_type")
     accession = study_info.get("accession")
     idf_file = os.path.basename(study_info.get("idf_filename", ""))
     alias = re.sub(r"\.idf\.txt$", "", idf_file)
@@ -723,6 +724,7 @@ def study_from_magetab(study_info):
                  experimental_design=ed_objects,
                  experiment_type=experiment_type,
                  date_of_experiment=date_of_experiment,
+                 submission_type=submission_type,
                  secondary_accession=secondary_accession,
                  related_experiment=related_experiment,
                  ea_curator=ea_curator,

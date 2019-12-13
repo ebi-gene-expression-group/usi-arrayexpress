@@ -41,6 +41,8 @@ def generate_usi_study_object(study, sub_info):
         study_attributes["experiment_type"].extend(generate_usi_attribute_entry(et))
 
     # Optional attributes
+    if study.submission_type:
+        study_attributes["submission_type"] = generate_usi_attribute_entry(study.submission_type)
     if study.date_of_experiment:
         study_attributes["date_of_experiment"] = generate_usi_attribute_entry(study.date_of_experiment)
     if study.secondary_accession:
