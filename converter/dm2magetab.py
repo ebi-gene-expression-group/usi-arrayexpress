@@ -275,9 +275,15 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
 
     protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
 
-    row.extend([protocol_refs[6],
-                OrderedDict(processed_data_values),
-                OrderedDict(factor_values)])
+    if processed_data_values:
+        row.extend([protocol_refs[6],
+                    OrderedDict(processed_data_values),
+                    OrderedDict(factor_values)])
+    else:
+        row.extend([OrderedDict(),
+                    OrderedDict(processed_data_values),
+                    OrderedDict(factor_values)])
+
     rows.append(row)
 
 
