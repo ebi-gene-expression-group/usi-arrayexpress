@@ -175,6 +175,9 @@ def generate_sdrf(sub):
                 else:
                     if ad.accession:
                         assay_values.append(("Comment[ENA_RUN]", ad.accession))
+                    else:
+                        assay_values.append(("Comment[RUN]", ad.alias))
+
                     row3 = row2[:] + [protocol_refs[4], OrderedDict(assay_values)]
 
                 # Get all data files
@@ -182,7 +185,7 @@ def generate_sdrf(sub):
 
                 # Special layout for droplet datasets, produces one row per assay_data not per raw data file
                 if submission_type == "singlecell" and is_droplet(ad):
-                    droplet_data_files(ad, data_values)
+                    add_droplet_data_files(ad, data_values)
                     row4 = row3[:] + [OrderedDict(data_values)]
                     end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
                     continue
@@ -381,7 +384,7 @@ def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
     protocol_dict = defaultdict(OrderedDict)
 
     for pos, p_types in protocol_positions.items():
-        prefs_for_position = [p for p in all_protocols if p.protocol_type and p.protocol_type.value in p_types]
+        prefs_for_position = [p for p in all_protocols if p and p.protocol_type.value in p_types]
         # Number of entries in the dict corresponds to the number of columns that will be created and
         # should be equal of the number of protocol refs for the same position
         column_number = 1
@@ -532,7 +535,7 @@ def is_droplet(ad):
     return False
 
 
-def droplet_data_files(ad, data_values, sep="~~~"):
+def add_droplet_data_files(ad, data_values, sep="~~~"):
     """Droplet experiments can have >2 files per assay_data and need additional metadata about the read type of each.
     This produces a special type of SDRF where each assay_data (run) has a separate row instead of each file.
     The output ouf this function is just adding all file information as Comments and using the assay_data alias
