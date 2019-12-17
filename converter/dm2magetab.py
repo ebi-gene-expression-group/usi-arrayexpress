@@ -175,25 +175,39 @@ def generate_sdrf(sub):
                 else:
                     if ad.accession:
                         assay_values.append(("Comment[ENA_RUN]", ad.accession))
+                    else:
+                        assay_values.append(("Comment[RUN]", ad.alias))
+
                     row3 = row2[:] + [protocol_refs[4], OrderedDict(assay_values)]
 
                 # Get all data files
                 data_values = []
+
+                # Special layout for droplet datasets, produces one row per assay_data not per raw data file
+                if submission_type == "singlecell" and is_droplet(ad):
+                    add_droplet_data_files(ad, data_values)
+                    row4 = row3[:] + [OrderedDict(data_values)]
+                    end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
+                    continue
+
+                # The normal SDRF layout has one row per raw data file
                 for f in ad.files:
-                    if ad.data_type == "raw":
+                    # The raw data column depends on submission and file type
+                    if ad.data_type == "raw" and submission_type == "microarray":
                         data_values.append(("Array Data File", f.name))
                     elif ad.data_type == "raw matrix":
                         data_values.append(("Array Data Matrix File", f.name))
+                    else:
+                        data_values.append(("Scan Name", f.name))
 
                     if f.checksum and f.checksum_method:
                         data_values.append(("Comment[{}]".format(f.checksum_method.upper()), f.checksum))
-                    if f.ftp_location:
+                    if f.ftp_location and submission_type == "microarray":
                         data_values.append(("Comment[ArrayExpress FTP file]", f.ftp_location))
-                    if f.read_type:
-                        for fx in ad.files:
-                            data_values.append(("Comment[{} file]".format(fx.read_type), fx.name))
-                    row4 = row3[:] + [OrderedDict(data_values)]
+                    elif f.ftp_location:
+                        data_values.append(("Comment[FASTQ_URI]", f.ftp_location))
 
+                    row4 = row3[:] + [OrderedDict(data_values)]
                     end_row(protocol_positions, all_protocols, ad, assay, sample, sub, rows, row4)
 
                 if not ad.files:
@@ -264,9 +278,15 @@ def end_row(protocol_positions, all_protocols, assay_data, assay, sample, sub, r
 
     protocol_refs = sort_protocol_refs_to_dict(protocol_positions, all_protocols)
 
-    row.extend([protocol_refs[6],
-                OrderedDict(processed_data_values),
-                OrderedDict(factor_values)])
+    if processed_data_values:
+        row.extend([protocol_refs[6],
+                    OrderedDict(processed_data_values),
+                    OrderedDict(factor_values)])
+    else:
+        row.extend([OrderedDict(),
+                    OrderedDict(processed_data_values),
+                    OrderedDict(factor_values)])
+
     rows.append(row)
 
 
@@ -364,7 +384,7 @@ def sort_protocol_refs_to_dict(protocol_positions, all_protocols, sep="~~~"):
     protocol_dict = defaultdict(OrderedDict)
 
     for pos, p_types in protocol_positions.items():
-        prefs_for_position = [p for p in all_protocols if p.protocol_type and p.protocol_type.value in p_types]
+        prefs_for_position = [p for p in all_protocols if p and p.protocol_type.value in p_types]
         # Number of entries in the dict corresponds to the number of columns that will be created and
         # should be equal of the number of protocol refs for the same position
         column_number = 1
@@ -504,3 +524,37 @@ def rearrange_sample_attributes(sample):
                     # Set or overwrite if the attribute is empty or is the same
                     setattr(sample, attribute, annotation.value)
                 break
+
+
+def is_droplet(ad):
+    """Check if this assay_data object belongs to a droplet single cell experiment.
+    This returns True if any of the files have a non-null data_type attribute."""
+    for f in ad.files:
+        if f.read_type:
+            return True
+    return False
+
+
+def add_droplet_data_files(ad, data_values, sep="~~~"):
+    """Droplet experiments can have >2 files per assay_data and need additional metadata about the read type of each.
+    This produces a special type of SDRF where each assay_data (run) has a separate row instead of each file.
+    The output ouf this function is just adding all file information as Comments and using the assay_data alias
+    as Scan Name instead of the file name."""
+
+    data_values.append(("Scan Name", ad.alias))
+
+    for f in ad.files:
+
+        # In this case, write the droplet format with one row per run not per file
+        data_values.append(("Comment[{} file]".format(f.read_type), f.name))
+
+        # this needs to be under else?
+        if f.checksum and f.checksum_method:
+            data_values.append(("{}{}Comment[{}]".format(f.name, sep, f.checksum_method.upper()), f.checksum))
+
+        if f.ftp_location:
+            data_values.append(("{}{}Comment[FASTQ_URI]".format(f.name, sep), f.ftp_location))
+        else:
+            # If we don't have a FASTQ
+            data_values.append(("{}{}Comment[FASTQ_URI]".format(f.name, sep), f.name))
+
