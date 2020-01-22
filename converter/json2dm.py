@@ -1,6 +1,7 @@
-
+import json
 import re
 from collections import OrderedDict
+from datetime import datetime
 
 from datamodel.submission import Submission
 from datamodel.sample import Sample
@@ -91,6 +92,41 @@ class JSONConverter:
 
         submission = Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
         return submission
+
+    def convert_annotare_submission(self, submission_json, submission_type=None, source_file_name=None):
+
+        # Hack to replace line breaks in JSON object with spaces
+        json_data = json.loads(re.sub(r"\\n", " ", json.dumps(submission_json)))
+
+        sub_info = {
+            "team": "",
+            "alias": "",
+            "submission_type": submission_type,
+            "metadata": source_file_name
+        }
+
+        project = Project(**self.convert_submittable(json_data, "project"))
+
+        study = Study(**self.convert_submittable(json_data, "study"))
+
+        protocols = [Protocol(**self.convert_submittable(p, "protocol")) for p in json_data.get("protocols", [])]
+
+        samples = []
+
+        assays = []
+
+        assay_data = []
+
+        analysis = []
+
+        return Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
+
+    def set_default(self):
+        pass
+
+    @staticmethod
+    def date_from_unixtime(unix_date, translation={}):
+        return datetime.utcfromtimestamp(unix_date/1000).strftime("%Y-%m-%d")
 
     def convert_submittable(self, submittable_object, submittable_name):
         """
