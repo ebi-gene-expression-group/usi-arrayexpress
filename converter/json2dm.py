@@ -121,8 +121,32 @@ class JSONConverter:
 
         return Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
 
-    def set_default(self):
-        pass
+    @staticmethod
+    def gather_protocolrefs(element, translation={}):
+        """Generate a list of all protocol names from an Annotare protocols object"""
+        return [protocol.get("name") for protocol in element if protocol]
+
+    @staticmethod
+    def use_default(element, default):
+        return default
+
+    def list_from_single_string(self, element, translation={}):
+        return [self.import_string(element, translation)]
+
+    def attribute_from_annotare_term(self, element, translation={}):
+        value = self.import_string(element.get("label"), translation)
+        accession = element.get("accession")
+        term_source = None
+        if accession:
+            term_source = "EFO"
+        return Attribute(value=value, term_source=term_source, term_accession=accession)
+
+    @staticmethod
+    def list_from_separated_string(element, separator):
+        """Split a string into a list based on the given separator.
+        Also trims spaces around the separator."""
+        pattern = r"\s*" + separator + r"\s*"
+        return re.split(pattern, element)
 
     @staticmethod
     def date_from_unixtime(unix_date, translation={}):
@@ -174,8 +198,10 @@ class JSONConverter:
         """
         if len(path) == 1:
             return json_object.get(path[0])
-        else:
+        elif len(path) > 1:
             return self.interpret_path(path[1:], json_object.get(path[0], {}))
+        else:
+            return {}
 
     # The following are converting functions that do the conversion from JSON sub-elements
     # For each data object the function in the mapping file (under import > method) is called
