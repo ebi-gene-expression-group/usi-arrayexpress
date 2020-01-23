@@ -33,6 +33,7 @@ class JSONConverter:
         self.mapping = mapping
         self.import_key = import_key
         self.unit_types = {}  # Will be used to store already discovered unit types
+        self.annotare_sample_attributes = {}
 
     def convert_submission(self, envelope_json, submission_type=None, source_file_name=None):
         """
@@ -109,9 +110,16 @@ class JSONConverter:
 
         study = Study(**self.convert_submittable(json_data, "study"))
 
-        protocols = [Protocol(**self.convert_submittable(p, "protocol")) for p in json_data.get("protocols", [])]
+        protocols_json = json_data.get("protocols", [])
+        protocols = [Protocol(**self.convert_submittable(p, "protocol")) for p in protocols_json]
 
-        samples = []
+        # Make dictionary to look up attribute names
+        self.annotare_sample_attributes = {str(a.get("id")): a for a in json_data.get("sampleAttributes")}
+
+        samples_json = json_data.get("samples", [])
+        samples = [Sample(**self.convert_submittable(s, "sample")) for s in samples_json]
+
+        print(samples)
 
         assays = []
 
@@ -119,12 +127,26 @@ class JSONConverter:
 
         analysis = []
 
+        # Post mapping transformations that use several JSON elements
+
+
+        study.protocolrefs = [protocol.get("name") for protocol in protocols_json if protocol]
+
         return Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
 
-    @staticmethod
-    def gather_protocolrefs(element, translation={}):
-        """Generate a list of all protocol names from an Annotare protocols object"""
-        return [protocol.get("name") for protocol in element if protocol]
+    def generate_annotare_sample_attribute(self, element, translation={}):
+        sample_dict = {}
+
+        for category_id, value in element.items():
+            category_info = self.annotare_sample_attributes.get(category_id, {})
+            category = category_info.get("name")
+            unit = None
+            if "units" in category_info:
+                unit = self.unit_from_annotare_term(category_info.get("units", {}))
+
+            sample_dict[category] = Attribute(value=value, unit=unit)
+
+        return sample_dict
 
     @staticmethod
     def use_default(element, default):
@@ -132,6 +154,14 @@ class JSONConverter:
 
     def list_from_single_string(self, element, translation={}):
         return [self.import_string(element, translation)]
+
+    def unit_from_annotare_term(self, element, translation={}):
+        value = self.import_string(element.get("label"), translation)
+        accession = element.get("accession")
+        term_source = None
+        if accession:
+            term_source = "EFO"
+        return Unit(value=value, term_source=term_source, term_accession=accession)
 
     def attribute_from_annotare_term(self, element, translation={}):
         value = self.import_string(element.get("label"), translation)
