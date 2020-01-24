@@ -106,6 +106,8 @@ class JSONConverter:
             "metadata": source_file_name
         }
 
+        self.annotare_sample_attributes = {str(a.get("id")): a for a in json_data.get("sampleAttributes")}
+
         project = Project(**self.convert_submittable(json_data, "project"))
 
         study = Study(**self.convert_submittable(json_data, "study"))
@@ -114,12 +116,9 @@ class JSONConverter:
         protocols = [Protocol(**self.convert_submittable(p, "protocol")) for p in protocols_json]
 
         # Make dictionary to look up attribute names
-        self.annotare_sample_attributes = {str(a.get("id")): a for a in json_data.get("sampleAttributes")}
 
         samples_json = json_data.get("samples", [])
         samples = [Sample(**self.convert_submittable(s, "sample")) for s in samples_json]
-
-        print(samples)
 
         assays = []
 
@@ -129,10 +128,19 @@ class JSONConverter:
 
         # Post mapping transformations that use several JSON elements
 
-
         study.protocolrefs = [protocol.get("name") for protocol in protocols_json if protocol]
 
         return Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
+
+    def gather_experimental_factors(self):
+        factors = []
+        for attrib in self.annotare_sample_attributes.values():
+            if re.search("FACTOR", attrib.get("type")):
+                if "term" in attrib:
+                    factors.append(self.attribute_from_annotare_term(attrib.get("term")))
+                else:
+                    factors.append(Attribute(value=attrib.get("name")))
+        return factors
 
     def generate_annotare_sample_attribute(self, element, translation={}):
         sample_dict = {}
@@ -149,7 +157,7 @@ class JSONConverter:
         return sample_dict
 
     @staticmethod
-    def use_default(element, default):
+    def use_default(default):
         return default
 
     def list_from_single_string(self, element, translation={}):
@@ -202,6 +210,7 @@ class JSONConverter:
             if method:
                 # Retrieve function by name
                 convert_function = getattr(self, method)
+
             if path and convert_function:
                 # Find the target object in the input JSON using the directions in path
                 target_object = self.interpret_path(path, submittable_object)
@@ -216,6 +225,12 @@ class JSONConverter:
                         submittable_attributes[attribute] = [convert_function(o, translation) for o in target_object]
                 elif target_object:
                     submittable_attributes[attribute] = convert_function(target_object, translation)
+            # If we don't have a direct target but a function that can generate the result
+            elif convert_function:
+                print(convert_function)
+                print("here")
+                submittable_attributes[attribute] = convert_function()
+                print(submittable_attributes)
 
         return submittable_attributes
 
