@@ -11,7 +11,7 @@ from datamodel.project import Project
 from datamodel.data import AssayData, Analysis
 from datamodel.assay import SeqAssay, SingleCellAssay, MicroarrayAssay
 from datamodel.components import Attribute, Unit
-from utils.converter_utils import guess_submission_type_from_study, get_term_from_url
+from utils.converter_utils import guess_submission_type_from_study, get_term_from_url, get_taxon
 from utils.common_utils import get_ontology_from_term_url, get_term_parent
 
 
@@ -96,8 +96,9 @@ class JSONConverter:
 
     def convert_annotare_submission(self, submission_json, submission_type=None, source_file_name=None):
 
+        print(submission_json)
         # Hack to replace line breaks in JSON object with spaces
-        json_data = json.loads(re.sub(r"\\n", " ", json.dumps(submission_json)))
+        json_data = json.loads(re.sub(r"\\n", " ", json.dumps(submission_json, sort_keys=True)))
 
         sub_info = {
             "team": "",
@@ -120,6 +121,30 @@ class JSONConverter:
         samples_json = json_data.get("samples", [])
         samples = [Sample(**self.convert_submittable(s, "sample")) for s in samples_json]
 
+        # Combine extracts and labeled extracts
+        assay_info = []
+
+        samples_dict = {str(s.get("id")): s.get("name") for s in json_data.get("samples", [])}
+        extracts_dict = {}
+        for extract in json_data.get("extracts", {}):
+            for sample_ref, linked_extracts in json_data.get("sampleId2ExtractIds", {}).items():
+                if extract.get("id") in linked_extracts:
+                    extract["sampleRef"] = samples_dict.get(sample_ref)
+            extracts_dict[extract.get("id")] = extract
+
+        print(extracts_dict)
+        print(samples_dict)
+        # For microarray look up label and create labeled extract (=assay) name
+        for le in json_data.get("labeledExtracts", {}):
+            linked_extract = extracts_dict.get(le.get("extractId"))
+            label_info = json_data.get("labels", [])
+            for label in label_info:
+                if label.get("id") == le.get("lableId"):
+                    le["label_name"] = label.get("name")
+                    le["le_name"] = "{}:{}".format(linked_extract.get("name"), label.get("name"))
+            assay_info.append({**le, **linked_extract})
+        print(assay_info)
+
         assays = []
 
         assay_data = []
@@ -130,28 +155,62 @@ class JSONConverter:
 
         study.protocolrefs = [protocol.get("name") for protocol in protocols_json if protocol]
 
+        self.handle_special_sample_attributes(samples)
+       # print(samples)
+
         return Submission(sub_info, project, study, protocols, samples, assays, assay_data, analysis)
 
+    @staticmethod
+    def add_to_dict(dict1, dict2, only_key_to_add=None, new_key_name=None):
+        if only_key_to_add:
+            added_key = new_key_name if new_key_name else only_key_to_add
+            dict1[added_key] = dict2.get(only_key_to_add)
+            return dict1
+        return OrderedDict(**dict1, **dict2)
+
+    @staticmethod
+    def handle_special_sample_attributes(samples):
+        mapping = {"organism": "taxon",
+                   "material type": "material_type",
+                   "description": "description"}
+        for s in samples:
+            # Move special attributes
+            for attrib_name, model_name in mapping.items():
+                try:
+                    value_attribute = s.attributes.pop(attrib_name)
+                    setattr(s, model_name, value_attribute.value)
+                except KeyError:
+                    continue
+            # Fill in taxon ID from ontology search
+            s.taxonId = get_taxon(s.taxon)
+
     def gather_experimental_factors(self):
+        """Return a list of sample attribute categories that have type FACTOR,
+        including ontology id if available"""
         factors = []
         for attrib in self.annotare_sample_attributes.values():
             if re.search("FACTOR", attrib.get("type")):
                 if "term" in attrib:
-                    factors.append(self.attribute_from_annotare_term(attrib.get("term")))
+                    attribute_object = self.attribute_from_annotare_term(attrib.get("term"))
+                    # Using the attribute name not term label to be consistent with the sample annotations
+                    attribute_object.value = attrib.get("name").lower()
+                    factors.append(attribute_object)
                 else:
-                    factors.append(Attribute(value=attrib.get("name")))
+                    factors.append(Attribute(value=attrib.get("name").lower()))
         return factors
 
     def generate_annotare_sample_attribute(self, element, translation={}):
-        sample_dict = {}
-
+        """Generate an Attribute dictionary from a list of Annotare sample attribute values.
+        The categories are encoded by id and need to be looked up in the sample attributes dict."""
+        sample_dict = OrderedDict()
         for category_id, value in element.items():
             category_info = self.annotare_sample_attributes.get(category_id, {})
-            category = category_info.get("name")
+            # Annotare sample attributes have a name and can have a term label/accession if the term is from EFO.
+            # The name and label are usually the same but can differ, so always using "name" in lower case.
+            category = category_info.get("name").lower()
             unit = None
             if "units" in category_info:
                 unit = self.unit_from_annotare_term(category_info.get("units", {}))
-
             sample_dict[category] = Attribute(value=value, unit=unit)
 
         return sample_dict
@@ -169,7 +228,8 @@ class JSONConverter:
         term_source = None
         if accession:
             term_source = "EFO"
-        return Unit(value=value, term_source=term_source, term_accession=accession)
+        unit_type = self.get_unit_type(value)
+        return Unit(value=value, term_source=term_source, term_accession=accession, unit_type=unit_type)
 
     def attribute_from_annotare_term(self, element, translation={}):
         value = self.import_string(element.get("label"), translation)

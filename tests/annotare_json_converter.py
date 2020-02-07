@@ -56,11 +56,10 @@ def main():
 
     # Generate IDF dictionary
 
-    print(sub.project)
     idf = dm2magetab.generate_idf(sub)
     # Generate SDRF: Output is a pandas dataframe
 
-    #sdrf = dm2magetab.generate_sdrf(sub)
+    sdrf = dm2magetab.generate_sdrf(sub)
 
     # New file paths
     prefix = "annotare_test"
@@ -77,7 +76,7 @@ def main():
 
     # Rename the columns to the new header list, created by applying a function
     # to "de-uniquify" the header fields, and write new SDRF file
-   # dm2magetab.write_sdrf_file(sdrf, new_sdrf_file, logger)
+    dm2magetab.write_sdrf_file(sdrf, new_sdrf_file, logger)
 
 
 if __name__ == '__main__':
