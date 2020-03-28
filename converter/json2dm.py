@@ -137,15 +137,25 @@ class JSONConverter:
         # For microarray look up label and create labeled extract (=assay) name
         for le in json_data.get("labeledExtracts", {}):
             linked_extract = extracts_dict.get(le.get("extractId"))
-            label_info = json_data.get("labels", [])
-            for label in label_info:
-                if label.get("id") == le.get("lableId"):
+            for label in json_data.get("labels", []):
+                if label.get("id") == le.get("labelId"):
                     le["label_name"] = label.get("name")
                     le["le_name"] = "{}:{}".format(linked_extract.get("name"), label.get("name"))
+            le["array_design"] = json_data.get("arrayDesign", "")
             assay_info.append({**le, **linked_extract})
         print(assay_info)
 
         assays = []
+        if submission_type == "microarray":
+            assays = [MicroarrayAssay(**self.convert_submittable(a, "microarray_assay"))
+                      for a in assay_info]
+        elif submission_type == "sequencing":
+            assays = [SeqAssay(**self.convert_submittable(a, "sequencing_assay"))
+                      for a in extracts_dict]
+        elif submission_type == "singlecell":
+            assays = [SingleCellAssay(**self.convert_submittable(a, "singlecell_assay"))
+                      for a in extracts_dict]
+        print(assays)
 
         assay_data = []
 
@@ -215,9 +225,8 @@ class JSONConverter:
 
         return sample_dict
 
-    @staticmethod
-    def use_default(default):
-        return default
+    def use_default(self, translation):
+        return translation.get("default")
 
     def list_from_single_string(self, element, translation={}):
         return [self.import_string(element, translation)]
@@ -287,10 +296,10 @@ class JSONConverter:
                     submittable_attributes[attribute] = convert_function(target_object, translation)
             # If we don't have a direct target but a function that can generate the result
             elif convert_function:
-                print(convert_function)
-                print("here")
-                submittable_attributes[attribute] = convert_function()
-                print(submittable_attributes)
+                if translation:
+                    submittable_attributes[attribute] = convert_function(translation)
+                else:
+                    submittable_attributes[attribute] = convert_function()
 
         return submittable_attributes
 
