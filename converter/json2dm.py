@@ -121,9 +121,7 @@ class JSONConverter:
         samples_json = json_data.get("samples", [])
         samples = [Sample(**self.convert_submittable(s, "sample")) for s in samples_json]
 
-        # Combine extracts and labeled extracts
-        assay_info = []
-
+        # Add sampleRef to extract info
         samples_dict = {str(s.get("id")): s.get("name") for s in json_data.get("samples", [])}
         extracts_dict = {}
         for extract in json_data.get("extracts", {}):
@@ -132,29 +130,33 @@ class JSONConverter:
                     extract["sampleRef"] = samples_dict.get(sample_ref)
             extracts_dict[extract.get("id")] = extract
 
+        # TODO: Add protocolrefs to extract in extracts_dict
+
         print(extracts_dict)
         print(samples_dict)
-        # For microarray look up label and create labeled extract (=assay) name
-        for le in json_data.get("labeledExtracts", {}):
-            linked_extract = extracts_dict.get(le.get("extractId"))
-            for label in json_data.get("labels", []):
-                if label.get("id") == le.get("labelId"):
-                    le["label_name"] = label.get("name")
-                    le["le_name"] = "{}:{}".format(linked_extract.get("name"), label.get("name"))
-            le["array_design"] = json_data.get("arrayDesign", "")
-            assay_info.append({**le, **linked_extract})
-        print(assay_info)
-
         assays = []
         if submission_type == "microarray":
+            # Combine extracts and labeled extracts
+            assay_info = []
+            # For microarray look up label and create labeled extract (=assay) name
+            for le in json_data.get("labeledExtracts", {}):
+                linked_extract = extracts_dict.get(le.get("extractId"))
+                for label in json_data.get("labels", []):
+                    if label.get("id") == le.get("labelId"):
+                        le["label_name"] = label.get("name")
+                        le["le_name"] = "{}:{}".format(linked_extract.get("name"), label.get("name"))
+                le["array_design"] = json_data.get("arrayDesign", "")
+                assay_info.append({**le, **linked_extract})
+            print(assay_info)
             assays = [MicroarrayAssay(**self.convert_submittable(a, "microarray_assay"))
                       for a in assay_info]
+
         elif submission_type == "sequencing":
             assays = [SeqAssay(**self.convert_submittable(a, "sequencing_assay"))
-                      for a in extracts_dict]
+                      for a in extracts_dict.values()]
         elif submission_type == "singlecell":
             assays = [SingleCellAssay(**self.convert_submittable(a, "singlecell_assay"))
-                      for a in extracts_dict]
+                      for a in extracts_dict.values()]
         print(assays)
 
         assay_data = []
